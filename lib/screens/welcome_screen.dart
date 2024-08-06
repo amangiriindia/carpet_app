@@ -74,7 +74,10 @@ class WelcomeScreen extends StatelessWidget {
                               MaterialPageRoute(builder: (context) => LoginScreen()),
                             );
                           },
-                          child: const Text('Login'),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(color: Colors.white), // Set text color to white
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -87,7 +90,7 @@ class WelcomeScreen extends StatelessWidget {
                             backgroundColor: Colors.white, // Text color
                             shape: RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.circular(8), // Rectangular shape
+                              BorderRadius.circular(8), // Rectangular shape
                               side: const BorderSide(
                                   color: Colors.black), // Border color
                             ),

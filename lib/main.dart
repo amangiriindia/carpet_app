@@ -1,5 +1,7 @@
+import 'package:carpet_app/screens/forgot_confirm_password.dart';
 import 'package:carpet_app/screens/login_screen.dart';
 import 'package:carpet_app/screens/sign_up_screen.dart';
+import 'package:carpet_app/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +9,7 @@ import 'screens/collection_screen.dart';
 import 'screens/enquiry_form.dart';
 import 'screens/enquiry_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/forgot_password_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/wishlist_screen.dart';
 import 'splash_screen/custom_splash_screen.dart';
@@ -44,7 +47,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:LoginScreen(), // Use SplashScreenHandler
+      home:ForgotPasswordScreen(), // Use SplashScreenHandler
+
       routes: {
         '/home': (context) => const HomeScreen(),
         '/collection_screen': (context) => const CollectionScreen(),

@@ -4,15 +4,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'login_screen.dart';
+
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderStateMixin {
-  late TextEditingController firstNameController, lastNameController, emailController, mobileController, passwordController, rePasswordController;
+  late TextEditingController firstNameController,
+      lastNameController,
+      emailController,
+      mobileController,
+      passwordController,
+      rePasswordController;
+  late FocusNode firstNameFocusNode,
+      lastNameFocusNode,
+      emailFocusNode,
+      mobileFocusNode,
+      passwordFocusNode,
+      rePasswordFocusNode;
   String? _rePasswordErrorText;
   bool _isTermsAccepted = false;
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +35,12 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
     mobileController = TextEditingController();
     passwordController = TextEditingController();
     rePasswordController = TextEditingController();
+    firstNameFocusNode = FocusNode();
+    lastNameFocusNode = FocusNode();
+    emailFocusNode = FocusNode();
+    mobileFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
+    rePasswordFocusNode = FocusNode();
 
     // Real-time validation
     rePasswordController.addListener(() {
@@ -45,6 +64,12 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
     mobileController.dispose();
     passwordController.dispose();
     rePasswordController.dispose();
+    firstNameFocusNode.dispose();
+    lastNameFocusNode.dispose();
+    emailFocusNode.dispose();
+    mobileFocusNode.dispose();
+    passwordFocusNode.dispose();
+    rePasswordFocusNode.dispose();
     super.dispose();
   }
 
@@ -133,6 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
       );
     }
   }
+
   Future<void> _saveUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('first_name', firstNameController.text);
@@ -170,6 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
   Widget _buildTextField({
     required String hintText,
     required TextEditingController controller,
+    required FocusNode focusNode,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
     List<TextInputFormatter>? inputFormatters,
@@ -181,12 +208,17 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
       height: height,
       child: TextField(
         controller: controller,
+        focusNode: focusNode,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         obscureText: obscureText,
         decoration: InputDecoration(
           hintText: hintText,
           border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(8),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
@@ -201,29 +233,34 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
         _buildTextField(
           hintText: 'First Name',
           controller: firstNameController,
+          focusNode: firstNameFocusNode,
         ),
         SizedBox(height: 20),
         _buildTextField(
           hintText: 'Last Name',
           controller: lastNameController,
+          focusNode: lastNameFocusNode,
         ),
         SizedBox(height: 20),
         _buildTextField(
           hintText: 'Email ID',
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
+          focusNode: emailFocusNode,
         ),
         SizedBox(height: 20),
         _buildTextField(
           hintText: 'Mobile Number',
           controller: mobileController,
           keyboardType: TextInputType.phone,
+          focusNode: mobileFocusNode,
         ),
         SizedBox(height: 20),
         _buildTextField(
           hintText: 'Password',
           controller: passwordController,
           obscureText: true,
+          focusNode: passwordFocusNode,
         ),
         SizedBox(height: 20),
         Column(
@@ -233,8 +270,9 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
               hintText: 'Confirm Password',
               controller: rePasswordController,
               obscureText: true,
+              focusNode: rePasswordFocusNode,
               height: 48,
-              width: double.infinity, // Fixed width for the re-enter field
+              width: double.infinity,
             ),
             if (_rePasswordErrorText != null)
               Padding(

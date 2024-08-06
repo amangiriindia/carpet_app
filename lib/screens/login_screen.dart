@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -14,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   late TextEditingController emailController, passwordController;
   late TabController _tabController;
+  late FocusNode emailFocusNode, passwordFocusNode;
 
   @override
   void initState() {
@@ -21,6 +23,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     _tabController = TabController(length: 1, vsync: this);
     emailController = TextEditingController();
     passwordController = TextEditingController();
+    emailFocusNode = FocusNode();
+    passwordFocusNode = FocusNode();
   }
 
   void _handleTapOutside() => FocusScope.of(context).unfocus();
@@ -30,6 +34,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     emailController.dispose();
     passwordController.dispose();
     _tabController.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -70,7 +76,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-
 
   void _showErrorDialog(String title, String message) {
     showDialog(
@@ -149,11 +154,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
   }
 
-
-
   Widget _buildTextField({
     required String hintText,
     required TextEditingController controller,
+    required FocusNode focusNode,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
     List<TextInputFormatter>? inputFormatters,
@@ -164,6 +168,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       height: height,
       child: TextField(
         controller: controller,
+        focusNode: focusNode,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
         obscureText: obscureText,
@@ -171,6 +176,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           hintText: hintText,
           errorText: errorText,
           border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(8),
           ),
           contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 15.0),
@@ -185,12 +194,14 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         _buildTextField(
           hintText: 'Email ID',
           controller: emailController,
+          focusNode: emailFocusNode,
           keyboardType: TextInputType.emailAddress,
         ),
         SizedBox(height: 20),
         _buildTextField(
           hintText: 'Password',
           controller: passwordController,
+          focusNode: passwordFocusNode,
           obscureText: true,
         ),
       ],
@@ -260,12 +271,19 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           Align(
                             alignment: Alignment.centerLeft,
                             child: GestureDetector(
-                              onTap: _forgotPassword,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                                );
+                              },
                               child: Text(
-                                'Forgot Password?',
+                                'Forgot Password? ',
+                                textAlign: TextAlign.center,
                                 style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.black,
-                                  fontSize: 16,
                                 ),
                               ),
                             ),

@@ -115,16 +115,69 @@ class SectionTitle extends StatelessWidget {
   final String title;
   const SectionTitle({super.key, required this.title});
 
-  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 20.0,
-          fontWeight: FontWeight.bold,
-        ),
+      // padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 35.0), // Add margin to the bottom
+            child: Image.asset(
+              'assets/image/home_heading_icon.png',
+              width: 10,
+              height: 15,
+            ),
+          ),
+          const SizedBox(width: 0.0),
+          // Add some spacing between the image and text
+          Stack(
+            children: [
+              // Left border
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Container(
+                  width: 2.0, // Adjust the width of the left border
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF991F35), Color(0xFF330A12)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ),
+              // Bottom border
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  height: 2.0, // Adjust the height of the bottom border
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF991F35), Color(0xFF330A12)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 6.0, bottom: 4.0),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

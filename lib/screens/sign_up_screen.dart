@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'login_screen.dart';
-
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderStateMixin {
-  late TextEditingController emailController, passwordController, rePasswordController;
+  late TextEditingController firstNameController, lastNameController, emailController, mobileController, passwordController, rePasswordController;
   String? _rePasswordErrorText;
   bool _isTermsAccepted = false;
-
   @override
   void initState() {
     super.initState();
+    firstNameController = TextEditingController();
+    lastNameController = TextEditingController();
     emailController = TextEditingController();
+    mobileController = TextEditingController();
     passwordController = TextEditingController();
     rePasswordController = TextEditingController();
 
@@ -37,26 +39,86 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
 
   @override
   void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
     emailController.dispose();
+    mobileController.dispose();
     passwordController.dispose();
     rePasswordController.dispose();
     super.dispose();
   }
 
-  Future<void> _saveUserInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', emailController.text);
-    await prefs.setString('password', passwordController.text);
-  }
-
-  void _signUp() async {
+  Future<void> _signUp() async {
     if (_isTermsAccepted) {
       if (passwordController.text == rePasswordController.text) {
-        await _saveUserInfo();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
+        final response = await http.post(
+          Uri.parse('https://email-fp0n.onrender.com/api/auth/register'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'firstName': firstNameController.text,
+            'lastName': lastNameController.text,
+            'email': emailController.text,
+            'mobileNumber': mobileController.text,
+            'password': passwordController.text,
+            'confirmPassword': rePasswordController.text,
+          }),
         );
+
+        // Debug print statements to check the response
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+
+        if (response.statusCode == 201) {
+          // Parse the response
+          final data = jsonDecode(response.body);
+
+          if (response.statusCode == 201) {
+            if (data['success'] == true) {
+              // Show success message
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(data['message'] ?? 'Registration successful!'),
+                ),
+              );
+
+              // Save user info and navigate to LoginScreen
+              await _saveUserInfo();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(data['message'] ?? 'An error occurred'),
+                ),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(data['message'] ?? 'An error occurred'),
+              ),
+            );
+          }
+        } else if (response.statusCode == 400) {
+          // Handle client-side errors
+          final data = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['message'] ?? 'Bad request. Please check your input.'),
+            ),
+          );
+        } else {
+          // Handle unexpected status codes
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to sign up. Please try again.'),
+            ),
+          );
+        }
       } else {
         setState(() {
           _rePasswordErrorText = 'Passwords do not match';
@@ -70,6 +132,14 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
         ),
       );
     }
+  }
+  Future<void> _saveUserInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('first_name', firstNameController.text);
+    await prefs.setString('last_name', lastNameController.text);
+    await prefs.setString('email', emailController.text);
+    await prefs.setString('mobile', mobileController.text);
+    await prefs.setString('password', passwordController.text);
   }
 
   void _showTermsAndConditions() {
@@ -129,9 +199,25 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
     return Column(
       children: [
         _buildTextField(
+          hintText: 'First Name',
+          controller: firstNameController,
+        ),
+        SizedBox(height: 20),
+        _buildTextField(
+          hintText: 'Last Name',
+          controller: lastNameController,
+        ),
+        SizedBox(height: 20),
+        _buildTextField(
           hintText: 'Email ID',
           controller: emailController,
           keyboardType: TextInputType.emailAddress,
+        ),
+        SizedBox(height: 20),
+        _buildTextField(
+          hintText: 'Mobile Number',
+          controller: mobileController,
+          keyboardType: TextInputType.phone,
         ),
         SizedBox(height: 20),
         _buildTextField(
@@ -144,7 +230,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildTextField(
-              hintText: 'Re-enter Password',
+              hintText: 'Confirm Password',
               controller: rePasswordController,
               obscureText: true,
               height: 48,
@@ -179,8 +265,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
               child: Text(
                 'I accept all terms and conditions',
                 style: TextStyle(
-                  color: Colors.blue,
-                  decoration: TextDecoration.underline,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -220,11 +305,11 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                     Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.0),
                             spreadRadius: 2,
                             blurRadius: 5,
                           ),

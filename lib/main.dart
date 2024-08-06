@@ -1,3 +1,4 @@
+import 'package:carpet_app/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,7 +42,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: SplashScreenHandler(isLoggedIn: isLoggedIn), // Use SplashScreenHandler
+      debugShowCheckedModeBanner: false,
+      home: SignUpScreen(), // Use SplashScreenHandler
       routes: {
         '/home': (context) => const HomeScreen(),
         '/collection_screen': (context) => const CollectionScreen(),
@@ -62,22 +64,22 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-class SplashScreenHandler extends StatelessWidget {
-  final bool isLoggedIn;
-
-  SplashScreenHandler({required this.isLoggedIn});
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Future.delayed(Duration(seconds: 0)), // Simulate splash screen delay
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return isLoggedIn ? const HomeScreen() : CustomSplashScreen();
-        }
-        return CustomSplashScreen(); // Show splash screen while loading
-      },
-    );
-  }
-}
+//
+// class SplashScreenHandler extends StatelessWidget {
+//   final bool isLoggedIn;
+//
+//   SplashScreenHandler({required this.isLoggedIn});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return FutureBuilder(
+//       future: Future.delayed(Duration(seconds: 0)), // Simulate splash screen delay
+//       builder: (context, snapshot) {
+//         if (snapshot.connectionState == ConnectionState.done) {
+//           return isLoggedIn ? const HomeScreen() : CustomSplashScreen();
+//         }
+//         return CustomSplashScreen(); // Show splash screen while loading
+//       },
+//     );
+//   }
+// }

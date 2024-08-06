@@ -33,17 +33,20 @@ class _NavigationManagerState extends State<NavigationManager> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Image.asset('assets/image/navbar_home_icon.png',
+                width: 24, height: 24),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
+            icon: Image.asset('assets/image/navbar_search_icon.png',
+                width: 24, height: 24),
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
+            icon: Image.asset('assets/image/navbar_like_icon.png',
+                width: 24, height: 24),
             label: 'Wishlist',
           ),
           BottomNavigationBarItem(

@@ -2,6 +2,8 @@ import 'package:carpet_app/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -31,44 +33,123 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     super.dispose();
   }
 
-  Future<bool> _validateUserCredentials() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? storedEmail = prefs.getString('email');
-    String? storedPassword = prefs.getString('password');
-
-    return emailController.text == storedEmail && passwordController.text == storedPassword;
-  }
-
   Future<void> _login() async {
-    if (await _validateUserCredentials()) {
-      // Set login status
+    final response = await http.post(
+      Uri.parse('https://email-fp0n.onrender.com/api/auth/login'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'email': emailController.text,
+        'password': passwordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
       SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token', data['token']);
       await prefs.setBool('isLoggedIn', true);
 
-      // Navigate to home screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+    } else if (response.statusCode == 400) {
+      final data = jsonDecode(response.body);
+      _showSnackBar(data['message']);
     } else {
-      // Show error message
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Login Failed'),
-          content: Text('Invalid credentials. Please try again.'),
+      _showSnackBar('Unable to login. Please try again later.');
+    }
+  }
+
+  void _showSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _forgotPassword() async {
+    TextEditingController emailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Forgot Password'),
+          content: TextField(
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: InputDecoration(
+              hintText: 'Enter your email',
+            ),
+          ),
           actions: [
+            TextButton(
+              onPressed: () async {
+                final response = await http.post(
+                  Uri.parse('https://email-fp0n.onrender.com/api/auth/forgot-password'),
+                  headers: <String, String>{
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(<String, String>{
+                    'email': emailController.text,
+                  }),
+                );
+
+                if (response.statusCode == 200) {
+                  final data = jsonDecode(response.body);
+                  _showSnackBar(data['message']);
+                } else if (response.statusCode == 400) {
+                  final data = jsonDecode(response.body);
+                  _showSnackBar(data['message']);
+                } else {
+                  _showSnackBar('Unable to send password reset link. Please try again later.');
+                }
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // Set the text color to black
+              ),
+              child: Text('Submit'),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('OK'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // Set the text color to black
+              ),
+              child: Text('Cancel'),
             ),
           ],
-        ),
-      );
-    }
+        );
+      },
+    );
   }
+
+
 
   Widget _buildTextField({
     required String hintText,
@@ -125,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           children: [
             Positioned.fill(
               child: Opacity(
-                opacity: 0.08, // Opacity for the background image
+                opacity: 0.80,
                 child: Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -145,11 +226,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.0),
                             spreadRadius: 2,
                             blurRadius: 5,
                           ),
@@ -175,9 +256,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             padding: EdgeInsets.all(16.0),
                             child: _buildEmailForm(),
                           ),
-                          SizedBox(height: 5),
+                          SizedBox(height: 10),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: GestureDetector(
+                              onTap: _forgotPassword,
+                              child: Text(
+                                'Forgot Password?',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
                           Container(
-                            width: 359.16,
+                            width: double.infinity,
                             height: 41.72,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -196,7 +291,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                 ),
                               ),
                               onPressed: _login, // Updated to use the new login method
-                              child: Text('Login'),
+                              child: Text(
+                                'Login',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                           ),
                         ],

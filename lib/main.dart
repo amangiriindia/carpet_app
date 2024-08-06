@@ -1,3 +1,4 @@
+import 'package:carpet_app/screens/login_screen.dart';
 import 'package:carpet_app/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: SignUpScreen(), // Use SplashScreenHandler
+      home:LoginScreen(), // Use SplashScreenHandler
       routes: {
         '/home': (context) => const HomeScreen(),
         '/collection_screen': (context) => const CollectionScreen(),

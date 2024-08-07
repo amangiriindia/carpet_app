@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -91,58 +92,26 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
           }),
         );
 
-        // Debug print statements to check the response
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
 
+        final data = jsonDecode(response.body);
+
         if (response.statusCode == 201) {
-          // Parse the response
-          final data = jsonDecode(response.body);
-
-          if (response.statusCode == 201) {
-            if (data['success'] == true) {
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(data['message'] ?? 'Registration successful!'),
-                ),
-              );
-
-              // Save user info and navigate to LoginScreen
-              await _saveUserInfo();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(data['message'] ?? 'An error occurred'),
-                ),
-              );
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(data['message'] ?? 'An error occurred'),
-              ),
+          if (data['success'] == true) {
+            showToast(data['message'] ?? 'Registration successful!');
+            await _saveUserInfo();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginScreen()),
             );
+          } else {
+            showToast(data['message'] ?? 'An error occurred');
           }
         } else if (response.statusCode == 400) {
-          // Handle client-side errors
-          final data = jsonDecode(response.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(data['message'] ?? 'Bad request. Please check your input.'),
-            ),
-          );
+          showToast(data['message'] ?? 'Bad request. Please check your input.');
         } else {
-          // Handle unexpected status codes
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to sign up. Please try again.'),
-            ),
-          );
+          showToast('Failed to sign up. Please try again.');
         }
       } else {
         setState(() {
@@ -150,13 +119,20 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
         });
       }
     } else {
-      // Show an error message if terms are not accepted
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('You must accept the terms and conditions to sign up.'),
-        ),
-      );
+      showToast('You must accept the terms and conditions to sign up.');
     }
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.TOP,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   Future<void> _saveUserInfo() async {
@@ -183,7 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+
               },
               child: Text('Close'),
             ),

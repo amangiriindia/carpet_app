@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'login_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast
 
 class ConfirmPasswordScreen extends StatefulWidget {
   final String email;
@@ -52,6 +53,17 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
     super.dispose();
   }
 
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.TOP,  // Change gravity to top
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
   Future<void> _changePassword() async {
     if (newPasswordController.text == confirmPasswordController.text) {
       final response = await http.post(
@@ -75,35 +87,19 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
 
       if (response.statusCode == 200) {
         if (data['success'] == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Your password has been changed successfully.'),
-            ),
-          );
+          _showToast('Your password has been changed successfully.');
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => LoginScreen()),
                 (Route<dynamic> route) => false,
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(data['message'] ?? 'An error occurred'),
-            ),
-          );
+          _showToast(data['message'] ?? 'An error occurred');
         }
       } else if (response.statusCode == 400) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(data['message'] ?? 'Invalid request. Please check your input.'),
-          ),
-        );
+        _showToast(data['message'] ?? 'Invalid request. Please check your input.');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to change password. Please try again.'),
-          ),
-        );
+        _showToast('Failed to change password. Please try again.');
       }
     } else {
       setState(() {

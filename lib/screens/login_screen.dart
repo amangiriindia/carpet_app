@@ -1,6 +1,7 @@
 import 'package:OACrugs/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -72,19 +73,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       );
     } else if (response.statusCode == 400) {
       final data = jsonDecode(response.body);
-      _showSnackBar(data['message']);
+      _showToast(data['message']);
     } else {
-      _showSnackBar('Unable to login. Please try again later.');
+      _showToast('Unable to login. Please try again later.');
     }
   }
 
-  void _showSnackBar(String message) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      duration: Duration(seconds: 3),
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.TOP,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
+
 
   void _showErrorDialog(String title, String message) {
     showDialog(
@@ -104,64 +109,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     );
   }
 
-  Future<void> _forgotPassword() async {
-    TextEditingController emailController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Forgot Password'),
-          content: TextField(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              hintText: 'Enter your email',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                final response = await http.post(
-                  Uri.parse('https://email-fp0n.onrender.com/api/auth/forgot-password'),
-                  headers: <String, String>{
-                    'Content-Type': 'application/json; charset=UTF-8',
-                  },
-                  body: jsonEncode(<String, String>{
-                    'email': emailController.text,
-                  }),
-                );
-
-                if (response.statusCode == 200) {
-                  final data = jsonDecode(response.body);
-                  _showSnackBar(data['message']);
-                } else if (response.statusCode == 400) {
-                  final data = jsonDecode(response.body);
-                  _showSnackBar(data['message']);
-                } else {
-                  _showSnackBar('Unable to send password reset link. Please try again later.');
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // Set the text color to black
-              ),
-              child: Text('Submit'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.black, // Set the text color to black
-              ),
-              child: Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   Widget _buildTextField({
     required String hintText,

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'forgot_confirm_password.dart';
 import 'login_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -29,6 +30,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.TOP,  // Change gravity to top
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
   Future<void> _sendOtp() async {
     final email = emailController.text;
     if (email.isEmpty) {
@@ -51,40 +63,23 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      if (data['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(data['message'] ?? 'OTP sent successfully!'),
-          ),
-        );
+    final data = jsonDecode(response.body);
 
+    if (response.statusCode == 200) {
+      if (data['success'] == true) {
+        _showToast(data['message'] ?? 'OTP sent successfully!');
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => ConfirmPasswordScreen(email: email)),
               (Route<dynamic> route) => false,
         );
-
-      } else if (response.statusCode == 404) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(data['message'] ?? 'Invalid email!'),
-          ),
-        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(data['message'] ?? 'An error occurred'),
-          ),
-        );
+        _showToast(data['message'] ?? 'An error occurred');
       }
+    } else if (response.statusCode == 404) {
+      _showToast(data['message'] ?? 'Invalid email!');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to send OTP. Please try again.'),
-        ),
-      );
+      _showToast('Failed to send OTP. Please try again.');
     }
   }
 

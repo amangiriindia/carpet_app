@@ -1,5 +1,4 @@
-import 'package:carpet_app/screens/home_screen.dart';
-import 'package:carpet_app/screens/sign_up_screen.dart';
+import 'package:OACrugs/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'login_screen.dart';

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:carpet_app/screens/collection_screen.dart';
-import 'package:carpet_app/screens/home_screen.dart';
-import 'package:carpet_app/screens/search_screen.dart';
-import 'package:carpet_app/screens/wishlist_screen.dart';
+import 'package:OACrugs/screens/collection_screen.dart';
+import 'package:OACrugs/screens/home_screen.dart';
+import 'package:OACrugs/screens/search_screen.dart';
+import 'package:OACrugs/screens/wishlist_screen.dart';
 
 class NavigationManager extends StatefulWidget {
   @override

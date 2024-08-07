@@ -80,9 +80,10 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
               content: Text('Your password has been changed successfully.'),
             ),
           );
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => LoginScreen()),
+                (Route<dynamic> route) => false,
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

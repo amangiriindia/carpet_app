@@ -1,6 +1,6 @@
-import 'package:carpet_app/screens/search_screen.dart';
-import 'package:carpet_app/screens/thanks_screen.dart';
-import 'package:carpet_app/screens/wishlist_screen.dart';
+import 'package:OACrugs/screens/search_screen.dart';
+import 'package:OACrugs/screens/thanks_screen.dart';
+import 'package:OACrugs/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/color_picker.dart';

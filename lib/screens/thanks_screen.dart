@@ -1,5 +1,5 @@
-import 'package:carpet_app/screens/search_screen.dart';
-import 'package:carpet_app/screens/wishlist_screen.dart';
+import 'package:OACrugs/screens/search_screen.dart';
+import 'package:OACrugs/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_navigation_bar.dart';

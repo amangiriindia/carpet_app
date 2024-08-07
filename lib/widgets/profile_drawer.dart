@@ -1,12 +1,15 @@
-import 'package:carpet_app/screens/welcome_screen.dart';
+
+import 'package:OACrugs/screens/pending_query.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:carpet_app/screens/address_screen.dart';
-import 'package:carpet_app/screens/approved_query.dart';
-import 'package:carpet_app/screens/order_screen.dart';
-import 'package:carpet_app/screens/pending_query.dart';
+
+import '../screens/address_screen.dart';
+import '../screens/approved_query.dart';
+import '../screens/order_screen.dart';
 import '../screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../screens/welcome_screen.dart';
 import '../splash_screen/custom_splash_screen.dart'; // Import shared_preferences
 
 class ProfileDrawer extends StatelessWidget {
@@ -109,15 +112,13 @@ class ProfileDrawer extends StatelessWidget {
             ),
             onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.remove('isLoggedIn'); // Clear login status
-              // Optionally clear other data
-              await prefs.remove('phoneNumber');
-              await prefs.remove('email');
-              await prefs.remove('password');
-
+              // Clear all stored data
+              await prefs.clear();
               // Navigate to the splash screen
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => WelcomeScreen()),
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) =>WelcomeScreen()),
+                    (Route<dynamic> route) => false,
               );
             },
           ),

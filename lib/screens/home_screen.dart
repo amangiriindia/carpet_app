@@ -182,3 +182,4 @@ class SectionTitle extends StatelessWidget {
     );
   }
 }
+

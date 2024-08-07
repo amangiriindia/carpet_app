@@ -60,14 +60,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         );
 
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(
-            builder: (context) => ConfirmPasswordScreen(email: 'amangiri381@gmail.com'),
-          ),
+          MaterialPageRoute(builder: (context) => ConfirmPasswordScreen(email: email)),
+              (Route<dynamic> route) => false,
         );
+
       } else if (response.statusCode == 404) {
-        // Optionally navigate to another screen or show a new widget
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(data['message'] ?? 'Invalid email!'),
@@ -83,7 +82,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('User with given email does not exist.'),
+          content: Text('Failed to send OTP. Please try again.'),
         ),
       );
     }

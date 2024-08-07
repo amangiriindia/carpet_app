@@ -13,27 +13,42 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateBasedOnLoginStatus();
+    _checkLoginStatus();
   }
 
-  Future<void> _navigateBasedOnLoginStatus() async {
-    await Future.delayed(Duration(seconds: 3), () {}); // Duration of splash screen
+
+  Future<void> _checkLoginStatus() async {
+
+    await Future.delayed(Duration(seconds: 3));
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    bool? isLoggedIn = prefs.getBool('isLoggedIn');
 
-    if (isLoggedIn) {
-      Navigator.pushReplacement(
+    if (isLoggedIn == true) {
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<dynamic> route) => false,
       );
     } else {
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+        MaterialPageRoute(builder: (context) => WelcomeScreen()),
+            (Route<dynamic> route) => false,
       );
     }
   }
+
+
+  Future<void> _navigateBasedOnLoginStatus() async {
+    await Future.delayed(
+        Duration(seconds: 3), () {
+
+    }); // Duration of splash screen
+
+
+  }
+
 
   @override
   Widget build(BuildContext context) {

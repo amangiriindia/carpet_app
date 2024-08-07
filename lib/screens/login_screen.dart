@@ -1,4 +1,4 @@
-import 'package:carpet_app/screens/sign_up_screen.dart';
+import 'package:OACrugs/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,13 +53,22 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      final user = data['user'];
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token', data['token']);
+      await prefs.setString('userId', user['_id']);
+      await prefs.setString('firstName', user['firstName']);
+      await prefs.setString('lastName', user['lastName']);
+      await prefs.setString('email', user['email']);
+      await prefs.setString('mobileNumber', user['mobileNumber']);
+      await prefs.setBool('isVerified', user['isVerified']);
       await prefs.setBool('isLoggedIn', true);
 
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<dynamic> route) => false,
       );
     } else if (response.statusCode == 400) {
       final data = jsonDecode(response.body);
@@ -323,9 +332,10 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     SizedBox(height: 2),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => SignUpScreen()),
+                              (Route<dynamic> route) => false,
                         );
                       },
                       child: Container(

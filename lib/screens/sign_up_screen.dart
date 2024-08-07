@@ -404,9 +404,10 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                     SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
+                        Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => LoginScreen()),
+                              (Route<dynamic> route) => false,
                         );
                       },
                       child: Text(

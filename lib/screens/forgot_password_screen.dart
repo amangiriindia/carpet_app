@@ -42,6 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _sendOtp() async {
+    _showLoadingDialog();
     final email = emailController.text;
     if (email.isEmpty) {
       setState(() {
@@ -59,7 +60,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         'email': email,
       }),
     );
-
+_hideLoadingDialog();
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
 
@@ -68,11 +69,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (response.statusCode == 200) {
       if (data['success'] == true) {
         _showToast(data['message'] ?? 'OTP sent successfully!');
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => ConfirmPasswordScreen(email: email)),
-              (Route<dynamic> route) => false,
-        );
+        // Show loading dialog before the delay (optional)
+        _showLoadingDialog();
+
+        // Add a 2-second delay before navigation
+        Future.delayed(Duration(seconds: 2), () {
+          // Hide the loading dialog (optional)
+          _hideLoadingDialog();
+
+          // Navigate to the LoginScreen after the delay
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => ConfirmPasswordScreen(email: email)),
+                (Route<dynamic> route) => false,
+          );
+        });
+
+
+
+
       } else {
         _showToast(data['message'] ?? 'An error occurred');
       }
@@ -81,6 +96,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     } else {
       _showToast('Failed to send OTP. Please try again.');
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissal when tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Loading...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideLoadingDialog() {
+    Navigator.of(context).pop(); // Close the dialog
   }
 
   Widget _buildTextField({
@@ -220,10 +258,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
-                        );
+                        // Show loading dialog before the delay (optional)
+                        _showLoadingDialog();
+
+                        // Add a 2-second delay before navigation
+                        Future.delayed(Duration(seconds: 2), () {
+                          // Hide the loading dialog (optional)
+                          _hideLoadingDialog();
+
+                          // Navigate to the LoginScreen after the delay
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                          );
+                        });
                       },
                       child: Text(
                         'Back To Login',

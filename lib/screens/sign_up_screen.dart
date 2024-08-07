@@ -11,7 +11,8 @@ class SignUpScreen extends StatefulWidget {
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderStateMixin {
+class _SignUpScreenState extends State<SignUpScreen>
+    with SingleTickerProviderStateMixin {
   late TextEditingController firstNameController,
       lastNameController,
       emailController,
@@ -77,6 +78,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
   Future<void> _signUp() async {
     if (_isTermsAccepted) {
       if (passwordController.text == rePasswordController.text) {
+        _showLoadingDialog();
+
         final response = await http.post(
           Uri.parse('https://email-fp0n.onrender.com/api/auth/register'),
           headers: <String, String>{
@@ -92,6 +95,9 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
           }),
         );
 
+        // Hide the loading dialog
+        _hideLoadingDialog();
+
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
 
@@ -101,10 +107,16 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
           if (data['success'] == true) {
             showToast(data['message'] ?? 'Registration successful!');
             await _saveUserInfo();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
-            );
+            // Show the loading dialog before navigating
+            _showLoadingDialog();
+            // Add a 2-second delay before navigating
+            Future.delayed(Duration(seconds: 2), () {
+              _hideLoadingDialog();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
+            });
           } else {
             showToast(data['message'] ?? 'An error occurred');
           }
@@ -123,10 +135,33 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
     }
   }
 
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissal when tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Loading...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideLoadingDialog() {
+    Navigator.of(context).pop(); // Close the dialog
+  }
+
   void showToast(String message) {
     Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.TOP,
       timeInSecForIosWeb: 1,
       backgroundColor: Colors.black,
@@ -159,7 +194,7 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
           actions: [
             TextButton(
               onPressed: () {
-
+                Navigator.of(context).pop();
               },
               child: Text('Close'),
             ),
@@ -197,7 +232,8 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
             borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(8),
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         ),
       ),
     );
@@ -380,11 +416,21 @@ class _SignUpScreenState extends State<SignUpScreen> with SingleTickerProviderSt
                     SizedBox(height: 10),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginScreen()),
-                              (Route<dynamic> route) => false,
-                        );
+                        // Show loading dialog before the delay (optional)
+                        _showLoadingDialog();
+
+                        // Add a 2-second delay before navigation
+                        Future.delayed(Duration(seconds: 2), () {
+                          // Hide the loading dialog (optional)
+                          _hideLoadingDialog();
+
+                          // Navigate to the LoginScreen after the delay
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
+                          );
+                        });
                       },
                       child: Text(
                         'LOGIN',

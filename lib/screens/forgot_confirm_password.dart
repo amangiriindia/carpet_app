@@ -56,7 +56,7 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
   void _showToast(String message) {
     Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.TOP,  // Change gravity to top
       backgroundColor: Colors.black,
       textColor: Colors.white,
@@ -65,6 +65,7 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
   }
 
   Future<void> _changePassword() async {
+    _showLoadingDialog();
     if (newPasswordController.text == confirmPasswordController.text) {
       final response = await http.post(
         Uri.parse('https://email-fp0n.onrender.com/api/auth/verify-otp'),
@@ -78,7 +79,7 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
           'confirmPassword': confirmPasswordController.text,
         }),
       );
-
+      _hideLoadingDialog();
       // Debug print statements to check the response
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -87,12 +88,24 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
 
       if (response.statusCode == 200) {
         if (data['success'] == true) {
+
           _showToast('Your password has been changed successfully.');
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
-                (Route<dynamic> route) => false,
-          );
+
+          _showLoadingDialog();
+
+          // Add a 2-second delay before navigation
+          Future.delayed(Duration(seconds: 2), () {
+            // Hide the loading dialog (optional)
+            _hideLoadingDialog();
+
+            // Navigate to the LoginScreen after the delay
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false,
+            );
+          });
+
         } else {
           _showToast(data['message'] ?? 'An error occurred');
         }
@@ -106,6 +119,29 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
         _rePasswordErrorText = 'Passwords do not match';
       });
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissal when tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Loading...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideLoadingDialog() {
+    Navigator.of(context).pop(); // Close the dialog
   }
 
   Widget _buildTextField({

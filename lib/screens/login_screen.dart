@@ -28,6 +28,29 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     passwordFocusNode = FocusNode();
   }
 
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissal when tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Loading...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _hideLoadingDialog() {
+    Navigator.of(context).pop(); // Close the dialog
+  }
+
   void _handleTapOutside() => FocusScope.of(context).unfocus();
 
   @override
@@ -41,6 +64,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   Future<void> _login() async {
+    _showLoadingDialog();
     final response = await http.post(
       Uri.parse('https://email-fp0n.onrender.com/api/auth/login'),
       headers: <String, String>{
@@ -51,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         'password': passwordController.text,
       }),
     );
+    _hideLoadingDialog();
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -66,11 +91,16 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       await prefs.setBool('isVerified', user['isVerified']);
       await prefs.setBool('isLoggedIn', true);
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-            (Route<dynamic> route) => false,
-      );
+      _showLoadingDialog();
+      // Add a 2-second delay before navigation
+      Future.delayed(Duration(seconds: 2), () {
+        _hideLoadingDialog();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+              (Route<dynamic> route) => false,
+        );
+      });
     } else if (response.statusCode == 400) {
       final data = jsonDecode(response.body);
       _showToast(data['message']);
@@ -82,14 +112,13 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   void _showToast(String message) {
     Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.TOP,
       backgroundColor: Colors.black,
       textColor: Colors.white,
       fontSize: 16.0,
     );
   }
-
 
   void _showErrorDialog(String title, String message) {
     showDialog(
@@ -108,8 +137,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       ),
     );
   }
-
-
 
   Widget _buildTextField({
     required String hintText,
@@ -229,10 +256,20 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             alignment: Alignment.centerLeft,
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
-                                );
+                                _showLoadingDialog();
+
+                                // Add a 2-second delay before navigation
+                                Future.delayed(Duration(seconds: 2), () {
+                                  // Hide the loading dialog (optional)
+                                  _hideLoadingDialog();
+
+                                  // Navigate to the ForgotPasswordScreen after the delay
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        ForgotPasswordScreen()),
+                                  );
+                                });
                               },
                               child: Text(
                                 'Forgot Password? ',
@@ -265,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              onPressed: _login, // Updated to use the new login method
+                              onPressed: _login,
                               child: Text(
                                 'Login',
                                 style: TextStyle(color: Colors.white),
@@ -280,11 +317,19 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     SizedBox(height: 2),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignUpScreen()),
-                              (Route<dynamic> route) => false,
-                        );
+                        _showLoadingDialog();
+
+                        // Add a 2-second delay before navigation
+                        Future.delayed(Duration(seconds: 2), () {
+                          // Hide the loading dialog (optional)
+                          _hideLoadingDialog();
+
+                          // Navigate to the SignUpScreen after the delay
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SignUpScreen()),
+                          );
+                        });
                       },
                       child: Container(
                         width: 99.6,

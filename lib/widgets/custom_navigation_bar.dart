@@ -33,9 +33,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                   ),
                   if (currentIndex == i) // Corrected hover icon condition
                     Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
+                      top: 1,
+                      left: 1,
+                      right: 1,
                       child: Image.asset('assets/image/buttom_navbar_hover.png'),
                     ),
                 ],
@@ -48,8 +48,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
       onTap: onTap,
       showSelectedLabels: false,
       showUnselectedLabels: false,
-      selectedItemColor: Colors.black, // You can remove these since color is handled manually
-      unselectedItemColor: Colors.grey,
     );
   }
 }

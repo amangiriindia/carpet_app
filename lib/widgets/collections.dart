@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
-class HorizontalImageList extends StatelessWidget {
+class HorizontalImageList extends StatefulWidget {
   const HorizontalImageList({super.key});
 
+  @override
+  _HorizontalImageListState createState() => _HorizontalImageListState();
+}
+
+class _HorizontalImageListState extends State<HorizontalImageList> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -16,7 +21,6 @@ class HorizontalImageList extends StatelessWidget {
               imagePath: 'assets/login/welcome.png',
               text: 'Modern Marvels',
               onTap: () {
-                // Handle the tap event for "Modern Marvels"
                 Navigator.pushNamed(
                   context,
                   '/collection_screen',
@@ -28,7 +32,6 @@ class HorizontalImageList extends StatelessWidget {
               imagePath: 'assets/login/welcome.png',
               text: 'Classic Elegance',
               onTap: () {
-                // Handle the tap event for "Classic Elegance"
                 Navigator.pushNamed(
                   context,
                   '/collection_screen',
@@ -40,7 +43,6 @@ class HorizontalImageList extends StatelessWidget {
               imagePath: 'assets/login/welcome.png',
               text: 'Bohemian Bliss',
               onTap: () {
-                // Handle the tap event for "Bohemian Bliss"
                 Navigator.pushNamed(
                   context,
                   '/collection_screen',
@@ -52,7 +54,6 @@ class HorizontalImageList extends StatelessWidget {
               imagePath: 'assets/login/welcome.png',
               text: 'Nature\'s Harmony',
               onTap: () {
-                // Handle the tap event for "Nature's Harmony"
                 Navigator.pushNamed(
                   context,
                   '/collection_screen',
@@ -64,7 +65,6 @@ class HorizontalImageList extends StatelessWidget {
               imagePath: 'assets/login/welcome.png',
               text: 'Modern Marvels',
               onTap: () {
-                // Handle the tap event for "Modern Marvels"
                 Navigator.pushNamed(
                   context,
                   '/collection_screen',
@@ -79,7 +79,7 @@ class HorizontalImageList extends StatelessWidget {
   }
 }
 
-class HorizontalImageItem extends StatelessWidget {
+class HorizontalImageItem extends StatefulWidget {
   final String imagePath;
   final String text;
   final VoidCallback onTap;
@@ -91,12 +91,17 @@ class HorizontalImageItem extends StatelessWidget {
   });
 
   @override
+  _HorizontalImageItemState createState() => _HorizontalImageItemState();
+}
+
+class _HorizontalImageItemState extends State<HorizontalImageItem> {
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 2),
-        width: 110.0, // Set width to 91px
+        width: 110.0, // Set width to 110px
         height: 110.0, // Set height to 110px
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12.0), // Adjust border radius as needed
@@ -104,23 +109,26 @@ class HorizontalImageItem extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Image.asset(
-                imagePath, // Image path
+                widget.imagePath, // Image path
                 fit: BoxFit.cover,
               ),
               Container(
-                color: Colors.black.withOpacity(0.2), // Adjust transparency here
+                color: Colors.black.withOpacity(0.3), // Semi-transparent background color
                 child: Center(
                   child: Container(
-                    padding: EdgeInsets.all(6.0), // Adjust padding as needed
+                    padding: EdgeInsets.all(5.0), // Adjust padding as needed
                     decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6), // Background color of the box
                       border: Border.all(color: Colors.white, width: 1), // White border
+                      borderRadius: BorderRadius.circular(5.0), // Rounded corners
                     ),
                     child: Text(
-                      text,
+                      widget.text,
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 10.0, // Adjust text size as needed
+                        fontSize: 11.0, // Adjust text size as needed
                       ),
+                      textAlign: TextAlign.center, // Center align text
                     ),
                   ),
                 ),

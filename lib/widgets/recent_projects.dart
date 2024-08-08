@@ -47,7 +47,7 @@ class _RecentProjectsSectionState extends State<RecentProjectsSection> {
           Positioned(
             bottom: 15.0,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.8, // Adjusted width based on screen size
+              width: MediaQuery.of(context).size.width * 0.4, // Adjusted width based on screen size
               height: 1.0, // Height of the slider
               decoration: BoxDecoration(
                 color: Colors.grey[300], // Greyish color
@@ -95,7 +95,7 @@ class RecentProjectItemWithImage extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(bottom: 25.0,left: 10), // Margin for the image
             height: 130.0,
-            width: 150,// Height of the image container
+            width:220,// Height of the image container
             child: ClipRRect(
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(120.0),
@@ -110,22 +110,42 @@ class RecentProjectItemWithImage extends StatelessWidget {
           // Right part - Text content
           Expanded(
             child: Container(
-              margin: EdgeInsets.only(top: 10.0,left: 15), // Margin for the text content
+              margin: EdgeInsets.only(top: 10.0,left: 15,right: 15), // Margin for the text content
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    projectName,
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.redAccent,
-                      fontWeight: FontWeight.bold,
+                  ShaderMask(
+                    blendMode: BlendMode.srcIn,
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: [const Color(0xFF991F35), const Color(0xFF330A12)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ).createShader(bounds),
+                    child: Text(
+                      projectName,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 12.49,
+                        fontWeight: FontWeight.w500,
+                        height: 18.74 / 12.49,
+                      ),
                     ),
                   ),
+
                   SizedBox(height: 4.0),
                   Text(
                     projectDescription,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 8.0,
+                      fontWeight: FontWeight.w300,
+                      height: 12.0 / 8.0, // Calculate line height from provided values
+                      color: Colors.black, // You might want to adjust the text color for visibility
+                    ),
                   ),
+
                 ],
               ),
             ),

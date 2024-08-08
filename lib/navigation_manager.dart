@@ -1,3 +1,4 @@
+import 'package:OACrugs/widgets/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:OACrugs/screens/collection_screen.dart';
 import 'package:OACrugs/screens/home_screen.dart';
@@ -30,30 +31,9 @@ class _NavigationManagerState extends State<NavigationManager> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex], // Display the selected screen
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/image/navbar_home_icon.png',
-                width: 24, height: 24),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/image/navbar_search_icon.png',
-                width: 24, height: 24),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset('assets/image/navbar_like_icon.png',
-                width: 24, height: 24),
-            label: 'Wishlist',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.collections),
-            label: 'Collection',
-          ),
-        ],
       ),
     );
   }

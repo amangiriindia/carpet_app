@@ -51,24 +51,24 @@ class _BannerSectionState extends State<BannerSection> {
           Positioned(
             bottom: 15.0,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.8, // Adjusted width based on screen size
-              height: 2.0, // Height of the slider
+              width: MediaQuery.of(context).size.width * 0.4,
+              height: 2.0,
               decoration: BoxDecoration(
-                color: Colors.grey[300], // Greyish color
-                borderRadius: BorderRadius.circular(10.0),
+                color: const Color(0xFFF2F2F2), // Light grey background
+                borderRadius: BorderRadius.circular(1.0),
               ),
               child: Row(
-                children: List.generate(
-                  _numPages,
-                      (index) => Expanded(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(_numPages, (index) {
+                  final isActive = _currentPage == index;
+                  return Expanded(
                     child: Container(
-                      decoration: BoxDecoration(
-                        color: _currentPage == index ? Colors.black : Colors.transparent, // White slider when active
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
+                      height: 2.0,
+                      color: isActive ? Colors.white : Colors.transparent,
+                      margin: const EdgeInsets.symmetric(horizontal: 2.0),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ),
           ),
@@ -88,12 +88,12 @@ class BannerImage extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(10.0),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(15.0),
+        borderRadius: BorderRadius.circular(7.0),
         child: Image.asset(
           imageUrl,
-          fit: BoxFit.cover, // Adjusted to cover the container
-          width: MediaQuery.of(context).size.width * 0.8, // Adjusted width based on screen size
-          height: 230.0, // Adjusted height to match BannerSection height
+          fit: BoxFit.cover,
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: 230.0,
         ),
       ),
     );

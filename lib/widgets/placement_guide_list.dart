@@ -14,8 +14,8 @@ class PlacementGuideItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200.0,
-      margin: EdgeInsets.symmetric(horizontal: 8.0),
+      width: 240.0,
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Stack(
         children: [
           // Black background
@@ -34,7 +34,7 @@ class PlacementGuideItem extends StatelessWidget {
             child: Opacity(
               opacity: 0.95,
               child: ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(8.0),
                 ),
                 child: Image.asset(
@@ -53,12 +53,26 @@ class PlacementGuideItem extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.w400,
+                  ShaderMask(
+                    blendMode: BlendMode.srcIn,
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [
+                        Color(0xFFFFFFFF),
+                        Color(0xFFEBEBEB),
+                        Color(0xFF999999)
+                      ],
+                      stops: [0.164, 0.4408, 0.15751],
+                      transform: GradientRotation(125.46 * (3.14159265359 / 180)),
+                    ).createShader(bounds),
+                    child: Text(
+                      title,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 20.49,
+                        fontWeight: FontWeight.bold,
+                        height: 18.74 / 12.49,
+                      ),
                     ),
                   ),
                   Expanded(
@@ -70,33 +84,61 @@ class PlacementGuideItem extends StatelessWidget {
                             TextSpan(
                               text: 'Tips:\n',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w400,
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 12.0,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                height: 9.0 / 6.0,
                               ),
                             ),
                             TextSpan(
-                              text:
-                              '• Full Coverage: The carpet should extend beyond the dining table by at least 24 inches on all sides to allow chairs to move in and out easily.\n\n',
+                              text: '• Full Coverage: The carpet should extend beyond the dining table by at least 24 inches on all sides to allow chairs to move in and out easily.\n\n',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 10.0,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                height: 12.0 / 8.0,
                               ),
                             ),
                             TextSpan(
-                              text:
-                              '• Durability: Choose a durable, easy-to-clean material to handle spills and heavy foot traffic.\n\n',
+                              text: '• Durability: Choose a durable, easy-to-clean material to handle spills and heavy foot traffic.\n\n',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 10.0,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                height: 9.0 / 6.0,
                               ),
                             ),
                             TextSpan(
-                              text:
-                              '• Shape Harmony: Match the carpet shape to your table shape (rectangular for long tables, round for circular tables).\n\n',
+                              text: '• Shape Harmony: Match the carpet shape to your table shape (rectangular for long tables, round for circular tables).\n\n',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 10.0,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                height: 9.0 / 6.0,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '• Full Coverage: The carpet should extend beyond the dining table by at least 24 inches on all sides to allow chairs to move in and out easily.\n\n',
+                              style: TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 10.0,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                height: 12.0 / 8.0,
+                              ),
+                            ),
+                            TextSpan(
+                              text: '• Full Coverage: The carpet should extend beyond the dining table by at least 24 inches on all sides to allow chairs to move in and out easily.\n\n',
+                              style: TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontSize: 10.0,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w500,
+                                height: 12.0 / 8.0,
                               ),
                             ),
                           ],
@@ -127,7 +169,7 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
   void _scrollLeft() {
     _scrollController.animateTo(
       _scrollController.offset - 200.0, // Adjust this value as needed
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
@@ -135,25 +177,25 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
   void _scrollRight() {
     _scrollController.animateTo(
       _scrollController.offset + 200.0, // Adjust this value as needed
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      const PlacementGuideItem(
+    final items = const [
+      PlacementGuideItem(
         title: 'Living Room',
         description: 'A cozy and stylish living room with modern amenities.',
         imagePath: 'assets/guide/clock.png',
       ),
-      const PlacementGuideItem(
+      PlacementGuideItem(
         title: 'Dining Room',
         description: 'An elegant dining room perfect for family meals.',
         imagePath: 'assets/guide/dinner.png',
       ),
-      const PlacementGuideItem(
+      PlacementGuideItem(
         title: 'Bedroom',
         description: 'A serene bedroom designed for relaxation.',
         imagePath: 'assets/guide/bed.png',
@@ -163,7 +205,7 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
     return Stack(
       children: [
         Container(
-          height: 550.0, // Adjusted for better UI design
+          height: 550.0,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -180,44 +222,62 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
           ),
         ),
         Positioned(
-          left: 0,
+          left: 2,
           top: 275.0, // Adjust this value to place the button in the middle vertically
           child: GestureDetector(
             onTap: _scrollLeft,
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.red, width: 2.0),
+                gradient: const LinearGradient( // Apply the gradient to the border
+                  colors: [Color(0xFF991F35), Color(0xFF330A12)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
               ),
               child: CircleAvatar(
                 backgroundColor: Colors.white.withOpacity(0.5),
-                child: Icon(
-                  Icons.arrow_back,
-                  color: Colors.red,
+                child: ShaderMask(  // Use ShaderMask to apply the gradient to the icon
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: const [Color(0xFF991F35), Color(0xFF330A12)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ).createShader(bounds),
+                  child: const Icon(Icons.arrow_back),
                 ),
               ),
             ),
           ),
+
         ),
         Positioned(
-          right: 0,
+          right: 2,
           top: 275.0, // Adjust this value to place the button in the middle vertically
-          child: GestureDetector(
-            onTap: _scrollRight,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.red, width: 2.0),
-              ),
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.5),
-                child: Icon(
-                  Icons.arrow_forward,
-                  color: Colors.red,
+            child: GestureDetector(
+              onTap: _scrollRight,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient( // Apply the gradient to the border
+                    colors: [Color(0xFF991F35), Color(0xFF330A12)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: CircleAvatar(
+                  backgroundColor: Colors.white.withOpacity(0.5),
+                  child: ShaderMask(  // Use ShaderMask to apply the gradient to the icon
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: const [Color(0xFF991F35), Color(0xFF330A12)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ).createShader(bounds),
+                    child: const Icon(Icons.arrow_forward),
+                  ),
                 ),
               ),
             ),
-          ),
+
         ),
       ],
     );

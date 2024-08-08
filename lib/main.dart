@@ -1,4 +1,6 @@
 
+import 'package:OACrugs/screens/color_test_screen.dart';
+import 'package:OACrugs/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,7 +41,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:CustomSplashScreen(), // Use SplashScreenHandler
+      home: HomeScreen(), // Use SplashScreenHandler
 
       routes: {
         '/home': (context) => const HomeScreen(),

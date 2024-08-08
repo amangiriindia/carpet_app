@@ -1,4 +1,5 @@
 import 'package:OACrugs/screens/sign_up_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'login_screen.dart';
@@ -9,109 +10,148 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Top Image
-            Image.asset(
-              'assets/login/welcome.png',
-              width: 450,
-              height: 450,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/login/sign_up_page_image.png',
               fit: BoxFit.cover,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Texts above buttons
-                  const Text(
-                    'Welcome',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2), // Spacing between the texts
-                  const Text(
-                    'Our Personalized Carpet Design Destination\nLogin to Your Account',
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 20), // Spacing between the texts and buttons
-                  // Buttons
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+          ),
+          SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Top Image
+                Image.asset(
+                  'assets/login/welcome.png',
+                  width: 450,
+                  height: 450,
+                  fit: BoxFit.cover,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 352,
-                        height: 42,
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment(-0.67, -1.0),
-                            end: Alignment(1.0, 1.91),
-                            colors: [Color(0xFF000000), Color(0xFF666666)],
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent, // Make button background transparent
-                            shadowColor: Colors.transparent, // Remove button shadow
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Rectangular shape
-                            ),
-                          ),
-                          onPressed: () {
-                            // Navigate to Home page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => LoginScreen()),
-                            );
-                          },
-                          child: const Text(
-                            'Login',
-                            style: TextStyle(color: Colors.white), // Set text color to white
-                          ),
+                      // Welcome Text
+                      const Text(
+                        'WELCOME',
+                        style: TextStyle(
+                          fontFamily: 'Impact',
+                          fontSize: 24.49,
+                          fontWeight: FontWeight.w900, // Make text more bold
+                          height: 1.22, // 29.87 / 24.49
+                          color: Color(0xFF292929),
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: 352,
-                        height: 42,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.black,
-                            backgroundColor: Colors.white, // Text color
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                              BorderRadius.circular(8), // Rectangular shape
-                              side: const BorderSide(
-                                  color: Colors.black), // Border color
+                      const Text(
+                        'Our Personalized Carpet Design Destination\nLogin to Your Account',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontFamily: 'Poppins', // Set the font family
+                          fontSize: 11.79, // Set the font size
+                          fontWeight: FontWeight.w400, // Set the font weight
+                          height: 18.14 / 11.79, // Set the line height
+                        ),
+                      ),
+                      const SizedBox(height: 20), // Spacing between the texts and buttons
+                      // Buttons
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            width: 352,
+                            height: 42,
+                            margin: const EdgeInsets.only(bottom: 8),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment(-0.67, -1.0),
+                                end: Alignment(1.0, 1.91),
+                                colors: [Color(0xFF000000), Color(0xFF666666)],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0x1C000000), // Shadow color with transparency
+                                  offset: const Offset(0, 4), // Offset to cast shadow below the button
+                                  blurRadius: 4, // Blur radius for shadow softness
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent, // Make button background transparent
+                                shadowColor: Colors.transparent, // Remove button shadow (since we have it in the container)
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // Rectangular shape
+                                ),
+                              ),
+                              onPressed: () {
+                                // Navigate to Home page
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                                );
+                              },
+                              child: const Text(
+                                'Login',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins', // Font family
+                                  fontSize: 14.51, // Font size
+                                  fontWeight: FontWeight.w300, // Font weight
+                                  height: 21.77 / 14.51, // Line height
+                                  letterSpacing: 0.14, // Letter spacing
+                                  color: Colors.white, // Set text color to white
+                                ),
+                              ),
                             ),
                           ),
-                          onPressed: () {
-                            // Navigate to Sign Up page
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => SignUpScreen()),
-                            );
-                          },
-                          child: const Text('Sign Up'),
-                        ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: 352,
+                            height: 42,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFFFFFFF), // Button background color (white)
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8), // Rectangular shape with rounded corners
+                                  side: const BorderSide(
+                                    color: Color(0xFF000000), // Border color (black)
+                                    width: 0.91, // Border width
+                                  ),
+                                ),
+                              ),
+                              onPressed: () {
+                                // Navigate to Sign Up page
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => SignUpScreen()),
+                                );
+                              },
+                              child: const Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins', // Font family
+                                  fontSize: 14.51, // Font size
+                                  fontWeight: FontWeight.w300, // Font weight
+                                  height: 21.77 / 14.51, // Line height
+                                  letterSpacing: 0.14, // Letter spacing
+                                  color: Colors.black, // Text color (black)
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 20), // Bottom spacing to avoid overflow
+              ],
             ),
-            const SizedBox(height: 20), // Bottom spacing to avoid overflow
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

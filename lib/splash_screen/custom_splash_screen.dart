@@ -40,14 +40,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
   }
 
 
-  Future<void> _navigateBasedOnLoginStatus() async {
-    await Future.delayed(
-        Duration(seconds: 3), () {
-
-    }); // Duration of splash screen
-
-
-  }
 
 
   @override
@@ -57,13 +49,14 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
         children: [
           Positioned.fill(
             child: Opacity(
-              opacity: 0.08,
+              opacity: 0.8, // Adjust the opacity value as needed (0.0 - 1.0)
               child: Image.asset(
-                'assets/logos/full_image.png',
+                'assets/login/sign_up_page_image.png',
                 fit: BoxFit.cover,
               ),
             ),
           ),
+
           Center(
             child: Image.asset(
               'assets/logos/center_image.png',

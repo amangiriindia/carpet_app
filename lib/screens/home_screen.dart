@@ -74,28 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const HorizontalImageList(),
                 const SizedBox(height: 10),
                 const Center(child: SectionTitle(title: "Recent Projects")),
-                const RecentProjectsSection(projects: [
-                  RecentProjectItemWithImage(
-                    imagePath: 'assets/login/welcome.png',
-                    projectName: 'Luxury Living Room \n      in Manhattan',
-                    projectDescription: 'A sleek, modern aesthetic featuring eclectic patterns, cozy seating, and a character to rival any gathering space.',
-                  ),
-                  RecentProjectItemWithImage(
-                    imagePath: 'assets/login/welcome.png',
-                    projectName: 'Stylish Office Space \n      in San Francisco',
-                    projectDescription: 'An office with a modern vibe, featuring open spaces, ergonomic seating, and a creative atmosphere.',
-                  ),
-                  RecentProjectItemWithImage(
-                    imagePath: 'assets/login/welcome.png',
-                    projectName: 'Cozy Apartment \n      in Brooklyn',
-                    projectDescription: 'A small but charming apartment with a cozy feel, featuring warm tones and stylish furniture.',
-                  ),
-                  RecentProjectItemWithImage(
-                    imagePath: 'assets/login/welcome.png',
-                    projectName: 'Cozy Apartment \n      in Brooklyn',
-                    projectDescription: 'A small but charming apartment with a cozy feel, featuring warm tones and stylish furniture.',
-                  ),
-                ]),
+                RecentProjectsSection(),
                 const SizedBox(height: 10),
                 const Center(child: SectionTitle(title: "Shops To Explore")),
                 const HorizontalImageList(),

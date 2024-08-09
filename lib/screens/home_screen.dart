@@ -98,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ]),
                 const SizedBox(height: 10),
                 const Center(child: SectionTitle(title: "Shops To Explore")),
-                ShopsToExploreList(width: 150.0),
+                const HorizontalImageList(),
                 const SizedBox(height: 10),
                 const Center(child: SectionTitle(title: "Guide for Placement")),
                 const PlacementGuideList(),

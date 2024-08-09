@@ -1,104 +1,107 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HorizontalImageList extends StatefulWidget {
-  const HorizontalImageList({super.key});
+  const HorizontalImageList({Key? key}) : super(key: key);
 
   @override
   _HorizontalImageListState createState() => _HorizontalImageListState();
 }
 
 class _HorizontalImageListState extends State<HorizontalImageList> {
+  late Future<List<CollectionItem>> _allCollections;
+
+  @override
+  void initState() {
+    super.initState();
+    _allCollections = fetchCollections();
+  }
+
+  Future<List<CollectionItem>> fetchCollections() async {
+    final response = await http.get(
+      Uri.parse('https://oacrugs.onrender.com/api/v1/collection/all-collection'),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      List<dynamic> allCollections = jsonResponse['allCollection'];
+      List<CollectionItem> items = allCollections.map((collection) {
+        List<int> imageData = List<int>.from(collection['photo']['data']['data']);
+        return CollectionItem(
+          imageData: Uint8List.fromList(imageData),
+          text: collection['name'], // Assuming the name is stored under 'name'
+        );
+      }).toList();
+      return items;
+    } else {
+      throw Exception('Failed to load collections');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, right: 4),
       child: Container(
         height: 150.0,
-        child: ListView(
-          scrollDirection: Axis.horizontal,
-          children: [
-            HorizontalImageItem(
-              imagePath: 'assets/login/welcome.png',
-              text: 'Modern Marvels',
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/collection_screen',
-                  arguments: {'selectedIndex': 3},
-                );
-              },
-            ),
-            HorizontalImageItem(
-              imagePath: 'assets/login/welcome.png',
-              text: 'Classic Elegance',
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/collection_screen',
-                  arguments: {'selectedIndex': 3},
-                );
-              },
-            ),
-            HorizontalImageItem(
-              imagePath: 'assets/login/welcome.png',
-              text: 'Bohemian Bliss',
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/collection_screen',
-                  arguments: {'selectedIndex': 3},
-                );
-              },
-            ),
-            HorizontalImageItem(
-              imagePath: 'assets/login/welcome.png',
-              text: 'Nature\'s Harmony',
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/collection_screen',
-                  arguments: {'selectedIndex': 3},
-                );
-              },
-            ),
-            HorizontalImageItem(
-              imagePath: 'assets/login/welcome.png',
-              text: 'Modern Marvels',
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/collection_screen',
-                  arguments: {'selectedIndex': 3},
-                );
-              },
-            ),
-          ],
+        child: FutureBuilder<List<CollectionItem>>(
+          future: _allCollections,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text('No collections found.'),
+              );
+            } else {
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return HorizontalImageItem(
+                    imageData: snapshot.data![index].imageData,
+                    text: snapshot.data![index].text,
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/collection_screen',
+                        arguments: {'selectedIndex': index},
+                      );
+                    },
+                  );
+                },
+              );
+            }
+          },
         ),
       ),
     );
   }
 }
 
-class HorizontalImageItem extends StatefulWidget {
-  final String imagePath;
+class HorizontalImageItem extends StatelessWidget {
+  final Uint8List imageData;
   final String text;
   final VoidCallback onTap;
 
   HorizontalImageItem({
-    required this.imagePath,
+    required this.imageData,
     required this.text,
     required this.onTap,
   });
 
   @override
-  _HorizontalImageItemState createState() => _HorizontalImageItemState();
-}
-
-class _HorizontalImageItemState extends State<HorizontalImageItem> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 2),
         width: 110.0, // Set width to 110px
@@ -108,9 +111,24 @@ class _HorizontalImageItemState extends State<HorizontalImageItem> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(
-                widget.imagePath, // Image path
+              // Image with small progress indicator
+              Image.memory(
+                imageData, // Display the image from the API
                 fit: BoxFit.cover,
+                gaplessPlayback: true,
+                frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                  if (wasSynchronouslyLoaded || frame != null) {
+                    // Image is loaded
+                    return child;
+                  } else {
+                    // Show small progress indicator while loading
+                    return Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 1.5, // Adjust the stroke width to make it smaller
+                      ),
+                    );
+                  }
+                },
               ),
               Container(
                 color: Colors.black.withOpacity(0.3), // Semi-transparent background color
@@ -123,7 +141,7 @@ class _HorizontalImageItemState extends State<HorizontalImageItem> {
                       borderRadius: BorderRadius.circular(5.0), // Rounded corners
                     ),
                     child: Text(
-                      widget.text,
+                      text,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 11.0, // Adjust text size as needed
@@ -139,4 +157,14 @@ class _HorizontalImageItemState extends State<HorizontalImageItem> {
       ),
     );
   }
+}
+
+class CollectionItem {
+  final Uint8List imageData;
+  final String text;
+
+  CollectionItem({
+    required this.imageData,
+    required this.text,
+  });
 }

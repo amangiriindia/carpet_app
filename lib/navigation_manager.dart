@@ -30,6 +30,7 @@ class _NavigationManagerState extends State<NavigationManager> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Set background color to white
       body: _screens[_selectedIndex], // Display the selected screen
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,

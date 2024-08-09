@@ -42,19 +42,23 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _unfocusKeyboard(context),
-      child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              _buildSearchBar(),
-              const SizedBox(height: 16.0),
-              _buildFilterRow(context),
-              const SizedBox(height: 16.0),
-              _buildGridView(context),
-            ],
+    return Container(
+      color: Colors.white, // Set the entire page background to white
+      child: GestureDetector(
+        onTap: () => _unfocusKeyboard(context),
+        child: Scaffold(
+          backgroundColor: Colors.white, // Ensure the Scaffold itself is white
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                _buildSearchBar(),
+                const SizedBox(height: 16.0),
+                _buildFilterRow(context),
+                const SizedBox(height: 16.0),
+                _buildGridView(context),
+              ],
+            ),
           ),
         ),
       ),
@@ -187,6 +191,3 @@ class SearchScreen extends StatelessWidget {
     );
   }
 }
-
-
-

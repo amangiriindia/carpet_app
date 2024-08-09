@@ -91,10 +91,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       await prefs.setBool('isVerified', user['isVerified']);
       await prefs.setBool('isLoggedIn', true);
 
-      _showLoadingDialog();
+
       // Add a 2-second delay before navigation
       Future.delayed(Duration(seconds: 2), () {
-        _hideLoadingDialog();
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),

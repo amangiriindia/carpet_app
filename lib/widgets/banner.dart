@@ -1,10 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class BannerSection extends StatefulWidget {
-  final List<String> bannerImages;
-
-  const BannerSection({required this.bannerImages});
-
   @override
   _BannerSectionState createState() => _BannerSectionState();
 }
@@ -12,12 +10,15 @@ class BannerSection extends StatefulWidget {
 class _BannerSectionState extends State<BannerSection> {
   PageController _pageController = PageController();
   int _currentPage = 0;
-  late int _numPages; // Number of banners
+  List<String> bannerImages = [];
+  bool isLoading = true;
+  late int _numPages;
 
   @override
   void initState() {
     super.initState();
-    _numPages = widget.bannerImages.length;
+    fetchSliderImages();
+
     _pageController.addListener(() {
       int nextPage = _pageController.page?.round() ?? 0;
       if (_currentPage != nextPage) {
@@ -28,6 +29,27 @@ class _BannerSectionState extends State<BannerSection> {
     });
   }
 
+  Future<void> fetchSliderImages() async {
+    final url = 'https://oacrugs.onrender.com/api/v1/slider/all-slider';
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['success']) {
+          setState(() {
+            bannerImages = List<String>.from(data['allSliderImg'].map((item) => item['photo']));
+            _numPages = bannerImages.length;
+            isLoading = false;
+          });
+        }
+      } else {
+        throw Exception('Failed to load images');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -36,6 +58,17 @@ class _BannerSectionState extends State<BannerSection> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (bannerImages.isEmpty) {
+      return Container(
+        height: 230.0,
+        child: Center(child: Text('No images available')),
+      );
+    }
+
     return Container(
       height: 230.0,
       child: Stack(
@@ -44,31 +77,31 @@ class _BannerSectionState extends State<BannerSection> {
           PageView(
             controller: _pageController,
             scrollDirection: Axis.horizontal,
-            children: widget.bannerImages
+            children: bannerImages
                 .map((imageUrl) => BannerImage(imageUrl))
                 .toList(),
           ),
           Positioned(
             bottom: 15.0,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.4,
-              height: 2.0,
+              width: MediaQuery.of(context).size.width * 0.4, // Adjusted width based on screen size
+              height: 1.0, // Height of the slider
               decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2), // Light grey background
-                borderRadius: BorderRadius.circular(1.0),
+                color: Colors.grey[300], // Greyish color
+                borderRadius: BorderRadius.circular(10.0),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_numPages, (index) {
-                  final isActive = _currentPage == index;
-                  return Expanded(
+                children: List.generate(
+                  _numPages,
+                      (index) => Expanded(
                     child: Container(
-                      height: 2.0,
-                      color: isActive ? Colors.white : Colors.transparent,
-                      margin: const EdgeInsets.symmetric(horizontal: 2.0),
+                      decoration: BoxDecoration(
+                        color: _currentPage == index ? Colors.black : Colors.transparent, // Black slider when active
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                     ),
-                  );
-                }),
+                  ),
+                ),
               ),
             ),
           ),
@@ -89,9 +122,9 @@ class BannerImage extends StatelessWidget {
       margin: EdgeInsets.all(10.0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(7.0),
-        child: Image.asset(
-          imageUrl,
-          fit: BoxFit.cover,
+        child: Image.memory(
+          base64Decode(imageUrl),
+          fit: BoxFit.contain, // Ensure the full image is displayed
           width: MediaQuery.of(context).size.width * 0.8,
           height: 230.0,
         ),

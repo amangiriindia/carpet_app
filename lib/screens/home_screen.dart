@@ -51,14 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.white, // Set background color to white
             child: ListView(
               children: [
-                const BannerSection(bannerImages: [
-                  'assets/login/welcome.png',
-                  'assets/login/welcome.png',
-                  'assets/login/welcome.png',
-                  'assets/login/welcome.png',
-                  'assets/login/welcome.png',
-                  'assets/login/welcome.png',
-                ]),
+                // const BannerSection(bannerImages: [
+                //   'https://oacrugs.onrender.com/api/v1/slider/slider-photo/66ad21488d5efe86ef314d7b',
+                //   'assets/image/slider_test_img.jpeg',
+                //   'assets/image/slider_test_img.jpeg',
+                //   'assets/image/slider_test_img.jpeg',
+                //
+                // ]),
+                BannerSection(),
+
                 const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {

@@ -1,3 +1,5 @@
+import 'package:OACrugs/splash_screen/custom_splash_screen.dart';
+import 'package:OACrugs/widgets/banner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/collection_screen.dart';

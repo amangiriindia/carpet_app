@@ -5,6 +5,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
   final Function(int) onTap;
 
   const CustomBottomNavigationBar({
+    backgroundColor = Colors.white, // Set background color to white
     super.key,
     required this.currentIndex,
     required this.onTap,

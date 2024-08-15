@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../screens/collection_screen.dart';
+
 class HorizontalImageList extends StatefulWidget {
   const HorizontalImageList({Key? key}) : super(key: key);
 
@@ -31,7 +33,8 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
         List<int> imageData = List<int>.from(collection['photo']['data']['data']);
         return CollectionItem(
           imageData: Uint8List.fromList(imageData),
-          text: collection['name'], // Assuming the name is stored under 'name'
+          text: collection['name'],
+          id: collection['_id'], // Extract collection ID
         );
       }).toList();
       return items;
@@ -50,7 +53,7 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
           future: _allCollections,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             } else if (snapshot.hasError) {
@@ -58,7 +61,7 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
                 child: Text('Error: ${snapshot.error}'),
               );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No collections found.'),
               );
             } else {
@@ -70,10 +73,14 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
                     imageData: snapshot.data![index].imageData,
                     text: snapshot.data![index].text,
                     onTap: () {
-                      Navigator.pushNamed(
+                      Navigator.push(
                         context,
-                        '/collection_screen',
-                        arguments: {'selectedIndex': index},
+                        MaterialPageRoute(
+                          builder: (context) => CollectionScreen(
+                            collectionId: snapshot.data![index].id,
+                            collectionName: snapshot.data![index].text,
+                          ),
+                        ),
                       );
                     },
                   );
@@ -103,7 +110,7 @@ class HorizontalImageItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 2),
         width: 110.0, // Set width to 110px
         height: 110.0, // Set height to 110px
         child: ClipRRect(
@@ -134,7 +141,7 @@ class HorizontalImageItem extends StatelessWidget {
                 color: Colors.black.withOpacity(0.3), // Semi-transparent background color
                 child: Center(
                   child: Container(
-                    padding: EdgeInsets.all(5.0), // Adjust padding as needed
+                    padding: const EdgeInsets.all(5.0), // Adjust padding as needed
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.6), // Background color of the box
                       border: Border.all(color: Colors.white, width: 1), // White border
@@ -142,7 +149,7 @@ class HorizontalImageItem extends StatelessWidget {
                     ),
                     child: Text(
                       text,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 11.0, // Adjust text size as needed
                       ),
@@ -162,9 +169,11 @@ class HorizontalImageItem extends StatelessWidget {
 class CollectionItem {
   final Uint8List imageData;
   final String text;
+  final String id;
 
   CollectionItem({
     required this.imageData,
     required this.text,
+    required this.id,
   });
 }

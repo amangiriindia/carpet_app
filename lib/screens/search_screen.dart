@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/grid_item.dart';
@@ -159,7 +160,7 @@ class SearchScreen extends StatelessWidget {
             builder: (context, wishListProvider, child) {
               final item = WishListItem(
                 id: 'item_$index', // Unique identifier for each item
-                imagePath: 'assets/login/welcome.png',
+                imagePath: Uint8List(0), // Replace with actual image data
                 name: 'Persian Tabriz',
                 price: 12999.0,
                 size: '151 x 102 cm',

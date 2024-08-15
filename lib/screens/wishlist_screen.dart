@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../wish_list_provider.dart';
@@ -79,8 +80,8 @@ class WishListItemWidget extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
             child: Row(
               children: [
-                Image.asset(
-                  item.imagePath,
+                Image.memory(
+                  item.imagePath, // Displaying image from Uint8List
                   width: 110,
                   height: 140,
                   fit: BoxFit.cover,

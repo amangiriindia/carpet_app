@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../wish_list_provider.dart';
 
@@ -5,20 +6,20 @@ class GridItem extends StatelessWidget {
   final WishListItem item;
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
-  final VoidCallback onTap; // New onTap callback
+  final VoidCallback onTap;
 
   const GridItem({
     super.key,
     required this.item,
     required this.isFavorite,
     required this.onFavoriteToggle,
-    required this.onTap, // Initialize onTap in constructor
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap, // Trigger onTap when the grid item is tapped
+      onTap: onTap,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5.0),
@@ -32,7 +33,7 @@ class GridItem extends StatelessWidget {
                     top: Radius.circular(5.0)),
                 child: Padding(
                   padding: const EdgeInsets.all(2.0),
-                  child: Image.asset(
+                  child: Image.memory(
                     item.imagePath,
                     width: double.infinity,
                     height: 200,
@@ -60,8 +61,7 @@ class GridItem extends StatelessWidget {
                         ),
                         Text(
                           item.size,
-                          style: const TextStyle(fontSize: 12.0, color: Colors
-                              .grey),
+                          style: const TextStyle(fontSize: 12.0, color: Colors.grey),
                         ),
                       ],
                     ),

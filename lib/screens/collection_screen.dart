@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/custom_app_bar.dart';
@@ -10,11 +12,19 @@ import 'notification_screen.dart';
 import 'search_screen.dart';
 import 'wishlist_screen.dart';
 import '../widgets/grid_item.dart';
+import 'package:http/http.dart' as http;
 
 class CollectionScreen extends StatefulWidget {
+  final String collectionId;
+  final String collectionName;
   final int initialIndex;
 
-  const CollectionScreen({super.key, this.initialIndex = 2});
+  const CollectionScreen({
+    required this.collectionId,
+    required this.collectionName,
+    this.initialIndex = 2,
+    super.key,
+  });
 
   @override
   _CollectionScreenState createState() => _CollectionScreenState();
@@ -22,11 +32,37 @@ class CollectionScreen extends StatefulWidget {
 
 class _CollectionScreenState extends State<CollectionScreen> {
   late int _selectedIndex;
+  late Future<List<SingleCollectionItem>> _singlecollectionitems;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
+    _singlecollectionitems = fetchSingleCollections(); // Call the function
+  }
+
+  Future<List<SingleCollectionItem>> fetchSingleCollections() async {
+    final response = await http.get(
+      Uri.parse('https://oacrugs.onrender.com/api/v1/carpet/all-carpet'),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      List<dynamic> getAllCarpets = jsonResponse['getAllCarpets'];
+      List<SingleCollectionItem> items = getAllCarpets.map<SingleCollectionItem>((collection) {
+        List<int> imageData = List<int>.from(collection['photo']['data']['data'] ?? []);
+        return SingleCollectionItem(
+          imageData: imageData.isNotEmpty ? Uint8List.fromList(imageData) : Uint8List(0),
+          collectionId: collection['collection'] ?? 'Unknown Collection',
+          carpetname: collection['name'] ?? 'Unknown ID',
+          price: (collection['price'] ?? 0).toString(),
+          dimension: collection['dimension'] ?? 'Unknown Dimension',
+        );
+      }).toList();
+      return items;
+    } else {
+      throw Exception('Failed to load collections');
+    }
   }
 
   void _onItemTapped(int index) {
@@ -91,6 +127,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
     return GestureDetector(
       onTap: () => _unfocusKeyboard(context),
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: const CustomAppBar(),
         drawer: const NotificationScreen(),
         endDrawer: const ProfileDrawer(),
@@ -105,8 +142,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(3.14),
                     child: IconButton(
-                      icon: const Icon(Icons.login_outlined,
-                          color: Colors.black54),
+                      icon: const Icon(Icons.login_outlined, color: Colors.black54),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
@@ -118,9 +154,9 @@ class _CollectionScreenState extends State<CollectionScreen> {
                 ],
               ),
               const SizedBox(height: 16.0),
-              const Text(
-                'Bohemian Bliss',
-                style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              Text(
+                widget.collectionName,
+                style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16.0),
               _buildFilterRow(context),
@@ -173,51 +209,69 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Widget _buildGridView(BuildContext context) {
     return Expanded(
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-        ),
-        itemCount: 6,
-        itemBuilder: (context, index) {
-          WishListItem item = WishListItem(
-            id: 'item_$index',
-            imagePath: 'assets/login/welcome.png',
-            name: 'Persian Tabriz',
-            price: 12999.0,
-            size: '151 x 102 cm',
-          );
+      child: FutureBuilder<List<SingleCollectionItem>>(
+        future: _singlecollectionitems,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No items found.'));
+          } else {
+            return GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.75,
+                crossAxisSpacing: 16.0,
+                mainAxisSpacing: 16.0,
+              ),
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                SingleCollectionItem item = snapshot.data![index];
 
-          return Consumer<WishListProvider>(
-            builder: (context, wishListProvider, child) {
-              bool isFavorite = wishListProvider.isInWishList(item);
-              return GridItem(
-                item: item,
-                isFavorite: isFavorite,
-                onFavoriteToggle: () {
-                  setState(() {
-                    if (isFavorite) {
-                      wishListProvider.removeItem(item);
-                    } else {
-                      wishListProvider.addItem(item);
-                    }
-                  });
-                },
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EnquiryScreen(),
-                    ),
-                  );
-                },
-              );
-            },
-          );
+                return GridItem(
+                  item: WishListItem(
+                    id: item.collectionId,
+                    imagePath: item.imageData, // Pass the image data directly
+                    name: item.carpetname,
+                    price: double.parse(item.price),
+                    size: item.dimension,
+                  ),
+                  isFavorite: false, // Implement your favorite logic if needed
+                  onFavoriteToggle: () {
+                    // Implement your favorite toggle logic if needed
+                  },
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const EnquiryScreen(),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          }
         },
       ),
     );
   }
+}
+
+class SingleCollectionItem {
+  final Uint8List imageData;
+  final String price;
+  final String collectionId;
+  final String carpetname;
+  final String dimension;
+
+  SingleCollectionItem({
+    required this.imageData,
+    required this.price,
+    required this.collectionId,
+    required this.carpetname,
+    required this.dimension,
+  });
 }

@@ -1,5 +1,4 @@
-import 'package:OACrugs/splash_screen/custom_splash_screen.dart';
-import 'package:OACrugs/widgets/banner.dart';
+import 'package:OACrugs/screens/test_color_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/collection_screen.dart';
@@ -33,11 +32,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(), // Use SplashScreenHandler
+      home: CarpetDesign(), // Use SplashScreenHandler
 
       routes: {
-        '/home': (context) => const HomeScreen(),
-        '/collection_screen': (context) => const CollectionScreen(),
+         '/home': (context) => const HomeScreen(),
+        // '/collection_screen': (context) => const CollectionScreen(collectionId: '', collectionName: '',),
         '/search_screen': (context) => const SearchScreen(),
         '/wishlist_screen': (context) => const WishListScreen(),
         '/enquiry_form': (context) => const EnquiryFormScreen(),

@@ -1,6 +1,5 @@
 import 'package:OACrugs/widgets/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:OACrugs/screens/collection_screen.dart';
 import 'package:OACrugs/screens/home_screen.dart';
 import 'package:OACrugs/screens/search_screen.dart';
 import 'package:OACrugs/screens/wishlist_screen.dart';
@@ -18,7 +17,6 @@ class _NavigationManagerState extends State<NavigationManager> {
     HomeScreen(),
     SearchScreen(),
     WishListScreen(),
-    CollectionScreen(),
   ];
 
   void _onItemTapped(int index) {

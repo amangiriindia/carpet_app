@@ -1,4 +1,10 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'package:share/share.dart';
 
 class CarpetDesign extends StatefulWidget {
   @override
@@ -8,41 +14,53 @@ class CarpetDesign extends StatefulWidget {
 class _CarpetDesignPageState extends State<CarpetDesign> {
   Color colorA = Colors.grey;
   Color colorB = Colors.grey;
+  GlobalKey _globalKey = GlobalKey(); // Key for RepaintBoundary
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Carpet Design')),
+      appBar: AppBar(
+        title: Text('Carpet Design'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _saveAsImage, // Save as Image
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
             child: Container(
               padding: EdgeInsets.all(16.0),
-              child: CustomPaint(
-                painter: CarpetPainter(colorA: colorA, colorB: colorB),
-                child: Center(
-                  child: Stack(
-                    children: [
-                      _buildDragTarget(
-                        label: "A",
-                        initialColor: colorA,
-                        onColorDropped: (color) {
-                          setState(() {
-                            colorA = color;
-                          });
-                        },
-                      ),
-                      _buildDragTarget(
-                        label: "B",
-                        initialColor: colorB,
-                        onColorDropped: (color) {
-                          setState(() {
-                            colorB = color;
-                          });
-                        },
-                        offsetX: 0.5,
-                      ),
-                    ],
+              child: RepaintBoundary(
+                key: _globalKey,
+                child: CustomPaint(
+                  painter: CarpetPainter(colorA: colorA, colorB: colorB),
+                  child: Center(
+                    child: Stack(
+                      children: [
+                        _buildDragTarget(
+                          label: "A",
+                          initialColor: colorA,
+                          onColorDropped: (color) {
+                            setState(() {
+                              colorA = color;
+                            });
+                          },
+                        ),
+                        _buildDragTarget(
+                          label: "B",
+                          initialColor: colorB,
+                          onColorDropped: (color) {
+                            setState(() {
+                              colorB = color;
+                            });
+                          },
+                          offsetX: 0.5,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -112,6 +130,24 @@ class _CarpetDesignPageState extends State<CarpetDesign> {
         },
       ),
     );
+  }
+
+  Future<void> _saveAsImage() async {
+    try {
+      RenderRepaintBoundary boundary = _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage();
+      ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+      final directory = (await getApplicationDocumentsDirectory()).path;
+      final imgFile = File('$directory/carpet_design.png');
+      imgFile.writeAsBytes(pngBytes);
+
+      // Share the image
+      Share.shareFiles([imgFile.path], text: 'Check out my carpet design!');
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }
 

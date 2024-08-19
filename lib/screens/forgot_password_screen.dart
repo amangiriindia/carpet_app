@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../const.dart';
 import 'forgot_confirm_password.dart';
 import 'login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast
@@ -52,7 +53,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('https://email-fp0n.onrender.com/api/auth/forgot-password'),
+      Uri.parse('${APIConstants.API_URL}/api/auth/forgot-password'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

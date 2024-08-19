@@ -11,17 +11,40 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _nameController = TextEditingController(text: '');
-  final TextEditingController _emailController = TextEditingController(text: '');
-  final TextEditingController _phoneNumberController = TextEditingController(text: '+91 9999999999');
-  final TextEditingController _addressController = TextEditingController(text: 'Xyz, Abc, 123456');
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneNumberController;
+  late TextEditingController _addressController;
 
   final String _joinedSince = '12th June 2023';
+
+  late String _userId; // Variable to store userId
 
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneNumberFocus = FocusNode();
   final FocusNode _addressFocus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      _userId = prefs.getString('userId') ?? '';
+
+      _nameController = TextEditingController(
+          text: '${prefs.getString('firstName') ?? ''} ${prefs.getString('lastName') ?? ''}'
+      );
+      _emailController = TextEditingController(text: prefs.getString('email') ?? '');
+      _phoneNumberController = TextEditingController(text: prefs.getString('mobileNumber') ?? '');
+      _addressController = TextEditingController(text: prefs.getString('address') ?? '');
+    });
+  }
 
   @override
   void dispose() {
@@ -77,26 +100,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   _buildStaticField('Joined Since', _joinedSince),
                   const SizedBox(height: 40),
                   Center(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          _saveProfileChanges();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 181,
+                      height: 25.24,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF000000), Color(0xFF666666)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(2.74),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 22),
-                        child: Text(
-                          'Save Changes',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            _saveProfileChanges();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.zero, // Remove default padding
+                          elevation: 0, // Remove shadow
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2.74),
+                          ),
+                          backgroundColor: Colors.transparent, // Make button background transparent
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Save Changes',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Poppins',
+                              fontSize: 8.78,
+                              fontWeight: FontWeight.w300,
+                              letterSpacing: 0.14,
+                              height: 1.5,
+                            ),
                           ),
                         ),
                       ),
@@ -129,15 +170,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: TextFormField(
                 controller: controller,
                 focusNode: focusNode,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                  color: const Color(0xFF3D3636),
+                ),
                 decoration: InputDecoration(
                   labelText: label,
-                  border: const UnderlineInputBorder(),
+                  labelStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14.66,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF292929),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.mode_edit_outline_outlined),
-              onPressed: () => FocusScope.of(context).requestFocus(focusNode),
+            Container(
+              width: 18,
+              height: 18,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1D1D1D),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: IconButton(
+                  icon: const Icon(Icons.mode_edit_outlined, size: 10, color: Colors.white),
+                  onPressed: () => FocusScope.of(context).requestFocus(focusNode),
+                  padding: EdgeInsets.zero,
+                ),
+              ),
             ),
           ],
         ),
@@ -162,11 +228,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _saveProfileChanges() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Save the updated profile information
+    // Use the existing userId and update profile information
+    await prefs.setString('userId', _userId); // Ensure the userId is saved
     await prefs.setString('full_name', _nameController.text);
     await prefs.setString('email', _emailController.text);
     await prefs.setString('phone_number', _phoneNumberController.text);
     await prefs.setString('address', _addressController.text);
+
+    // Optionally: If you have an API or server to update this data, you could call it here.
 
     // Show a confirmation message
     ScaffoldMessenger.of(context).showSnackBar(

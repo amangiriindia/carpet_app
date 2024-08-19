@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../const.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_navigation_bar.dart';
 import '../widgets/profile_drawer.dart';
@@ -43,7 +44,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
 
   Future<List<SingleCollectionItem>> fetchSingleCollections() async {
     final response = await http.get(
-      Uri.parse('https://oacrugs.onrender.com/api/v1/carpet/all-carpet'),
+      Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
     );
 
     if (response.statusCode == 200) {

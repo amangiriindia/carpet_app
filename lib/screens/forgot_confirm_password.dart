@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../const.dart';
 import 'login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast
 
@@ -68,16 +69,18 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
     _showLoadingDialog();
     if (newPasswordController.text == confirmPasswordController.text) {
       final response = await http.post(
-        Uri.parse('https://email-fp0n.onrender.com/api/auth/verify-otp'),
+        Uri.parse('${APIConstants.API_URL}/api/auth/verify-otp'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
+
         body: jsonEncode(<String, String>{
           'email': widget.email,
           'otp': otpController.text,
           'password': newPasswordController.text,
           'confirmPassword': confirmPasswordController.text,
         }),
+
       );
       _hideLoadingDialog();
       // Debug print statements to check the response

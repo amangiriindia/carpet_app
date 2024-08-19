@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../const.dart';
 import '../screens/collection_screen.dart';
 
 class HorizontalImageList extends StatefulWidget {
@@ -23,7 +24,7 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
 
   Future<List<CollectionItem>> fetchCollections() async {
     final response = await http.get(
-      Uri.parse('https://oacrugs.onrender.com/api/v1/collection/all-collection'),
+      Uri.parse('${APIConstants.API_URL}/api/v1/collection/all-collection'),
     );
 
     if (response.statusCode == 200) {

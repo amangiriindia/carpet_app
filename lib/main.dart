@@ -1,11 +1,12 @@
-import 'package:OACrugs/screens/test_color_drop.dart';
+import 'package:OACrugs/screens/collection_screen.dart';
+import 'package:OACrugs/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/collection_screen.dart';
 import 'screens/enquiry_form.dart';
 import 'screens/enquiry_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
+import 'screens/welcome_screen.dart';
 import 'screens/wishlist_screen.dart';
 import 'widgets/color_picker.dart';
 import 'wish_list_provider.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: CarpetDesign(), // Use SplashScreenHandler
+      home: CollectionScreen(collectionId: '', collectionName: '',), // Use SplashScreenHandler
 
       routes: {
          '/home': (context) => const HomeScreen(),

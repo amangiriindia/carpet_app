@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../const.dart';
+
 class RecentProjectsSection extends StatefulWidget {
   @override
   _RecentProjectsSectionState createState() => _RecentProjectsSectionState();
@@ -35,7 +37,7 @@ class _RecentProjectsSectionState extends State<RecentProjectsSection> {
 
   Future<List<RecentProjectsitem>> fetchRecentProjects() async {
     final response = await http.get(
-      Uri.parse('https://oacrugs.onrender.com/api/v1/recent/all-recent'),
+      Uri.parse('${APIConstants.API_URL}/api/v1/recent/all-recent'),
     );
 
     if (response.statusCode == 200) {

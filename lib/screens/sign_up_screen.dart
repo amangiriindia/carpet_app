@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../const.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -81,7 +82,7 @@ class _SignUpScreenState extends State<SignUpScreen>
         _showLoadingDialog();
 
         final response = await http.post(
-          Uri.parse('https://email-fp0n.onrender.com/api/auth/register'),
+          Uri.parse('${APIConstants.API_URL}/api/auth/register'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },

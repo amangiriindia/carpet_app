@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../const.dart';
+
 class BannerSection extends StatefulWidget {
   @override
   _BannerSectionState createState() => _BannerSectionState();
@@ -30,7 +32,7 @@ class _BannerSectionState extends State<BannerSection> {
   }
 
   Future<void> fetchSliderImages() async {
-    final url = 'https://oacrugs.onrender.com/api/v1/slider/all-slider';
+    final url = '${APIConstants.API_URL}/api/v1/slider/all-slider';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {

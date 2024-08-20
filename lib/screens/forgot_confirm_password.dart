@@ -69,7 +69,7 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
     _showLoadingDialog();
     if (newPasswordController.text == confirmPasswordController.text) {
       final response = await http.post(
-        Uri.parse('${APIConstants.API_URL}/api/auth/verify-otp'),
+        Uri.parse('${APIConstants.API_URL}/api/v1/user/verify-otp'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

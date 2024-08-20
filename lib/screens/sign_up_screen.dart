@@ -79,10 +79,10 @@ class _SignUpScreenState extends State<SignUpScreen>
   Future<void> _signUp() async {
     if (_isTermsAccepted) {
       if (passwordController.text == rePasswordController.text) {
-        _showLoadingDialog();
+        CommonFunction.showLoadingDialog(context);
 
         final response = await http.post(
-          Uri.parse('${APIConstants.API_URL}/api/auth/register'),
+          Uri.parse('${APIConstants.API_URL}/api/v1/user/register'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },

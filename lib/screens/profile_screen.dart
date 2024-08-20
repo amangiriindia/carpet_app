@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -11,23 +14,30 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late TextEditingController _nameController;
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _addressController;
 
-  final String _joinedSince = '12th June 2023';
+  late String _userId;
 
-  late String _userId; // Variable to store userId
-
-  final FocusNode _nameFocus = FocusNode();
+  final FocusNode _firstNameFocus = FocusNode();
+  final FocusNode _lastNameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _phoneNumberFocus = FocusNode();
   final FocusNode _addressFocus = FocusNode();
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    _firstNameController = TextEditingController();
+    _lastNameController = TextEditingController();
+    _emailController = TextEditingController();
+    _phoneNumberController = TextEditingController();
+    _addressController = TextEditingController();
     _loadUserData();
   }
 
@@ -35,32 +45,91 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setState(() {
-      _userId = prefs.getString('userId') ?? '';
-
-      _nameController = TextEditingController(
-          text: '${prefs.getString('firstName') ?? ''} ${prefs.getString('lastName') ?? ''}'
-      );
-      _emailController = TextEditingController(text: prefs.getString('email') ?? '');
-      _phoneNumberController = TextEditingController(text: prefs.getString('mobileNumber') ?? '');
-      _addressController = TextEditingController(text: prefs.getString('address') ?? '');
+      _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
+      _firstNameController.text = prefs.getString('firstName') ?? '';
+      _lastNameController.text = prefs.getString('lastName') ?? '';
+      _emailController.text = prefs.getString('email') ?? '';
+      _phoneNumberController.text = prefs.getString('mobileNumber') ?? '';
+      _addressController.text = prefs.getString('address') ?? '';
+      _isLoading = false;
     });
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _phoneNumberController.dispose();
     _addressController.dispose();
-    _nameFocus.dispose();
+    _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
     _emailFocus.dispose();
     _phoneNumberFocus.dispose();
     _addressFocus.dispose();
     super.dispose();
   }
 
+  Future<void> _saveProfileChanges() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    CommonFunction.showLoadingDialog(context);
+
+    final url = 'https://oac.onrender.com/api/v1/user/update-user/$_userId';
+
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'firstName': _firstNameController.text.trim(),
+          'lastName': _lastNameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'mobileNumber': _phoneNumberController.text.trim(),
+          'address': _addressController.text.trim(),
+        }),
+      );
+
+      CommonFunction.hideLoadingDialog(context);
+
+      final responseBody = json.decode(response.body);
+      final user = responseBody['updatedUser'];
+      if (response.statusCode == 200 && responseBody['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${user['firstName']} ${user['lastName']}, Profile changes saved successfully!')),
+        );
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('firstName', user['firstName']);
+        await prefs.setString('lastName', user['lastName']);
+        await prefs.setString('email', user['email']);
+        await prefs.setString('mobileNumber', user['mobileNumber']);
+        await prefs.setString('address', user['address']);
+
+        // Optionally, you can refresh the user profile or navigate away
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save changes: ${responseBody['message']}')),
+        );
+      }
+    } catch (e) {
+      CommonFunction.hideLoadingDialog(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -70,7 +139,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Form(
               key: _formKey,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Row(
                     children: [
@@ -92,12 +161,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       const Spacer(flex: 2),
                     ],
                   ),
+                  const SizedBox(height: 40),
+                  _buildProfileIcon(),
                   const SizedBox(height: 20),
-                  _buildField('Full Name', _nameController, _nameFocus),
+                  _buildField('First Name', _firstNameController, _firstNameFocus),
+                  _buildField('Last Name', _lastNameController, _lastNameFocus),
                   _buildField('Email', _emailController, _emailFocus),
                   _buildField('Phone No.', _phoneNumberController, _phoneNumberFocus),
                   _buildField('Address', _addressController, _addressFocus),
-                  _buildStaticField('Joined Since', _joinedSince),
                   const SizedBox(height: 40),
                   Center(
                     child: Container(
@@ -112,21 +183,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         borderRadius: BorderRadius.circular(2.74),
                       ),
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            _formKey.currentState!.save();
-                            _saveProfileChanges();
-                          }
-                        },
+                        onPressed: _saveProfileChanges,
                         style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.zero, // Remove default padding
-                          elevation: 0, // Remove shadow
+                          padding: EdgeInsets.zero,
+                          elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(2.74),
                           ),
-                          backgroundColor: Colors.transparent, // Make button background transparent
+                          backgroundColor: Colors.transparent,
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Text(
                             'Save Changes',
                             textAlign: TextAlign.center,
@@ -152,6 +218,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildProfileIcon() {
+    String name = _firstNameController.text.trim();
+    String initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+
+    return CircleAvatar(
+      radius: 40,
+      backgroundColor: const Color(0xFF666666),
+      child: Text(
+        initial,
+        style: const TextStyle(
+          fontSize: 40,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   Widget _buildField(String label, TextEditingController controller, FocusNode focusNode) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -170,20 +254,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: TextFormField(
                 controller: controller,
                 focusNode: focusNode,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
                   height: 1.5,
-                  color: const Color(0xFF3D3636),
+                  color: Colors.black38,
                 ),
                 decoration: InputDecoration(
                   labelText: label,
-                  labelStyle: TextStyle(
+                  labelStyle: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 14.66,
                     fontWeight: FontWeight.w400,
-                    color: const Color(0xFF292929),
+                    color: Colors.black,
                   ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -193,8 +277,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               width: 18,
               height: 18,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1D1D1D),
+              decoration: const BoxDecoration(
+                color: Color(0xFF1D1D1D),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -208,38 +292,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStaticField(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: TextFormField(
-        initialValue: value,
-        readOnly: true,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const UnderlineInputBorder(),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _saveProfileChanges() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Use the existing userId and update profile information
-    await prefs.setString('userId', _userId); // Ensure the userId is saved
-    await prefs.setString('full_name', _nameController.text);
-    await prefs.setString('email', _emailController.text);
-    await prefs.setString('phone_number', _phoneNumberController.text);
-    await prefs.setString('address', _addressController.text);
-
-    // Optionally: If you have an API or server to update this data, you could call it here.
-
-    // Show a confirmation message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile changes saved successfully!')),
     );
   }
 }

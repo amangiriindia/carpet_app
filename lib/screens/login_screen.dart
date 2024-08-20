@@ -9,6 +9,7 @@ import '../const.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -29,28 +30,6 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     passwordFocusNode = FocusNode();
   }
 
-  void _showLoadingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissal when tapping outside
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text('Loading...'),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _hideLoadingDialog() {
-    Navigator.of(context).pop(); // Close the dialog
-  }
 
   void _handleTapOutside() => FocusScope.of(context).unfocus();
 
@@ -65,9 +44,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }
 
   Future<void> _login() async {
-    _showLoadingDialog();
+    CommonFunction.showLoadingDialog(context);
     final response = await http.post(
-      Uri.parse('${APIConstants.API_URL}/api/auth/login'),
+      Uri.parse('${APIConstants.API_URL}/api/v1/user/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -76,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         'password': passwordController.text,
       }),
     );
-    _hideLoadingDialog();
+    CommonFunction.hideLoadingDialog(context);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -91,6 +70,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       await prefs.setString('mobileNumber', user['mobileNumber']);
       await prefs.setBool('isVerified', user['isVerified']);
       await prefs.setBool('isLoggedIn', true);
+
 
 
       // Add a 2-second delay before navigation
@@ -256,12 +236,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                             alignment: Alignment.centerLeft,
                             child: GestureDetector(
                               onTap: () {
-                                _showLoadingDialog();
+                                CommonFunction.showLoadingDialog(context);
 
                                 // Add a 2-second delay before navigation
                                 Future.delayed(Duration(seconds: 2), () {
                                   // Hide the loading dialog (optional)
-                                  _hideLoadingDialog();
+                                  CommonFunction.hideLoadingDialog(context);
 
                                   // Navigate to the ForgotPasswordScreen after the delay
                                   Navigator.push(
@@ -317,12 +297,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     SizedBox(height: 2),
                     GestureDetector(
                       onTap: () {
-                        _showLoadingDialog();
+                        CommonFunction.showLoadingDialog(context);
 
                         // Add a 2-second delay before navigation
                         Future.delayed(Duration(seconds: 2), () {
                           // Hide the loading dialog (optional)
-                          _hideLoadingDialog();
+                          CommonFunction.hideLoadingDialog(context);
 
                           // Navigate to the SignUpScreen after the delay
                           Navigator.push(

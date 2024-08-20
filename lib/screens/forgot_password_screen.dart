@@ -53,7 +53,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
 
     final response = await http.post(
-      Uri.parse('${APIConstants.API_URL}/api/auth/forgot-password'),
+      Uri.parse('${APIConstants.API_URL}/api/v1/user/forgot-password'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

@@ -1,4 +1,3 @@
-import 'package:OACrugs/screens/collection_screen.dart';
 import 'package:OACrugs/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: CollectionScreen(collectionId: '', collectionName: '',), // Use SplashScreenHandler
+      home: EditProfileScreen(), // Use SplashScreenHandler
 
       routes: {
          '/home': (context) => const HomeScreen(),

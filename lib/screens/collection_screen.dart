@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../const.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/custom_navigation_bar.dart';
@@ -46,25 +45,33 @@ class _CollectionScreenState extends State<CollectionScreen> {
     final response = await http.get(
       Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
     );
-
+       print(response.statusCode);
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      List<dynamic> getAllCarpets = jsonResponse['getAllCarpets'];
-      List<SingleCollectionItem> items = getAllCarpets.map<SingleCollectionItem>((collection) {
-        List<int> imageData = List<int>.from(collection['photo']['data']['data'] ?? []);
-        return SingleCollectionItem(
-          imageData: imageData.isNotEmpty ? Uint8List.fromList(imageData) : Uint8List(0),
-          collectionId: collection['collection'] ?? 'Unknown Collection',
-          carpetname: collection['name'] ?? 'Unknown ID',
-          price: (collection['price'] ?? 0).toString(),
-          dimension: collection['dimension'] ?? 'Unknown Dimension',
-        );
-      }).toList();
-      return items;
+      // Add a null check for 'getAllCarpets'
+      final List<dynamic> getAllCarpets = jsonResponse['getAllCarpets'] ?? [];
+
+      // Ensure getAllCarpets is a list
+      if (getAllCarpets is List<dynamic>) {
+        List<SingleCollectionItem> items = getAllCarpets.map<SingleCollectionItem>((collection) {
+          List<int> imageData = List<int>.from(collection['photo']['data']['data'] ?? []);
+          return SingleCollectionItem(
+            imageData: imageData.isNotEmpty ? Uint8List.fromList(imageData) : Uint8List(0),
+            collectionId: collection['collection'] ?? 'Unknown Collection',
+            carpetname: collection['name'] ?? 'Unknown ID',
+            price: (collection['price'] ?? 0).toString(),
+            dimension: collection['dimension'] ?? 'Unknown Dimension',
+          );
+        }).toList();
+        return items;
+      } else {
+        throw Exception('Unexpected response format');
+      }
     } else {
       throw Exception('Failed to load collections');
     }
   }
+
 
   void _onItemTapped(int index) {
     setState(() {

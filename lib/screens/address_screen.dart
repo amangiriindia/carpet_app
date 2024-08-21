@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../const.dart';
+
 class AddressScreen extends StatefulWidget {
   const AddressScreen({super.key});
 
@@ -15,12 +17,8 @@ class AddressScreen extends StatefulWidget {
 class _AddressScreenState extends State<AddressScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Current selected address
   String? _selectedAddressId;
-
-  // Address list from API
   List<dynamic> _addresses = [];
-
   late String _userId;
 
   @override
@@ -29,70 +27,114 @@ class _AddressScreenState extends State<AddressScreen> {
     _loadUserData();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c'; // Fallback user ID if not found
+      _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
     });
     _fetchAddresses();
   }
 
   Future<void> _fetchAddresses() async {
-    final url = 'https://oac.onrender.com/api/v1/address/user-address';
+    CommonFunction.showLoadingDialog(context);
+    final url = '${APIConstants.API_URL}/api/v1/address/user-address';
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'userId': _userId}),
       );
-      print(response.statusCode);
-
+      CommonFunction.hideLoadingDialog(context);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success']) {
           setState(() {
             _addresses = data['addresses'];
           });
-        } else if (data['addresses'].isEmpty) {
-          // No addresses found
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('No addresses found for this user.')),
-          );
         } else {
-          // Unexpected success state
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to fetch addresses: ${data['message']}')),
           );
         }
-      } else if (response.statusCode == 404) {
-        // No addresses found for this user
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No addresses found for this user.')),
-        );
-      } else if (response.statusCode == 500) {
-        // Server error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Server error. Please try again later.')),
-        );
       } else {
-        // Handle other response status codes
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to fetch addresses. Please try again later.')),
         );
       }
     } catch (error) {
-      // Handle any other errors such as network issues
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $error')),
       );
     }
   }
 
+  Future<void> _deleteAddress(String addressId) async {
+    CommonFunction.showLoadingDialog(context);
+    final url = '${APIConstants.API_URL}/api/v1/address/delete-address/$addressId';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+      CommonFunction.hideLoadingDialog(context);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success']) {
+          setState(() {
+            _addresses.removeWhere((address) => address['_id'] == addressId);
+          });
+          Fluttertoast.showToast(
+            msg: data['message'],
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16.0,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to delete address: ${data['message']}')),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete address. Please try again later.')),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $error')),
+      );
+    }
+  }
+
+  void _confirmDelete(BuildContext context, String addressId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Delete Address"),
+          content: Text("Are you sure you want to delete this address?"),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Delete"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteAddress(addressId);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -251,6 +293,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   icon: const Icon(Icons.delete, color: Colors.black54),
                   onPressed: () {
                     // Add your delete functionality here
+                    _confirmDelete;
                   },
                 ),
               ],

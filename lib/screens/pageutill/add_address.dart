@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../const.dart';
+
 class AddAddressPage extends StatefulWidget {
   @override
   _AddAddressPageState createState() => _AddAddressPageState();
@@ -47,7 +49,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
   }
 
   Future<void> _addAddress() async {
-    final String apiUrl = 'https://oac.onrender.com/api/v1/address/create-address/';
+    CommonFunction.showLoadingDialog(context);
+    final String apiUrl = '${APIConstants.API_URL}/api/v1/address/create-address/';
 
     Map<String, dynamic> addressData = {
       "userId": _userId,
@@ -67,7 +70,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(addressData),
       );
-
+      CommonFunction.hideLoadingDialog(context);
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
         if (data['success']) {

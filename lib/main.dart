@@ -1,5 +1,9 @@
 import 'package:OACrugs/screens/address_screen.dart';
+import 'package:OACrugs/screens/collection_screen.dart';
 import 'package:OACrugs/screens/pageutill/add_address.dart';
+import 'package:OACrugs/screens/pageutill/carpet_pattern_choose.dart';
+import 'package:OACrugs/screens/pageutill/home_product_horigontal_list.dart';
+import 'package:OACrugs/screens/pending_query.dart';
 import 'package:OACrugs/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +38,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: AddressScreen(), // Use SplashScreenHandler
+      home:  CarpetPatternPage(carpetId: 'testid', carpetName: 'test',), // Use SplashScreenHandler
 
       routes: {
          '/home': (context) => const HomeScreen(),

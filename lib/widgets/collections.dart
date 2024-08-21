@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../const.dart';
 import '../screens/collection_screen.dart';
+import '../screens/pageutill/carpet_pattern_choose.dart';
 
 class HorizontalImageList extends StatefulWidget {
   const HorizontalImageList({Key? key}) : super(key: key);
@@ -24,12 +25,12 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
 
   Future<List<CollectionItem>> fetchCollections() async {
     final response = await http.get(
-      Uri.parse('${APIConstants.API_URL}/api/v1/collection/all-collection'),
+      Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
     );
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(response.body);
-      List<dynamic> allCollections = jsonResponse['allCollection'];
+      List<dynamic> allCollections = jsonResponse['carpets'];
       List<CollectionItem> items = allCollections.map((collection) {
         List<int> imageData = List<int>.from(collection['photo']['data']['data']);
         return CollectionItem(
@@ -77,9 +78,9 @@ class _HorizontalImageListState extends State<HorizontalImageList> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CollectionScreen(
-                            collectionId: snapshot.data![index].id,
-                            collectionName: snapshot.data![index].text,
+                          builder: (context) => CarpetPatternPage(
+                            carpetId: snapshot.data![index].id,
+                            carpetName:  snapshot.data![index].text,
                           ),
                         ),
                       );

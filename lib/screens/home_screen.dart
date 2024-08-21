@@ -1,3 +1,4 @@
+import 'package:OACrugs/screens/pageutill/home_product_horigontal_list.dart';
 import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
 import 'package:flutter/material.dart';
 import '../widgets/banner.dart';
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 RecentProjectsSection(),
                 const SizedBox(height: 10),
                 const Center(child: SectionTitle(title: "Shops To Explore")),
-                const HorizontalImageList(),
+                const HomeCarpetItems(),
                 const SizedBox(height: 10),
                 const Center(child: SectionTitle(title: "Guide for Placement")),
                 const PlacementGuideList(),

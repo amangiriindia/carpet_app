@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:  CarpetPatternPage(carpetId: 'testid', carpetName: 'test',), // Use SplashScreenHandler
+      home:  HomeScreen(), // Use SplashScreenHandler
 
       routes: {
          '/home': (context) => const HomeScreen(),

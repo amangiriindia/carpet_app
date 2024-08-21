@@ -136,6 +136,16 @@ class _AddressScreenState extends State<AddressScreen> {
     );
   }
 
+  Future<void> _checkCarpetShapeSizeFlag() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool carpetShapeSizeFlag = prefs.getBool('carpetShapeSizeFlag') ?? false;
+
+    if (carpetShapeSizeFlag) {
+      prefs.setBool('carpetShapeSizeFlag', false); // Reset the flag
+      Navigator.of(context).pop(true); // Pop and pass true to indicate the flag was true
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -256,10 +266,13 @@ class _AddressScreenState extends State<AddressScreen> {
                 Radio<String>(
                   value: _id,
                   groupValue: _selectedAddressId,
-                  onChanged: (value) {
+                  onChanged: (value) async {
                     setState(() {
                       _selectedAddressId = value;
                     });
+                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setString('CurrentSelectedAddress', _selectedAddressId!);
+
                     Fluttertoast.showToast(
                       msg: "Selected Address ID: $_id",
                       toastLength: Toast.LENGTH_SHORT,
@@ -269,34 +282,22 @@ class _AddressScreenState extends State<AddressScreen> {
                       textColor: Colors.white,
                       fontSize: 16.0,
                     );
+
+                    // Check carpetShapeSizeFlag and navigate accordingly
+                    _checkCarpetShapeSizeFlag();
                   },
-                  activeColor: Colors.black,
                 ),
               ],
             ),
           ),
           Positioned(
-            top: 8,
-            right: 8,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, color: Colors.black54),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) =>  AddAddressPage()),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.black54),
-                  onPressed: () {
-                    // Add your delete functionality here
-                    _confirmDelete;
-                  },
-                ),
-              ],
+            top: 0,
+            right: 0,
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                _confirmDelete(context, _id);
+              },
             ),
           ),
         ],

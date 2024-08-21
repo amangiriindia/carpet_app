@@ -6,10 +6,9 @@ import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
-
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
-}
+} 
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
@@ -19,9 +18,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _emailController;
   late TextEditingController _phoneNumberController;
   late TextEditingController _addressController;
-
   late String _userId;
-
   final FocusNode _firstNameFocus = FocusNode();
   final FocusNode _lastNameFocus = FocusNode();
   final FocusNode _emailFocus = FocusNode();

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert'; // For JSON encoding
+import 'dart:typed_data'; // Import for Uint8List
 import '../../widgets/color_picker.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_navigation_bar.dart';
@@ -8,8 +11,9 @@ import '../../widgets/profile_drawer.dart';
 import '../home_screen.dart';
 import '../notification_screen.dart';
 import '../search_screen.dart';
-import 'package:OACrugs/screens/wishlist_screen.dart'; // Correct import statement
-import 'dart:typed_data'; // Import for Uint8List
+import 'package:OACrugs/screens/wishlist_screen.dart';
+
+import '../thanks_screen.dart'; // Correct import statement
 
 class EnquiryScreen extends StatefulWidget {
   final String carpetId;
@@ -48,6 +52,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   final _queryController = TextEditingController();
   DateTime? _expectedDeliveryDate;
   var _userId;
+
   @override
   void initState() {
     super.initState();
@@ -57,13 +62,89 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
     _expectedDeliveryDate = widget.expectedDeliveryDate;
     _loadUserData();
   }
+
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
     });
-
   }
+
+  Future<void> _submitEnquiry() async {
+    final String apiUrl = 'https://oac.onrender.com/api/v1/enquiry/create-enquiry';
+
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(apiUrl))
+        ..fields['user'] = _userId
+        ..fields['address'] = widget.addressId
+        ..fields['product'] = widget.carpetId
+        ..fields['quantity'] = _quantityController.text
+        ..fields['productSize'] = widget.dimensionId
+        ..fields['shape'] = widget.shapeId
+        ..fields['productColor'] = jsonEncode(widget.hexCodes) // Encode as JSON array
+        ..fields['query'] = _queryController.text
+        ..fields['status'] = 'false'
+        ..fields['expectedDelivery'] = _expectedDeliveryDate?.toIso8601String() ?? ''
+        ..fields['patternId'] = widget.patternId;
+      // Check if the image is available and add it to the request
+      if (widget.patternImage.isNotEmpty) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'photo',
+            widget.patternImage,
+            filename: 'pattern_image.jpg',
+
+          ),
+        );
+        print('Added file to request');
+      } else {
+        print('Pattern image is null or empty, skipping image upload.');
+      }
+
+      // Send the request
+      final response = await request.send();
+
+      // Convert the streamed response into a full Response object
+      final responseBody = await http.Response.fromStream(response);
+      final responseJson = json.decode(responseBody.body);
+
+      // Debugging: Print request details and response
+      print('Request fields: ${request.fields}');
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${responseBody.body}');
+
+      if (response.statusCode == 201) {
+        // Success case
+        print('Enquiry submitted successfully');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ThankYouScreen(),
+          ),
+        );
+      } else {
+        // Handle error cases, including 400, 401, 500, and others
+        String errorMessage = responseJson['message'] ?? 'Unknown error';
+        print('Failed to submit enquiry: $errorMessage');
+
+        // You can show an error message to the user here
+        // For example, using a SnackBar:
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $errorMessage')),
+        );
+      }
+    } catch (error) {
+      // Catch and print any errors during the process
+      print('Error submitting enquiry: $error');
+
+      // Show a generic error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred while submitting the enquiry.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorPickerProvider = Provider.of<ColorPickerProvider>(context, listen: false);
@@ -184,14 +265,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                             SizedBox(height: 16),
                             Center(
                               child: ElevatedButton(
-                                onPressed: () {
-                                  // Handle form submission
-                                  // You can use the data from controllers and fields
-                                  print('Quantity: ${_quantityController.text}');
-                                  print('Expected Delivery Date: ${_expectedDeliveryDate?.toLocal()}');
-                                  print('Query: ${_queryController.text}');
-                                  // Implement your form submission logic here
-                                },
+                                onPressed: _submitEnquiry, // Trigger the API call
                                 child: Text('Submit Enquiry'),
                                 style: ElevatedButton.styleFrom(
                                   foregroundColor: Colors.white,
@@ -238,6 +312,15 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
               context,
               PageRouteBuilder(
                 pageBuilder: (_, __, ___) => const WishListScreen(),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          } else if (index == 3) {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => const ProfileDrawer(),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

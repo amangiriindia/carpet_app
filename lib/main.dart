@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:  HomeScreen(), // Use SplashScreenHandler
+      home:  HomeScreen(),
 
       routes: {
          '/home': (context) => const HomeScreen(),

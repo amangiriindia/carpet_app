@@ -1,79 +1,62 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import '../wish_list_provider.dart';
+
+import '../screens/search_screen.dart';
+
 
 class GridItem extends StatelessWidget {
-  final WishListItem item;
-  final bool isFavorite;
-  final VoidCallback onFavoriteToggle;
+  final CollectionItem item;
   final VoidCallback onTap;
+  final VoidCallback onLikeToggle;
+  final bool isLiked;
 
   const GridItem({
-    super.key,
+    Key? key,
     required this.item,
-    required this.isFavorite,
-    required this.onFavoriteToggle,
     required this.onTap,
-  });
+    required this.onLikeToggle,
+    required this.isLiked,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
-        ),
+        elevation: 5.0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(5.0)),
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Image.memory(
-                    item.imagePath,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              child: Image.memory(
+                item.imageData,
+                fit: BoxFit.cover,
+                width: double.infinity,
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.name,
-                          style: const TextStyle(
-                              fontSize: 14.0, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '₹ ${item.price}',
-                          style: const TextStyle(fontSize: 12.0),
-                        ),
-                        Text(
-                          item.size,
-                          style: const TextStyle(fontSize: 12.0, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border),
-                    color: isFavorite ? Colors.red : Colors.black,
-                    onPressed: onFavoriteToggle,
-                  ),
-                ],
+              child: Text(
+                item.text,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                '\$${item.price}',
+                style: const TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: Icon(
+                isLiked ? Icons.favorite : Icons.favorite_border,
+                color: isLiked ? Colors.red : Colors.grey,
+              ),
+              onPressed: onLikeToggle,
             ),
           ],
         ),

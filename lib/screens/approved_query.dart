@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
+
 import 'order_screen.dart';
 
 class ApprovedQueryScreen extends StatefulWidget {
@@ -9,20 +14,60 @@ class ApprovedQueryScreen extends StatefulWidget {
 }
 
 class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
-  final List<Order> orders = [
-    Order(
-      imagePath: 'assets/login/welcome.png',
-      name: 'Persian Tabriz',
-      price: 29.99,
-      size: '151 x 102 cm',
-    ),
-    Order(
-      imagePath: 'assets/login/welcome.png',
-      name: 'Persian Tabriz',
-      price: 49.99,
-      size: '151 x 102 cm',
-    ),
-  ];
+  late String _userId;
+  List<Order> orders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
+    // Once userId is loaded, fetch orders
+    _fetchOrders();
+  }
+
+  Future<void> _fetchOrders() async {
+    if (_userId.isEmpty) {
+      print('User ID is not initialized');
+      return;
+    }
+
+    final url = 'https://oac.onrender.com/api/v1/enquiry/user/enquiry-approve';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({"user": _userId}),
+    );
+
+    print(response.statusCode);
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success']) {
+        setState(() {
+          orders = (data['enquiries'] as List).map((item) {
+            List<int> photoData = List<int>.from(item['photo']['data']['data']);
+
+            return Order(
+              imagePath: 'data:image/jpeg;base64,' + base64Encode(Uint8List.fromList(photoData)),
+              name: item['product']['name'] ?? 'Unknown',
+              price: item['product']['price']?.toDouble() ?? 0.0,
+              size: item['productSize']['size'] ?? 'Unknown',
+            );
+          }).toList();
+        });
+      }
+    } else {
+      // Handle errors if needed
+      print('Failed to load orders');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,8 +85,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(3.14),
                       child: IconButton(
-                        icon: const Icon(Icons.login_outlined,
-                            color: Colors.black54),
+                        icon: const Icon(Icons.login_outlined, color: Colors.black54),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
@@ -50,8 +94,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
                     const SizedBox(width: 4),
                     const Text(
                       'Approved Query',
-                      style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -103,8 +146,8 @@ class OrderWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           children: [
-            Image.asset(
-              order.imagePath,
+            Image.memory(
+              base64Decode(order.imagePath.split(',')[1]),
               width: 110,
               height: 140,
               fit: BoxFit.cover,
@@ -124,7 +167,7 @@ class OrderWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '\$${order.price.toStringAsFixed(2)}',
+                    '₹${order.price.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,

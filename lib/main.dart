@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:  WishListScreen(),
+      home:  HomeScreen(),
 
       routes: {
          '/home': (context) => const HomeScreen(),

@@ -1,153 +1,158 @@
+import 'dart:convert';
 import 'dart:typed_data';
+import 'package:OACrugs/screens/search_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../wish_list_provider.dart';
-import 'enquiry_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../const.dart';
+import '../widgets/grid_item.dart';
 
-class WishListScreen extends StatelessWidget {
+class WishListScreen extends StatefulWidget {
   const WishListScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.favorite_border, color: Colors.black54),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Wishlist',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Consumer<WishListProvider>(
-                  builder: (context, wishListProvider, child) {
-                    final items = wishListProvider.items;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        return WishListItemWidget(
-                          item: items[index],
-                          onRemove: () {
-                            wishListProvider.removeItem(items[index]);
-                          },
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  _WishlistScreenState createState() => _WishlistScreenState();
 }
 
-class WishListItemWidget extends StatelessWidget {
-  final WishListItem item;
-  final VoidCallback onRemove;
+class _WishlistScreenState extends State<WishListScreen> {
+  List<CollectionItem> _wishlistItems = [];
 
-  const WishListItemWidget({
-    super.key,
-    required this.item,
-    required this.onRemove,
-  });
+  @override
+  void initState() {
+    super.initState();
+    _loadWishlistItems();
+  }
+  Future<void> _loadWishlistItems() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final List<String>? likedItemIds = prefs.getStringList('liked_items');
+
+      print('Liked item IDs from SharedPreferences: $likedItemIds'); // Debugging
+
+      if (likedItemIds != null && likedItemIds.isNotEmpty) {
+        try {
+          // Fetch item details for each liked item
+          List<CollectionItem> items = await Future.wait(
+            likedItemIds.map((id) => _fetchItemById(id)),
+          );
+          setState(() {
+            _wishlistItems = items;
+          });
+        } catch (fetchError) {
+          print('Error fetching wishlist items (inner catch): $fetchError');
+          // Show a more specific error message if possible
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error fetching wishlist items.')),
+          );
+        }
+      }
+    } catch (error) {
+      print('Error loading wishlist items (outer catch): $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading wishlist. Please try again later.')),
+      );
+    }
+  }
+
+  Future<CollectionItem> _fetchItemById(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('${APIConstants.API_URL}/api/v1/carpet/$id'),
+      );
+
+      print('Fetch item by ID response status code: ${response.statusCode}');
+      print('Fetch item by ID response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+
+        // Check if the 'photo' data exists and has the expected structure
+        if (jsonResponse['photo'] != null &&
+            jsonResponse['photo']['data'] != null &&
+            jsonResponse['photo']['data']['data'] != null) {
+
+          List<int> imageData = List<int>.from(jsonResponse['photo']['data']['data']);
+          return CollectionItem(
+            imageData: Uint8List.fromList(imageData),
+            text: jsonResponse['name'],
+            price: jsonResponse['price'].toString(),
+            id: jsonResponse['_id'],
+          );
+        } else {
+          // Handle the case where 'photo' data is missing or has an unexpected structure
+          throw Exception('Invalid photo data in response');
+        }
+      } else {
+        throw Exception('Failed to load item by id: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching item by id: $error');
+      rethrow;
+    }
+  }
+
+
+
+  Future<void> _toggleLike(String id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      List<String> likedItemIds = prefs.getStringList('liked_items') ?? [];
+
+      if (likedItemIds.contains(id)) {
+        likedItemIds.remove(id);
+        _wishlistItems.removeWhere((item) => item.id == id);
+      } else {
+        likedItemIds.add(id);
+        final newItem = await _fetchItemById(id);
+        setState(() {
+          _wishlistItems.add(newItem);
+        });
+      }
+
+      await prefs.setStringList('liked_items', likedItemIds);
+      setState(() {});
+    } catch (error) {
+      print('Error toggling like: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-            child: Row(
-              children: [
-                Image.memory(
-                  item.imagePath, // Displaying image from Uint8List
-                  width: 110,
-                  height: 140,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.name,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '₹ ${item.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        item.size,
-                        style: const TextStyle(fontSize: 14, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 25),
-                      TextButton(
-                        onPressed: () {
-
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(color: Colors.black),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Text(
-                            'Enquiry',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text('Wishlist'),
+          backgroundColor: Colors.deepPurple,
+        ),
+        body: _wishlistItems.isEmpty
+            ? const Center(
+          child: Text('No items in wishlist'),
+        )
+            : Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.75,
+              crossAxisSpacing: 16.0,
+              mainAxisSpacing: 16.0,
             ),
+            itemCount: _wishlistItems.length,
+            itemBuilder: (context, index) {
+              final item = _wishlistItems[index];
+              return GridItem(
+                item: item,
+                onTap: () {
+                  // Handle item tap
+                },
+                onLikeToggle: () => _toggleLike(item.id),
+                isLiked: true,
+              );
+            },
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.black54),
-              onPressed: onRemove,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';
 import '../widgets/grid_item.dart';
 
@@ -60,7 +60,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
         setState(() {
           _items = items.take(9).toList(); // Limit to 9 items
-          _filteredItems = _items;
+
+          // Initialize _filteredItems with all items
+          _filteredItems = List.from(_items);
         });
       } else {
         throw Exception('Failed to load collections');
@@ -99,9 +101,14 @@ class _SearchScreenState extends State<SearchScreen> {
   void _search(String query) {
     setState(() {
       _searchQuery = query.toLowerCase();
-      _filteredItems = _items.where((item) {
-        return item.text.toLowerCase().contains(_searchQuery);
-      }).toList();
+      if (query.isEmpty) {
+        // If the search query is empty, show all items
+        _filteredItems = List.from(_items);
+      } else {
+        _filteredItems = _items.where((item) {
+          return item.text.toLowerCase().contains(_searchQuery);
+        }).toList();
+      }
     });
   }
 
@@ -150,7 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Expanded(
             child: TextField(
               onChanged: _search,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText: 'Search',
                 border: InputBorder.none,
               ),
@@ -195,10 +202,10 @@ class _SearchScreenState extends State<SearchScreen> {
             onTap: () => _showFilterOptions(context),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.filter_list, color: Colors.black, size: 16.0),
-                const SizedBox(width: 4.0),
-                const Text(
+              children: const [
+                Icon(Icons.filter_list, color: Colors.black, size: 16.0),
+                SizedBox(width: 4.0),
+                Text(
                   'Filter',
                   style: TextStyle(color: Colors.black, fontSize: 12.0),
                 ),

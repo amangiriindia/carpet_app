@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PendingOueryScreen extends StatefulWidget {
   const PendingOueryScreen({Key? key}) : super(key: key);
@@ -8,22 +12,53 @@ class PendingOueryScreen extends StatefulWidget {
 }
 
 class _PendingOueryScreenState extends State<PendingOueryScreen> {
-  final List<Order> orders = [
-    Order(
-      imagePath: 'assets/login/welcome.png',
-      name: 'Persian Tabriz',
-      price: 29.99,
-      size: '151 x 102 cm',
+  late String _userId;
+  List<Order> orders = [];
 
-    ),
-    Order(
-      imagePath: 'assets/login/welcome.png',
-      name: 'Persian Tabriz',
-      price: 49.99,
-      size: '151 x 102 cm',
-    ),
-    // Add more orders here
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
+    });
+    _fetchOrders();
+  }
+
+  Future<void> _fetchOrders() async {
+    final url = 'https://oac.onrender.com/api/v1/enquiry/user/enquiry-pending';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({"user": _userId}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success']) {
+        setState(() {
+          orders = (data['enquiries'] as List).map((item) {
+            // Ensure 'data' is a List<int>
+            List<int> photoData = List<int>.from(item['photo']['data']['data']);
+
+            return Order(
+              imagePath: 'data:image/jpeg;base64,' + base64Encode(Uint8List.fromList(photoData)),
+              name: item['product']['name']?? 'Unknown',
+              price: item['product']['price']?.toDouble() ?? 0.0,
+              size: item['productSize']['size'] ?? 'Unknown',
+            );
+          }).toList();
+        });
+      }
+    } else {
+      // Handle errors if needed
+      print('Failed to load orders');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +77,7 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(3.14),
                       child: IconButton(
-                        icon: const Icon(Icons.login_outlined,
-                            color: Colors.black54),
+                        icon: const Icon(Icons.login_outlined, color: Colors.black54),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
@@ -52,15 +86,14 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
                     const SizedBox(width: 4),
                     const Text(
                       'Pending Query',
-                      style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 ListView.builder(
-                  shrinkWrap: true, // Use this property to limit the height
-                  physics: NeverScrollableScrollPhysics(), // Disable scrolling
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
                     return OrderWidget(order: orders[index]);
@@ -97,7 +130,7 @@ class OrderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white, // Set the background color of the Card to white
+      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -105,8 +138,8 @@ class OrderWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           children: [
-            Image.asset(
-              order.imagePath,
+            Image.memory(
+              base64Decode(order.imagePath.split(',')[1]),
               width: 110,
               height: 140,
               fit: BoxFit.cover,
@@ -126,7 +159,7 @@ class OrderWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '\$${order.price.toStringAsFixed(2)}',
+                    '₹${order.price.toStringAsFixed(2)}',  // Using INR symbol ₹
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -148,8 +181,8 @@ class OrderWidget extends StatelessWidget {
                     child: Text(
                       'Pending Query',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.black
+                          fontSize: 12,
+                          color: Colors.black
                       ),
                     ),
                   ),
@@ -161,4 +194,5 @@ class OrderWidget extends StatelessWidget {
       ),
     );
   }
+
 }

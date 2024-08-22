@@ -271,20 +271,15 @@ class _AddressScreenState extends State<AddressScreen> {
                       _selectedAddressId = value;
                     });
                     final SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setString('CurrentSelectedAddress', _selectedAddressId!);
+                    await prefs.setString('CurrentSelectedAddress', _id);
 
-                    Fluttertoast.showToast(
-                      msg: "Selected Address ID: $_id",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.black,
-                      textColor: Colors.white,
-                      fontSize: 16.0,
-                    );
+                    if (prefs.get('checkCarpetFlag') != null) {
+                      await prefs.setBool('CurrentSelectedAddressFlag', true);
+                      Navigator.of(context).pop();  // Pops the current page
+                    }
 
-                    // Check carpetShapeSizeFlag and navigate accordingly
-                    _checkCarpetShapeSizeFlag();
+
+
                   },
                 ),
               ],

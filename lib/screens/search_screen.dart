@@ -177,12 +177,7 @@ class SearchScreen extends StatelessWidget {
                   }
                 },
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EnquiryScreen(),
-                    ),
-                  );
+
                 },
               );
             },

@@ -115,10 +115,7 @@ class WishListItemWidget extends StatelessWidget {
                       const SizedBox(height: 25),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => EnquiryScreen()),
-                          );
+
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),

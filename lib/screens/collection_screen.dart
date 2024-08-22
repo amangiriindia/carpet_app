@@ -251,12 +251,7 @@ class _CollectionScreenState extends State<CollectionScreen> {
                     // Implement your favorite toggle logic if needed
                   },
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const EnquiryScreen(),
-                      ),
-                    );
+
                   },
                 );
               },

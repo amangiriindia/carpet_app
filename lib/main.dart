@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         '/search_screen': (context) => const SearchScreen(),
         '/wishlist_screen': (context) => const WishListScreen(),
         '/enquiry_form': (context) => const EnquiryFormScreen(),
-        '/enquiry_screen': (context) => const EnquiryScreen(), // Add EnquiryScreen to routes
+
       },
 
     );

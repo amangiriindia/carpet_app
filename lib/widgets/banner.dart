@@ -35,6 +35,7 @@ class _BannerSectionState extends State<BannerSection> {
     final url = '${APIConstants.API_URL}/api/v1/slider/all-slider';
     try {
       final response = await http.get(Uri.parse(url));
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {

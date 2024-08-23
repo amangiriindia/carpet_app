@@ -1,9 +1,9 @@
+import 'package:OACrugs/screens/pageutill/place_order_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-
 import 'order_screen.dart';
 
 class ApprovedQueryScreen extends StatefulWidget {
@@ -43,9 +43,6 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
       body: json.encode({"user": _userId}),
     );
 
-    print(response.statusCode);
-    print(response.body);
-
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['success']) {
@@ -54,10 +51,14 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
             List<int> photoData = List<int>.from(item['photo']['data']['data']);
 
             return Order(
+              enquiryId: item['_id'] ?? 'Unknown',
               imagePath: 'data:image/jpeg;base64,' + base64Encode(Uint8List.fromList(photoData)),
-              name: item['product']['name'] ?? 'Unknown',
-              price: item['product']['price']?.toDouble() ?? 0.0,
+              carpetName: item['product']['name'] ?? 'Unknown',
+              patternName: item['patternId']['name'] ?? 'Unknown',
               size: item['productSize']['size'] ?? 'Unknown',
+              price: item['product']['price']?.toDouble() ?? 0.0,
+              shape: item['shape']['shape'] ?? 'Unknown',
+              description: item['product']['description'] ?? 'No description available',
             );
           }).toList();
         });
@@ -67,6 +68,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
       print('Failed to load orders');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -117,19 +119,26 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
 }
 
 class Order {
+  final String enquiryId;
   final String imagePath;
-  final String name;
-  final double price;
+  final String carpetName;
+  final String patternName;
   final String size;
+  final double price;
+  final String shape;
+  final String description;
 
   Order({
+    required this.enquiryId,
     required this.imagePath,
-    required this.name,
-    required this.price,
+    required this.carpetName,
+    required this.patternName,
     required this.size,
+    required this.price,
+    required this.shape,
+    required this.description,
   });
 }
-
 class OrderWidget extends StatelessWidget {
   final Order order;
 
@@ -138,7 +147,7 @@ class OrderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white, // Set the background color of the Card to white
+      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -146,11 +155,15 @@ class OrderWidget extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
           children: [
+            // Display image with error handling
             Image.memory(
               base64Decode(order.imagePath.split(',')[1]),
               width: 110,
               height: 140,
               fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(child: Text('Error loading image'));
+              },
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -158,8 +171,8 @@ class OrderWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    order.name,
-                    style: TextStyle(
+                    order.carpetName,
+                    style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: Colors.black
@@ -182,24 +195,34 @@ class OrderWidget extends StatelessWidget {
                   Row(
                     children: [
                       const Text('Approved', style: TextStyle(color: Colors.green)),
-                      SizedBox(width: 15),
+                      const SizedBox(width: 15),
                       InkWell(
                         onTap: () {
-                          // Add your button functionality here, e.g., navigate to the orders page
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => OrderScreen()), // Replace OrdersPage with your target page
+                            MaterialPageRoute(
+                              builder: (context) => ConfirmOrderPage(
+                                enquiryId: order.enquiryId,
+                                imagePath: order.imagePath,
+                                carpetName: order.carpetName,
+                                patternName: order.patternName,
+                                size: order.size,
+                                price: order.price,
+                                shape: order.shape,
+                                description: order.description,
+                              ),
+                            ),
                           );
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                           decoration: BoxDecoration(
                             color: Colors.black,
                             border: Border.all(color: Colors.black),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: const Text(
-                            'Go To Orders',
+                            'Place Order',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.white,
@@ -208,7 +231,7 @@ class OrderWidget extends StatelessWidget {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -218,3 +241,9 @@ class OrderWidget extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+

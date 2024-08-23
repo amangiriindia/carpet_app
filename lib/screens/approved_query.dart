@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'order_screen.dart';
 
 class ApprovedQueryScreen extends StatefulWidget {
   const ApprovedQueryScreen({super.key});
@@ -241,9 +240,3 @@ class OrderWidget extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-

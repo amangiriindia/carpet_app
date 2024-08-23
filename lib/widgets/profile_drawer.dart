@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../screens/address_screen.dart';
 import '../screens/approved_query.dart';
 import '../screens/order_screen.dart';
+import '../screens/pageutill/about_us_screen.dart';
+import '../screens/pageutill/custmer_support_screen.dart';
 import '../screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,6 +101,35 @@ class ProfileDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const ApprovedQueryScreen(),
+              ));
+            },
+          ),
+          const Divider(height: 1),
+
+          ListTile( // New Customer Support ListTile
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+            leading: const Icon(Icons.headset_mic_outlined, size: 24),
+            title: const Text(
+              'Customer Support',
+              style: TextStyle(fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const CustomerSupportScreen(),
+              ));
+            },
+          ),
+          const Divider(height: 1),
+          ListTile( // New About Us ListTile
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+            leading: const Icon(Icons.info_outline, size: 24),
+            title: const Text(
+              'About Us',
+              style: TextStyle(fontSize: 16),
+            ),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const AboutUsScreen(),
               ));
             },
           ),

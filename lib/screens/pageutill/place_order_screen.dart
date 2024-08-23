@@ -3,6 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/custom_app_bar.dart';
+import '../../widgets/profile_drawer.dart';
+import '../notification_screen.dart';
+
 class ConfirmOrderPage extends StatelessWidget {
   final String enquiryId;
   final String imagePath;
@@ -12,6 +16,11 @@ class ConfirmOrderPage extends StatelessWidget {
   final double price;
   final String shape;
   final String description;
+  final double patternPrice;
+  final double sizePrice;
+  final double gstPercent;
+  final double shapePrice;
+  final double colorPrice;
 
   const ConfirmOrderPage({
     super.key,
@@ -23,7 +32,23 @@ class ConfirmOrderPage extends StatelessWidget {
     required this.price,
     required this.shape,
     required this.description,
+    required this.patternPrice,
+    required this.sizePrice,
+    required this.gstPercent,
+    required this.shapePrice,
+    required this.colorPrice,
   });
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(value, style: const TextStyle(fontSize: 16)),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +56,8 @@ class ConfirmOrderPage extends StatelessWidget {
     Uint8List? decodedImage;
     try {
       // Ensure the base64 string is correctly formatted
-      if (imagePath.startsWith('data:image/') && imagePath.contains(';base64,')) {
+      if (imagePath.startsWith('data:image/') &&
+          imagePath.contains(';base64,')) {
         decodedImage = base64Decode(imagePath.split(',')[1]);
       } else {
         throw FormatException('Invalid image format');
@@ -40,103 +66,215 @@ class ConfirmOrderPage extends StatelessWidget {
       print('Error decoding image: $e');
     }
 
+    // Calculate individual prices and totals
+    double subtotal =
+        price + patternPrice + sizePrice + shapePrice + colorPrice;
+    double gstAmount = subtotal * (gstPercent / 100);
+    double totalPrice = subtotal + gstAmount;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Confirm Order'),
-        backgroundColor: Colors.deepPurple,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Display
-            if (decodedImage != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.memory(
-                  decodedImage,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              )
-            else
-              const Center(
-                child: Text('Error loading image'),
-              ),
-            const SizedBox(height: 20),
+      backgroundColor: Colors.white,
+      appBar: const CustomAppBar(),
+      drawer: const NotificationScreen(),
+      endDrawer: const ProfileDrawer(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Fixed "Order Summary" Section
+          Container(
 
-            // Carpet Name
-            Text(
-              carpetName,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
-            const SizedBox(height: 10),
-
-            // Price
-            Text(
-              'Price: ₹${price.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
-            ),
-            const SizedBox(height: 10),
-
-            // Pattern Name
-            Text(
-              'Pattern: $patternName',
-              style: const TextStyle(fontSize: 18, color: Colors.black87),
-            ),
-            const SizedBox(height: 10),
-
-            // Size
-            Text(
-              'Size: $size',
-              style: const TextStyle(fontSize: 18, color: Colors.black87),
-            ),
-            const SizedBox(height: 10),
-
-            // Shape
-            Text(
-              'Shape: $shape',
-              style: const TextStyle(fontSize: 18, color: Colors.black87),
-            ),
-            const SizedBox(height: 10),
-
-            // Description
-            Text(
-              'Description:',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
-
-            // Pay Now Button
-            Align(
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 50),
-                  backgroundColor: Colors.deepPurple,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+            child: Row(
+              children: [
+                const SizedBox(width: 12),
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(3.14),
+                  child: IconButton(
+                    icon:
+                        const Icon(Icons.login_outlined, color: Colors.black54),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
-                onPressed: () {
-                  // Add your payment logic here
-                },
-                child: const Text(
-                  'Pay Now',
-                  style: TextStyle(fontSize: 18, color: Colors.white),
+                const SizedBox(width: 80),
+                const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                const SizedBox(width: 4),
+                const Text(
+                  'Order Summary',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Image Display
+                  if (decodedImage != null)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(
+                        decodedImage,
+                        width: double.infinity,
+                        height: 250,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  else
+                    const Center(
+                      child: Text('Error loading image'),
+                    ),
+                  const SizedBox(height: 24),
+
+                  // Carpet Name
+                  Text(
+
+                    carpetName,
+                    style: const TextStyle(
+                        fontSize: 18, ),
+                  ),
+
+
+                  // Details (Pattern, Size, Shape, Description) in a Dropdown
+                  ExpansionTile(
+                    title: const Text('Carpet Details',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    children: [
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDetailRow('Pattern:', patternName),
+                              const SizedBox(height: 8),
+                              _buildDetailRow('Size:', size),
+                              const SizedBox(height: 8),
+                              _buildDetailRow('Shape:', shape),
+                              const SizedBox(height: 16),
+                              const Text(
+                                'Description:',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                description,
+                                style: const TextStyle(
+                                    fontSize: 14, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Card(
+                    elevation: 2,
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 0.0), // No margin needed for full width
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Price Breakdown Table
+                          Table(
+                            columnWidths: const {
+                              0: FlexColumnWidth(2),
+                              1: FlexColumnWidth(1),
+                            },
+                            children: [
+                              _buildTableRow('Carpet Price:',
+                                  '₹${price.toStringAsFixed(2)}'),
+                              _buildTableRow('Pattern Price:',
+                                  '₹${patternPrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Size Price:',
+                                  '₹${sizePrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Shape Price:',
+                                  '₹${shapePrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Color Price:',
+                                  '₹${colorPrice.toStringAsFixed(2)}'),
+                              TableRow(
+                                children: [
+                                  const SizedBox(height: 10),
+                                  Container(),
+                                ],
+                              ),
+                              _buildTableRow('Subtotal:',
+                                  '₹${subtotal.toStringAsFixed(2)}'),
+                              _buildTableRow(
+                                  'GST (${gstPercent.toStringAsFixed(0)}%):',
+                                  '₹${gstAmount.toStringAsFixed(2)}'),
+                            ],
+                          ),
+                          const Divider(color: Colors.black54),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Total Price:',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                Text('₹${totalPrice.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Pay Now Button (full width)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      onPressed: () {
+                        // Add your payment logic here
+                      },
+                      child: const Text(
+                        'Pay Now',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+
+  TableRow _buildTableRow(String label, String value) {
+    return TableRow(
+      children: [
+        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(value, style: const TextStyle(fontSize: 14)),
+      ],
     );
   }
 }

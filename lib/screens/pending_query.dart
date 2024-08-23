@@ -3,6 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/custom_app_bar.dart';
+import '../widgets/profile_drawer.dart';
+import 'notification_screen.dart';
 
 class PendingOueryScreen extends StatefulWidget {
   const PendingOueryScreen({Key? key}) : super(key: key);
@@ -64,10 +67,13 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: const CustomAppBar(),
+      drawer: const NotificationScreen(),
+      endDrawer: const ProfileDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[

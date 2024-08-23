@@ -1,4 +1,5 @@
 
+import 'package:OACrugs/splash_screen/custom_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/enquiry_form.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:  HomeScreen(),
+      home:  CustomSplashScreen(),
 
       routes: {
          '/home': (context) => const HomeScreen(),

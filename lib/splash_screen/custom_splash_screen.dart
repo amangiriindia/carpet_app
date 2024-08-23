@@ -16,14 +16,14 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
     _checkLoginStatus();
   }
 
-
   Future<void> _checkLoginStatus() async {
-
+    // Initial delay before checking login status
     await Future.delayed(Duration(seconds: 3));
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? isLoggedIn = prefs.getBool('isLoggedIn');
 
+    // Navigate based on the login status
     if (isLoggedIn == true) {
       Navigator.pushAndRemoveUntil(
         context,
@@ -39,9 +39,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
     }
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +53,6 @@ class _CustomSplashScreenState extends State<CustomSplashScreen> {
               ),
             ),
           ),
-
           Center(
             child: Image.asset(
               'assets/logos/center_image.png',

@@ -5,6 +5,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../../const.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../../widgets/profile_drawer.dart';
+import '../address_screen.dart';
+import '../notification_screen.dart';
 
 class AddAddressPage extends StatefulWidget {
   @override
@@ -22,6 +26,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
       postalCodeController;
 
   late String _userId;
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -49,50 +55,56 @@ class _AddAddressPageState extends State<AddAddressPage> {
   }
 
   Future<void> _addAddress() async {
-    CommonFunction.showLoadingDialog(context);
-    final String apiUrl = '${APIConstants.API_URL}/api/v1/address/create-address/';
+    if (_formKey.currentState!.validate()) {
+      CommonFunction.showLoadingDialog(context);
+      final String apiUrl = '${APIConstants.API_URL}/api/v1/address/create-address/';
 
-    Map<String, dynamic> addressData = {
-      "userId": _userId,
-      "name": nameController.text,
-      "number": phoneController.text,
-      "altPhone": altPhoneController.text,
-      "street": streetController.text,
-      "city": cityController.text,
-      "state": stateController.text,
-      "country": countryController.text,
-      "postalCode": postalCodeController.text,
-    };
+      Map<String, dynamic> addressData = {
+        "userId": _userId,
+        "name": nameController.text,
+        "number": phoneController.text,
+        "altPhone": altPhoneController.text,
+        "street": streetController.text,
+        "city": cityController.text,
+        "state": stateController.text,
+        "country": countryController.text,
+        "postalCode": postalCodeController.text,
+      };
 
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(addressData),
-      );
-      CommonFunction.hideLoadingDialog(context);
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        if (data['success']) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(data['message'])),
-          );
+      try {
+        final response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(addressData),
+        );
+        CommonFunction.hideLoadingDialog(context);
+        if (response.statusCode == 201) {
+          final data = jsonDecode(response.body);
+          if (data['success']) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(data['message'])),
+            );
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => AddressScreen()), // Replace AddressScreen with your actual screen
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to create address')),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to create address')),
+            SnackBar(content: Text('Server error: ${response.statusCode}')),
           );
         }
-      } else {
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Server error: ${response.statusCode}')),
+          SnackBar(content: Text('Network error: $e')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Network error: $e')),
-      );
     }
   }
+
 
   @override
   void dispose() {
@@ -110,14 +122,15 @@ class _AddAddressPageState extends State<AddAddressPage> {
   Widget _buildTextField({
     required String hintText,
     required TextEditingController controller,
+    required String? Function(String?) validator,
     TextInputType keyboardType = TextInputType.text,
     bool obscureText = false,
     List<TextInputFormatter>? inputFormatters,
   }) {
     return Container(
-      height: 48,
+      height: 60, // Increased height to ensure consistent size
       margin: EdgeInsets.symmetric(vertical: 8),
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
@@ -131,8 +144,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
             borderSide: BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(8),
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 15.0),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 15.0), // Adjusted padding
         ),
+        validator: validator,
       ),
     );
   }
@@ -142,15 +156,10 @@ class _AddAddressPageState extends State<AddAddressPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Add Address",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          backgroundColor: Colors.black,
-        ),
+        backgroundColor: Colors.white,
+        appBar: const CustomAppBar(),
+        drawer: const NotificationScreen(),
+        endDrawer: const ProfileDrawer(),
         body: Stack(
           children: [
             Positioned.fill(
@@ -166,24 +175,40 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 ),
               ),
             ),
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Row(
+                      children: [
+                        const SizedBox(width: 12),
+                        Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.rotationY(3.14),
+                          child: IconButton(
+                            icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        ),
+                        const SizedBox(width: 80),
+                        const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                        const SizedBox(width: 4),
+                        const Text(
+                          'Add Address',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
                     Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
+                        color: Colors.white, // Set the background color to white
                         borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.white.withOpacity(0.0),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                          ),
-                        ],
+                        // Removed boxShadow
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -191,37 +216,91 @@ class _AddAddressPageState extends State<AddAddressPage> {
                           _buildTextField(
                             hintText: 'Name',
                             controller: nameController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your name';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'Phone Number',
                             controller: phoneController,
                             keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your phone number';
+                              }
+                              if (value.length < 10) {
+                                return 'Phone number must be at least 10 digits';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'Alternative Mobile Number',
                             controller: altPhoneController,
                             keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value != null && value.isNotEmpty && value.length < 10) {
+                                return 'Alternative phone number must be at least 10 digits';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'Street Address',
                             controller: streetController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your street address';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'City',
                             controller: cityController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your city';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'State',
                             controller: stateController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your state';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'Country',
                             controller: countryController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your country';
+                              }
+                              return null;
+                            },
                           ),
                           _buildTextField(
                             hintText: 'Postal Code',
                             controller: postalCodeController,
                             keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your postal code';
+                              }
+                              if (value.length < 5) {
+                                return 'Postal code must be at least 5 digits';
+                              }
+                              return null;
+                            },
                           ),
                           SizedBox(height: 20),
                           Container(

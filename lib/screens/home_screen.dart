@@ -47,42 +47,37 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         children: <Widget>[
-          // Home Screen Page with white background
+          // Home Screen Page with single scroll
           Container(
             color: Colors.white, // Set background color to white
-            child: ListView(
-              children: [
-                // const BannerSection(bannerImages: [
-                //   'https://oacrugs.onrender.com/api/v1/slider/slider-photo/66ad21488d5efe86ef314d7b',
-                //   'assets/image/slider_test_img.jpeg',
-                //   'assets/image/slider_test_img.jpeg',
-                //   'assets/image/slider_test_img.jpeg',
-                //
-                // ]),
-                BannerSection(),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  BannerSection(),
 
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/collection_screen',
-                      arguments: {'selectedIndex': 3},
-                    );
-                  },
-                  child: const Center(child: SectionTitle(title: "Collections")),
-                ),
-                const HorizontalImageList(),
-                const SizedBox(height: 10),
-                const Center(child: SectionTitle(title: "Recent Projects")),
-                RecentProjectsSection(),
-                const SizedBox(height: 10),
-                const Center(child: SectionTitle(title: "Shops To Explore")),
-                const HomeCarpetItems(),
-                const SizedBox(height: 10),
-                const Center(child: SectionTitle(title: "Guide for Placement")),
-                const PlacementGuideList(),
-              ],
+                  const SizedBox(height: 10),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/collection_screen',
+                        arguments: {'selectedIndex': 3},
+                      );
+                    },
+                    child: const Center(child: SectionTitle(title: "Collections")),
+                  ),
+                  const HorizontalImageList(),
+                  const SizedBox(height: 10),
+                  const Center(child: SectionTitle(title: "Recent Projects")),
+                  RecentProjectsSection(),
+                  const SizedBox(height: 10),
+                  const Center(child: SectionTitle(title: "Shops To Explore")),
+                  const HomeCarpetItems(), // Include your carpet items here
+                  const SizedBox(height: 10),
+                  const Center(child: SectionTitle(title: "Guide for Placement")),
+                  const PlacementGuideList(),
+                ],
+              ),
             ),
           ),
           // Search Screen Page
@@ -94,6 +89,4 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-
-
 }

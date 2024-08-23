@@ -20,7 +20,6 @@ class CarpetItemCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.all(12.0),
-        height: 280.0, // Fixed card height
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20.0),
@@ -34,6 +33,7 @@ class CarpetItemCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Allows the height to be dynamic
           children: [
             // Image Section
             ClipRRect(
@@ -41,8 +41,8 @@ class CarpetItemCard extends StatelessWidget {
               child: Image.memory(
                 imageData,
                 fit: BoxFit.cover,
-                height: 180.0, // Fixed image height
                 width: double.infinity,
+                height: 200,
               ),
             ),
             // Name & Price Section
@@ -50,6 +50,7 @@ class CarpetItemCard extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min, // Dynamic height for text
                 children: [
                   Text(
                     text,

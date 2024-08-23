@@ -26,13 +26,13 @@ class CustomerSupportScreen extends StatelessWidget {
             child: Row(
               children: [
                 const SizedBox(width: 12),
-                Transform(
-                  alignment: Alignment.center,
-                  transform: Matrix4.rotationY(3.14),
-                  child: IconButton(
-                    icon: const Icon(Icons.login_outlined, color: Colors.black54),
-                    onPressed: () => Navigator.of(context).pop(),
+                IconButton(
+                  icon: Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.rotationY(3.14),
+                    child: const Icon(Icons.login_outlined, color: Colors.black54),
                   ),
+                  onPressed: () => Navigator.of(context).pop(), // Handle back press
                 ),
                 const SizedBox(width: 80),
                 const Icon(Icons.list_alt_outlined, color: Colors.black54),
@@ -71,14 +71,7 @@ class CustomerSupportScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12), // Modern rounded corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 3,
-                          blurRadius: 5,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      // Removed boxShadow here to eliminate the shadow
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,

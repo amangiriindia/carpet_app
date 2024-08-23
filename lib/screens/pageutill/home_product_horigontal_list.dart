@@ -36,9 +36,8 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
         return CollectionItem(
           imageData: Uint8List.fromList(imageData),
           text: collection['name'],
-          price: collection['price'].toString(), // Extract price and convert to String
+          price: collection['price'].toString(),
           id: collection['_id'],
-         // Extract collection ID
         );
       }).toList();
 
@@ -52,54 +51,66 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Container(
-        height: 320.0, // Adjusted height to accommodate the grid
-        child: FutureBuilder<List<CollectionItem>>(
-          future: _allCollections,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(
-                child: Text('No collections found.'),
-              );
-            } else {
-              return GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2 items per row
-                  crossAxisSpacing: 0,
-                  mainAxisSpacing: 0,
-                  childAspectRatio: 0.6, // Adjusted aspect ratio for better fit
-                ),
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return CarpetItemCard(
-                    imageData: snapshot.data![index].imageData,
-                    text: snapshot.data![index].text,
-                    price: snapshot.data![index].price,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CarpetPatternPage(
-                          carpetId: snapshot.data![index].id,
-                          carpetName:  snapshot.data![index].text,
-                          ),
-                        ),
+      child: FutureBuilder<List<CollectionItem>>(
+        future: _allCollections,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text('No collections found.'),
+            );
+          } else {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                // Calculate the number of rows based on the number of items
+                int itemCount = snapshot.data!.length;
+                double itemHeight = 320.0; // Height of each item
+                int crossAxisCount = 2; // Number of items per row
+                int numberOfRows = (itemCount / crossAxisCount).ceil();
+                double totalHeight = itemHeight * numberOfRows;
+
+                return SizedBox(
+                  height: totalHeight,
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(), // Disable scroll for GridView
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, // 2 items per row
+                      crossAxisSpacing: 0,
+                      mainAxisSpacing: 0,
+                      childAspectRatio: 0.6,
+                    ),
+                    itemCount: itemCount,
+                    itemBuilder: (context, index) {
+                      return CarpetItemCard(
+                        imageData: snapshot.data![index].imageData,
+                        text: snapshot.data![index].text,
+                        price: snapshot.data![index].price,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CarpetPatternPage(
+                                carpetId: snapshot.data![index].id,
+                                carpetName: snapshot.data![index].text,
+                              ),
+                            ),
+                          );
+                        },
                       );
                     },
-                  );
-                },
-              );
-            }
-          },
-        ),
+                  ),
+                );
+              },
+            );
+          }
+        },
       ),
     );
   }

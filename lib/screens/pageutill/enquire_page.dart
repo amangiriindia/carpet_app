@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -113,6 +114,13 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       print('Request fields: ${request.fields}');
       print('Response status code: ${response.statusCode}');
       print('Response body: ${responseBody.body}');
+
+      Fluttertoast.showToast(
+        msg: 'Response body: ${responseBody.body}',
+        toastLength: Toast.LENGTH_LONG, // Use Toast.LENGTH_LONG for a longer duration
+        gravity: ToastGravity.BOTTOM,
+      );
+
 
       if (response.statusCode == 201) {
         // Success case

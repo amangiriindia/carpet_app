@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../const.dart';
+import '../widgets/custom_app_bar.dart';
+import '../widgets/profile_drawer.dart';
+import 'notification_screen.dart';
 
 class AddressScreen extends StatefulWidget {
   const AddressScreen({super.key});
@@ -153,10 +156,14 @@ class _AddressScreenState extends State<AddressScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: const CustomAppBar(),
+        drawer: const NotificationScreen(),
+        endDrawer: const ProfileDrawer(),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -289,7 +296,7 @@ class _AddressScreenState extends State<AddressScreen> {
             top: 0,
             right: 0,
             child: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon: const Icon(Icons.delete, color: Colors.black54),
               onPressed: () {
                 _confirmDelete(context, _id);
               },

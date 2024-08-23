@@ -3,6 +3,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../widgets/custom_app_bar.dart';
+import '../../widgets/profile_drawer.dart';
+import '../notification_screen.dart';
 import 'carpet_shape_size_choose.dart';
 
 class CarpetPatternColorFillerPage extends StatefulWidget {
@@ -10,29 +13,39 @@ class CarpetPatternColorFillerPage extends StatefulWidget {
   final String patternId;
   final String carpetName;
   final Uint8List patternImage;
+  final int patternNumber;
 
   const CarpetPatternColorFillerPage({
     required this.carpetId,
     required this.patternId,
     required this.carpetName,
     required this.patternImage,
+    required this.patternNumber,
   });
 
   @override
-  _CarpetPatternColorFillerPageState createState() => _CarpetPatternColorFillerPageState();
+  _CarpetPatternColorFillerPageState createState() =>
+      _CarpetPatternColorFillerPageState();
 }
 
-class _CarpetPatternColorFillerPageState extends State<CarpetPatternColorFillerPage> {
+class _CarpetPatternColorFillerPageState
+    extends State<CarpetPatternColorFillerPage> {
   List<String> _colors = [];
+  List<String> _colorHexCodes = [];
+  List<String> _colorsid = [];
   bool _isLoadingColors = true;
   String _colorErrorMessage = '';
-  Map<String, String?> _selectedColors = {'A': null, 'B': null, 'C': null};
+  Map<String, String?> _selectedColors = {};
+  List<Map<String, String>> _selectionOrder = [];
 
   @override
   void initState() {
     super.initState();
     _showToastMessages();
     _fetchColors();
+    _initializeSelectedColors();
+    print(widget.patternId);
+    print(widget.patternNumber);
   }
 
   void _showToastMessages() {
@@ -55,6 +68,15 @@ class _CarpetPatternColorFillerPageState extends State<CarpetPatternColorFillerP
       textColor: Colors.white,
       fontSize: 16.0,
     );
+    Fluttertoast.showToast(
+      msg: "Pattern Number: ${widget.patternNumber}",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black54,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   Future<void> _fetchColors() async {
@@ -68,6 +90,8 @@ class _CarpetPatternColorFillerPageState extends State<CarpetPatternColorFillerP
 
         setState(() {
           _colors = colors.map((color) => color['name'] as String).toList();
+          _colorHexCodes = colors.map((color) => color['name'] as String).toList();
+          _colorsid = colors.map((color) => color['_id'] as String).toList();
           _isLoadingColors = false;
         });
       } else {
@@ -84,25 +108,37 @@ class _CarpetPatternColorFillerPageState extends State<CarpetPatternColorFillerP
     }
   }
 
+  void _initializeSelectedColors() {
+    final boxLabels = _getBoxLabels();
+    setState(() {
+      _selectedColors = {for (var label in boxLabels) label: null};
+    });
+  }
+
+  List<String> _getBoxLabels() {
+    final labels = <String>[];
+    for (int i = 0; i < widget.patternNumber; i++) {
+      labels.add(String.fromCharCode('A'.codeUnitAt(0) + i));
+    }
+    return labels;
+  }
+
   void _onContinuePressed() {
-    // Check if all color boxes (A, B, C) are filled
     if (_selectedColors.values.any((color) => color == null)) {
-      // Show a message if any box is unfilled
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please choose a color for all boxes'),
+        const SnackBar(
+          content: Text('Please choose a color for all boxes'),
           backgroundColor: Colors.red,
         ),
       );
     } else {
-      // Redirect to CarpetShapeSizePage
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => CarpetShapeSizePage(
           carpetId: widget.carpetId,
           patternId: widget.patternId,
           carpetName: widget.carpetName,
           patternImage: widget.patternImage,
-          hexCodes: _selectedColors.values.whereType<String>().toList(),
+          hexCodes: _selectionOrder.map((selection) => selection['colorId']!).toList(),
         ),
       ));
     }
@@ -110,142 +146,187 @@ class _CarpetPatternColorFillerPageState extends State<CarpetPatternColorFillerP
 
   @override
   Widget build(BuildContext context) {
+    final boxLabels = _getBoxLabels();
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Carpet Pattern Color Filler'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      appBar: const CustomAppBar(),
+      drawer: const NotificationScreen(),
+      endDrawer: const ProfileDrawer(),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Container(
+            padding: const EdgeInsets.all(12.0),
+            color: Colors.white,
+            child: Row(
               children: [
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    image: DecorationImage(
-                      image: MemoryImage(widget.patternImage),
-                      fit: BoxFit.cover,
-                    ),
+                const SizedBox(width: 12),
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(3.14),
+                  child: IconButton(
+                    icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
-                const SizedBox(height: 20.0),
-                Text(
-                  widget.carpetName,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 20.0),
+                const SizedBox(width: 80),
+                const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                const SizedBox(width: 4),
                 const Text(
-                  'Choose your color',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  'Choose Color',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                 ),
-                const SizedBox(height: 20.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: ['A', 'B', 'C'].map((box) {
-                    return DragTarget<String>(
-                      onAccept: (color) {
-                        setState(() {
-                          _selectedColors[box] = color;
-                        });
-                      },
-                      builder: (context, candidateData, rejectedData) {
-                        return Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 2.0),
-                            color: _selectedColors[box] != null
-                                ? Color(int.parse(_selectedColors[box]!.replaceFirst('#', '0xFF')))
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Center(
-                            child: Text(
-                              box,
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: _selectedColors[box] != null ? Colors.black : Colors.grey,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 20.0),
               ],
             ),
           ),
           Expanded(
-            child: _isLoadingColors
-                ? Center(child: CircularProgressIndicator())
-                : _colorErrorMessage.isNotEmpty
-                ? Center(child: Text(_colorErrorMessage))
-                : GridView.builder(
-              padding: const EdgeInsets.all(16.0),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 270,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8.0),
+                            image: DecorationImage(
+                              image: MemoryImage(widget.patternImage),
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20.0),
+                        Text(
+                          widget.carpetName,
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(height: 15.0),
+                        Wrap(
+                          spacing: 8.0,
+                          runSpacing: 8.0,
+                          children: boxLabels.map((box) {
+                            return DragTarget<String>(
+                              onAccept: (colorId) {
+                                setState(() {
+                                  _selectedColors[box] = colorId;
+                                  _selectionOrder.add({
+                                    'label': box,
+                                    'colorId': colorId,
+                                  });
+                                });
+                              },
+                              builder: (context, candidateData, rejectedData) {
+                                return Container(
+                                  width: (MediaQuery.of(context).size.width - 65) / 4,
+                                  height: (MediaQuery.of(context).size.width - 65) / 4,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black, width: 2.0),
+                                    color: _selectedColors[box] != null
+                                        ? Color(int.parse(
+                                        _colorHexCodes[_colorsid.indexOf(_selectedColors[box]!)]
+                                            .replaceFirst('#', '0xFF')))
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      box,
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: _selectedColors[box] != null
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 10.0),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    child: _isLoadingColors
+                        ? const Center(child: CircularProgressIndicator())
+                        : _colorErrorMessage.isNotEmpty
+                        ? Center(child: Text(_colorErrorMessage))
+                        : GridView.builder(
+                      padding: const EdgeInsets.all(16.0),
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 8.0,
+                        mainAxisSpacing: 8.0,
+                      ),
+                      itemCount: _colors.length,
+                      itemBuilder: (context, index) {
+                        final colorHex = _colorHexCodes[index];
+                        final colorId = _colorsid[index];
+                        return Draggable<String>(
+                          data: colorId,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color(int.parse(colorHex
+                                  .replaceFirst('#', '0xFF'))),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          feedback: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Color(int.parse(colorHex
+                                  .replaceFirst('#', '0xFF'))),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          childWhenDragging: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(16.0),
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _onContinuePressed,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 15.0),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                          ),
+                          child: const Text(
+                            'Continue',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                ],
               ),
-              itemCount: _colors.length,
-              itemBuilder: (context, index) {
-                final colorHex = _colors[index];
-                return Draggable<String>(
-                  data: colorHex,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(int.parse(colorHex.replaceFirst('#', '0xFF'))),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  feedback: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Color(int.parse(colorHex.replaceFirst('#', '0xFF'))),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  childWhenDragging: Container(
-                    color: Colors.grey.withOpacity(0.5),
-                    width: 50,
-                    height: 50,
-                    child: Center(
-                      child: Icon(Icons.color_lens, color: Colors.white),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _onContinuePressed,
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.black,
-                minimumSize: Size(double.infinity, 50),
-              ),
-              child: const Text('Continue'),
             ),
           ),
         ],

@@ -68,6 +68,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
     setState(() {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
     });
+
   }
 
   Future<void> _submitEnquiry() async {
@@ -171,7 +172,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                 widget.patternImage,
                 height: 250,
                 width: 200,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
               ),
               SizedBox(height: 8),
               const Divider(indent: 20, endIndent: 20),

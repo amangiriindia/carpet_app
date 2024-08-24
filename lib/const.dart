@@ -16,6 +16,10 @@ class AppStyles {
   static const Color gradientEndColor = Color(0xFF666666);   // #666666
   static const Color backgroundPrimary = Color(0xFFFFFFFF); // #FFFFFF
   static const Color backgroundSecondry = Color(0xFFF1F1F1);   // #F1F1F1
+  static const Color successColor = Color(0xFF28A745); // A green color for success
+  static const Color errorColor = Color(0xFFDC3545);   // A red color for error
+
+
 
   // Button Gradient
   static const LinearGradient buttonGradient = LinearGradient(
@@ -38,7 +42,7 @@ class AppStyles {
 
   // Text Sizes
   static const double headingTextSize = 24.0;
-  static const double bodyTextSize = 11.79; // Adjusted for body text size
+  static const double bodyTextSize = 16; // Adjusted for body text size
   static const double smallTextSize = 12.0;
 
   // Text Styles
@@ -49,7 +53,7 @@ class AppStyles {
     color: primaryTextColor,
   );
 
-  static const TextStyle bodyTextStyle = TextStyle(
+  static const TextStyle primaryBodyTextStyle = TextStyle(
     fontFamily: primaryFontFamily,
     fontSize: bodyTextSize, // 11.79px
     fontWeight: FontWeight.w400, // 400 weight (normal)
@@ -60,7 +64,7 @@ class AppStyles {
 
   static const TextStyle secondaryBodyTextStyle = TextStyle(
     fontFamily: primaryFontFamily,
-    fontSize: bodyTextSize, // 11.79px
+    fontSize: smallTextSize, // 11.79px
     fontWeight: FontWeight.w400,
     height: 1.5,
     textBaseline: TextBaseline.alphabetic,
@@ -101,7 +105,7 @@ class CommonFunction {
       );
     },
   );
-
+ 
   static void hideLoadingDialog(BuildContext context) {
     Navigator.of(context).pop(); // Close the dialog
   }

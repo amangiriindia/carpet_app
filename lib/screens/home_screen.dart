@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:OACrugs/const.dart';
 import 'package:OACrugs/screens/pageutill/home_product_horigontal_list.dart';
 import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
-import 'package:flutter/material.dart';
 import '../widgets/banner.dart';
 import '../widgets/collections.dart';
 import '../widgets/placement_guide_list.dart';
@@ -9,6 +10,7 @@ import '../widgets/shop_list.dart';
 import 'base_screen.dart';
 import 'search_screen.dart';
 import 'wishlist_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +22,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -36,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return BaseScreen(
       selectedIndex: _selectedIndex,
       onTap: _onItemTapped,
@@ -47,14 +58,13 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         children: <Widget>[
-          // Home Screen Page with single scroll
           Container(
-            color: Colors.white, // Set background color to white
+            color: AppStyles.backgroundSecondry,
+
             child: SingleChildScrollView(
               child: Column(
                 children: [
                   BannerSection(),
-
                   const SizedBox(height: 10),
                   GestureDetector(
                     onTap: () {
@@ -76,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 10),
                   const Center(child: SectionTitle(title: "Guide for Placement")),
                   const PlacementGuideList(),
+
                 ],
               ),
             ),

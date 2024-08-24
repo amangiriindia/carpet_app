@@ -1,3 +1,4 @@
+import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -5,7 +6,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
   final Function(int) onTap;
 
   const CustomBottomNavigationBar({
-    backgroundColor = Colors.white, // Set background color to white
     super.key,
     required this.currentIndex,
     required this.onTap,
@@ -14,6 +14,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      backgroundColor: AppStyles.backgroundPrimary,
       items: [
         for (int i = 0; i < 3; i++)
           BottomNavigationBarItem(

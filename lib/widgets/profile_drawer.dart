@@ -1,4 +1,5 @@
 
+import 'package:OACrugs/const.dart';
 import 'package:OACrugs/screens/pending_query.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import '../screens/approved_query.dart';
 import '../screens/order_screen.dart';
 import '../screens/pageutill/about_us_screen.dart';
 import '../screens/pageutill/custmer_support_screen.dart';
+import '../screens/pageutill/home_title_heading.dart';
 import '../screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,19 +22,16 @@ class ProfileDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: AppStyles.backgroundPrimary,
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          Container(
-            padding: const EdgeInsets.only(top: 120, bottom: 50),
-            color: Colors.white10,
-            child: const Center(
-              child: Text(
-                'Profile',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
+
+          const Padding(
+            padding: EdgeInsets.only(top: 70.0), // Adjust the value to your needs
+            child: SectionTitle(title: "Profile"),
           ),
+
           const SizedBox(height: 10),
           const Divider(height: 1),
           ListTile(
@@ -40,7 +39,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.mode_edit_outline_outlined, size: 24),
             title: const Text(
               'Edit Profile',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -54,7 +53,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.location_on_outlined, size: 24),
             title: const Text(
               'Address',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -68,7 +67,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.shopping_bag_outlined, size: 24),
             title: const Text(
               'Orders',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -82,7 +81,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.notes_outlined, size: 24),
             title: const Text(
               'Pending Query',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -96,7 +95,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.done_all_outlined, size: 24),
             title: const Text(
               'Approved Query',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -111,7 +110,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.headset_mic_outlined, size: 24),
             title: const Text(
               'Customer Support',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -125,7 +124,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.info_outline, size: 24),
             title: const Text(
               'About Us',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
@@ -139,7 +138,7 @@ class ProfileDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout, size: 24),
             title: const Text(
               'Log Out',
-              style: TextStyle(fontSize: 16),
+              style: AppStyles.primaryBodyTextStyle,
             ),
             onTap: () async {
               SharedPreferences prefs = await SharedPreferences.getInstance();

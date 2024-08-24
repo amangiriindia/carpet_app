@@ -1,7 +1,10 @@
+import 'package:OACrugs/const.dart';
+import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart'; // For loading indicator
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -13,6 +16,7 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   String? _userId;
   List<dynamic> _notifications = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -29,6 +33,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Future<void> _fetchNotifications() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final url = 'https://oac.onrender.com/api/v1/notification/user/notification';
     final response = await http.post(
       Uri.parse(url),
@@ -40,91 +48,121 @@ class _NotificationScreenState extends State<NotificationScreen> {
       final data = json.decode(response.body);
       setState(() {
         _notifications = data['notifications'];
+        _isLoading = false;
       });
     } else {
       // Handle errors here
+      setState(() {
+        _isLoading = false;
+      });
       print('Failed to load notifications');
     }
   }
 
-  Widget buildListTile({
+  Widget buildNotificationCard({
     required IconData iconData,
     required String title,
     required String description,
-    required bool status, // Add a status parameter to control the icon color
+    required bool status,
     VoidCallback? onTap,
   }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-      title: Row(
-        children: [
-          Icon(
-            iconData,
-            size: 24,
-            color: status ? Colors.green : Colors.red, // Color based on status
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(fontSize: 16),
-              overflow: TextOverflow.ellipsis, // Handle long text
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+      child: Card(
+        color: AppStyles.backgroundSecondry,
+        elevation: 1, // Add elevation for a modern shadow effect
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15), // Rounded corners
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(15), // Apply the same border radius
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Icon(
+                  iconData,
+                  size: 28, // Slightly larger icon for emphasis
+                  color: status ? AppStyles.successColor : AppStyles.errorColor, // Modern color for status
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: AppStyles.primaryBodyTextStyle.copyWith(
+                          fontWeight: FontWeight.bold, // Bold for emphasis
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3), // Spacing between title and description
+                      Text(
+                        description,
+                        style: AppStyles.secondaryBodyTextStyle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(left: 44.0, top: 10),
-        child: Text(
-          description,
-          style: const TextStyle(fontSize: 14),
-          maxLines: 2, // Limit description to 2 lines
-          overflow: TextOverflow.ellipsis,
         ),
       ),
-      onTap: onTap,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: AppStyles.backgroundPrimary,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          Container(
-            padding: const EdgeInsets.only(top: 50, bottom: 20),
-            color: Colors.white10,
-            child: const Center(
-              child: Text(
-                'Notification',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
+          const Padding(
+            padding: EdgeInsets.only(top: 70.0), // Adjust the value to your needs
+            child: SectionTitle(title: "Notification"),
           ),
+
           const Divider(height: 1),
-          _notifications.isEmpty
-              ? const Center(child: CircularProgressIndicator())
+          _isLoading
+              ? Center(
+            child: SpinKitThreeBounce(
+              color: AppStyles.primaryColorStart,
+              size: 20.0,
+            ),
+          )
+              : _notifications.isEmpty
+              ? const Center(
+            child: Text(
+              'No notifications available',
+              style: AppStyles.tertiaryBodyTextStyle,
+            ),
+          )
               : ListView.builder(
-            shrinkWrap: true, // Use shrinkWrap to limit the size within the Drawer
-            physics: const NeverScrollableScrollPhysics(), // Disable scrolling in the ListView
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: _notifications.length,
             itemBuilder: (context, index) {
               final notification = _notifications[index];
-              final bool status = notification['type'] ?? false; // Use the 'type' field for status
+              final bool status = notification['type'] ?? false;
 
               return Column(
                 children: [
-                  buildListTile(
+                  buildNotificationCard(
                     iconData: Icons.notifications,
                     title: notification['message'] ?? 'No Title',
-                    description: notification['description'] ?? 'No Description',
+                    description:
+                    notification['description'] ?? 'No Description',
                     status: status,
                     onTap: () {
                       // Handle notification tap
                     },
                   ),
-                  const Divider(height: 1), // Reduced height of Divider
                 ],
               );
             },

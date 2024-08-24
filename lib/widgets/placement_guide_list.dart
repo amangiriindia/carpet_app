@@ -1,3 +1,4 @@
+import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
 
 class PlacementGuideItem extends StatelessWidget {
@@ -14,6 +15,7 @@ class PlacementGuideItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+
       width: 240.0,
       margin: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Stack(
@@ -205,7 +207,8 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
     return Stack(
       children: [
         Container(
-          height: 550.0,
+          color: AppStyles.backgroundSecondry,
+          height: 560,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -248,38 +251,37 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
               ),
             ),
           ),
-
         ),
         Positioned(
           right: 2,
           top: 275.0, // Adjust this value to place the button in the middle vertically
-            child: GestureDetector(
-              onTap: _scrollRight,
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient( // Apply the gradient to the border
-                    colors: [Color(0xFF991F35), Color(0xFF330A12)],
+          child: GestureDetector(
+            onTap: _scrollRight,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient( // Apply the gradient to the border
+                  colors: [Color(0xFF991F35), Color(0xFF330A12)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: CircleAvatar(
+                backgroundColor: Colors.white.withOpacity(0.5),
+                child: ShaderMask(  // Use ShaderMask to apply the gradient to the icon
+                  shaderCallback: (bounds) => LinearGradient(
+                    colors: const [Color(0xFF991F35), Color(0xFF330A12)],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                  ),
-                ),
-                child: CircleAvatar(
-                  backgroundColor: Colors.white.withOpacity(0.5),
-                  child: ShaderMask(  // Use ShaderMask to apply the gradient to the icon
-                    shaderCallback: (bounds) => LinearGradient(
-                      colors: const [Color(0xFF991F35), Color(0xFF330A12)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ).createShader(bounds),
-                    child: const Icon(Icons.arrow_forward),
-                  ),
+                  ).createShader(bounds),
+                  child: const Icon(Icons.arrow_forward),
                 ),
               ),
             ),
-
+          ),
         ),
       ],
     );
   }
 }
+

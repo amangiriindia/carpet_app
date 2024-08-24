@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../const.dart';
 
@@ -36,13 +37,22 @@ class _RecentProjectsSectionState extends State<RecentProjectsSection> {
   }
 
   Future<List<RecentProjectsitem>> fetchRecentProjects() async {
-    final response = await http.get(
-      Uri.parse('${APIConstants.API_URL}/api/v1/recent/all-recent'),
-    );
+    final prefs = await SharedPreferences.getInstance();
+    final String cacheKey = 'cached_recent_projects';
+    final String timestampKey = 'cache_timestamp';
 
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      List<dynamic> allRecentImg = jsonResponse['allRecentImg'];
+    final cachedData = prefs.getString(cacheKey);
+    final cachedTimestamp = prefs.getInt(timestampKey);
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final cacheDuration = Duration(hours: 1); // Define cache duration
+
+    // Check if cache is still valid
+    if (cachedData != null &&
+        cachedTimestamp != null &&
+        now - cachedTimestamp < cacheDuration.inMilliseconds) {
+      // Cache is valid
+      final List<dynamic> allRecentImg = json.decode(cachedData);
       List<RecentProjectsitem> items = allRecentImg.map((recentproject) {
         List<int> imageData = List<int>.from(recentproject['photo']['data']['data']);
         return RecentProjectsitem(
@@ -54,7 +64,31 @@ class _RecentProjectsSectionState extends State<RecentProjectsSection> {
 
       return items;
     } else {
-      throw Exception('Failed to load recent projects');
+      // Cache is expired or not available, fetch from API
+      final response = await http.get(
+        Uri.parse('${APIConstants.API_URL}/api/v1/recent/all-recent'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        List<dynamic> allRecentImg = jsonResponse['allRecentImg'];
+        List<RecentProjectsitem> items = allRecentImg.map((recentproject) {
+          List<int> imageData = List<int>.from(recentproject['photo']['data']['data']);
+          return RecentProjectsitem(
+            image: Uint8List.fromList(imageData),
+            title: recentproject['title'],
+            description: recentproject['description'] ?? 'No description available',
+          );
+        }).cast<RecentProjectsitem>().toList();
+
+        // Cache the new data and update the timestamp
+        prefs.setString(cacheKey, json.encode(allRecentImg));
+        prefs.setInt(timestampKey, now);
+
+        return items;
+      } else {
+        throw Exception('Failed to load recent projects');
+      }
     }
   }
 

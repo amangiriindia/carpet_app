@@ -3,9 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';
-import '../screens/collection_screen.dart';
 import '../screens/pageutill/carpet_pattern_choose.dart';
 
 class CollectionGrid extends StatefulWidget {
@@ -25,14 +24,23 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
   }
 
   Future<List<CollectionItem>> fetchCollections() async {
-    final response = await http.get(
-      Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
-    );
+    final prefs = await SharedPreferences.getInstance();
+    final String cacheKey = 'cached_collections';
+    final String timestampKey = 'cache_timestamp';
 
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      List<dynamic> allCollections = jsonResponse['carpets'];
-      List<CollectionItem> items = allCollections.map((collection) {
+    final cachedData = prefs.getString(cacheKey);
+    final cachedTimestamp = prefs.getInt(timestampKey);
+
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final cacheDuration = Duration(hours: 1); // Define cache duration
+
+    // Check if cache is still valid
+    if (cachedData != null &&
+        cachedTimestamp != null &&
+        now - cachedTimestamp < cacheDuration.inMilliseconds) {
+      // Cache is valid
+      final List<dynamic> allCollections = json.decode(cachedData);
+      return allCollections.map((collection) {
         List<int> imageData = List<int>.from(collection['photo']['data']['data']);
         return CollectionItem(
           imageData: Uint8List.fromList(imageData),
@@ -40,9 +48,32 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
           id: collection['_id'],
         );
       }).toList();
-      return items;
     } else {
-      throw Exception('Failed to load collections');
+      // Cache is expired or not available, fetch from API
+      final response = await http.get(
+        Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        List<dynamic> allCollections = jsonResponse['carpets'];
+        List<CollectionItem> items = allCollections.map((collection) {
+          List<int> imageData = List<int>.from(collection['photo']['data']['data']);
+          return CollectionItem(
+            imageData: Uint8List.fromList(imageData),
+            text: collection['name'],
+            id: collection['_id'],
+          );
+        }).toList();
+
+        // Cache the new data and update the timestamp
+        prefs.setString(cacheKey, json.encode(allCollections));
+        prefs.setInt(timestampKey, now);
+
+        return items;
+      } else {
+        throw Exception('Failed to load collections');
+      }
     }
   }
 
@@ -54,7 +85,6 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
         future: _allCollections,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Replace CircularProgressIndicator with SpinKit
             return const Center(
               child: SpinKitRotatingCircle(
                 color: Colors.white,
@@ -71,13 +101,13 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
             );
           } else {
             return GridView.builder(
-              physics: const NeverScrollableScrollPhysics(), // Disable scrolling
-              shrinkWrap: true, // Adjust the height of the grid to fit its content
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // 3 cards per row
-                crossAxisSpacing: 8.0, // Space between columns
-                mainAxisSpacing: 8.0, // Space between rows
-                childAspectRatio: 0.9, // Adjust the height to width ratio of the cards
+                crossAxisCount: 3,
+                crossAxisSpacing: 8.0,
+                mainAxisSpacing: 8.0,
+                childAspectRatio: 1.0, // Adjusted childAspectRatio
               ),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
@@ -123,56 +153,51 @@ class CollectionGridItem extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(color: Colors.grey.shade300), // Optional border for each card
+          border: Border.all(color: Colors.grey.shade300),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.0), // Adjust border radius as needed
+          borderRadius: BorderRadius.circular(12.0),
           child: Stack(
             fit: StackFit.expand,
             children: [
               Image.memory(
-                imageData, // Display the image from the API
+                imageData,
                 fit: BoxFit.cover,
                 gaplessPlayback: true,
                 frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
                   if (wasSynchronouslyLoaded || frame != null) {
                     return child;
                   } else {
-                    return Center( // Wrapped in a Container for demonstration
+                    return Center(
                       child: Container(
-                        width: 200, // Provide enough space
-                        height: 200,
-                        child: SpinKitFadingCircle(
-                          size: 50.0,
-                          itemBuilder: (BuildContext context, int index) {
-                            return DecoratedBox(
-                              decoration: BoxDecoration(
-                                color:
-                              index.isOdd ? Colors.red : Colors.green, // Adjusted condition
-                              ),
-                            );
-                          },
-                        ),
+                        width: 75,
+                        height: 75,
+                         child: SpinKitThreeBounce(
+                        color: AppStyles.primaryColorStart,
+                        size: 20.0,
                       ),
+
+                  ),
                     );
                   }
                 },
               ),
               Container(
-                color: Colors.black.withOpacity(0.3), // Semi-transparent overlay
+                color: Colors.black.withOpacity(0.3),
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.all(5.0), // Adjust padding as needed
+                    // padding: const EdgeInsets.all(5.0), // Reduced padding
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6), // Background color of the text box
-                      border: Border.all(color: Colors.white, width: 1), // White border
-                      borderRadius: BorderRadius.circular(5.0), // Rounded corners for the text box
+                      color: Colors.black.withOpacity(0.6),
+                      border: Border.all(color: Colors.white, width: 1),
+                      borderRadius: BorderRadius.circular(5.0),
                     ),
                     child: Text(
                       text,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 11.0, // Adjust text size as needed
+                        fontSize: 11.0,
+                        overflow: TextOverflow.ellipsis, // Control text overflow
                       ),
                       textAlign: TextAlign.center,
                     ),

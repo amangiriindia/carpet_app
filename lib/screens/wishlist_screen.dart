@@ -14,7 +14,7 @@ class WishListScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(16.0),
-            color: Colors.white,
+
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center, // Center items horizontally
               children: [

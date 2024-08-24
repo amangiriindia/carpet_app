@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../const.dart';
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor:AppStyles.backgroundPrimary,
       leading: IconButton(
         icon: const Stack(
           children: [

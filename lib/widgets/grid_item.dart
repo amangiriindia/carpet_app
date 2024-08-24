@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../const.dart';
 import '../screens/search_screen.dart';
 
 class GridItem extends StatelessWidget {
@@ -17,29 +18,46 @@ class GridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    return InkWell(
+      onTap: onTap, // Use onTap for navigation
+      hoverColor: Colors.grey[200],
       child: Card(
+        color: AppStyles.backgroundPrimary,
+        margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(12.0),
         ),
-        elevation: 3,
+        elevation: 2.0,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(15.0),
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
+                  child: Image.memory(
+                    item.imageData,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 150.0,
+                  ),
                 ),
-                child: Image.memory(
-                  item.imageData,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+                Positioned(
+                  right: 8.0,
+                  top: 8.0,
+                  child: IconButton(
+                    icon: Icon(
+                      isLiked ? Icons.favorite : Icons.favorite_border,
+                      color: isLiked ? Colors.redAccent : Colors.grey[600],
+                      size: 24.0,
+                    ),
+                    onPressed: onLikeToggle,
+                  ),
                 ),
-              ),
+              ],
             ),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -48,26 +66,18 @@ class GridItem extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
+                      color: AppStyles.primaryTextColor,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4.0),
                   Text(
-                    'Price: \$${item.price}',
-                    style: const TextStyle(fontSize: 14.0),
-                  ),
-                  const SizedBox(height: 4.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-
-                      IconButton(
-                        icon: Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: isLiked ? Colors.red : Colors.grey,
-                        ),
-                        onPressed: onLikeToggle,
-                      ),
-                    ],
+                    'Price: ${item.price}',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: AppStyles.secondaryTextColor,
+                    ),
                   ),
                 ],
               ),

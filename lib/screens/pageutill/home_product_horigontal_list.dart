@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../const.dart';
 import '../collection_screen.dart';
@@ -25,25 +27,48 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
   }
 
   Future<List<CollectionItem>> fetchCollections() async {
-    final response = await http.get(
-      Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
-    );
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      List<dynamic> allCollections = jsonResponse['carpets'];
-      List<CollectionItem> items = allCollections.map((collection) {
-        List<int> imageData = List<int>.from(collection['photo']['data']['data']);
-        return CollectionItem(
-          imageData: Uint8List.fromList(imageData),
-          text: collection['name'],
-          price: collection['price'].toString(),
-          id: collection['_id'],
-        );
-      }).toList();
+    final prefs = await SharedPreferences.getInstance();
+    final cacheKey = 'cached_carpet_items';
+    final cacheTimestampKey = 'cache_timestamp';
+    final cacheDuration = Duration(minutes: 10); // Adjust cache duration as needed
 
-      return items.take(9).toList(); // Limit to 9 items
+    final currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+    final lastCacheTimestamp = prefs.getInt(cacheTimestampKey) ?? 0;
+    final shouldFetchFromServer = DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(lastCacheTimestamp)) > cacheDuration;
+
+    if (shouldFetchFromServer) {
+      final response = await http.get(
+        Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        List<dynamic> allCollections = jsonResponse['carpets'];
+        List<CollectionItem> items = allCollections.map((collection) {
+          List<int> imageData = List<int>.from(collection['photo']['data']['data']);
+          return CollectionItem(
+            imageData: Uint8List.fromList(imageData),
+            text: collection['name'],
+            price: collection['price'].toString(),
+            id: collection['_id'],
+          );
+        }).toList();
+
+        prefs.setString(cacheKey, json.encode(items.map((e) => e.toJson()).toList()));
+        prefs.setInt(cacheTimestampKey, currentTimestamp);
+        return items.take(9).toList(); // Limit to 9 items
+      } else {
+        throw Exception('Failed to load collections');
+      }
     } else {
-      throw Exception('Failed to load collections');
+      final cachedData = prefs.getString(cacheKey);
+      if (cachedData != null) {
+        final List<dynamic> decodedData = json.decode(cachedData);
+        final List<CollectionItem> items = decodedData.map((e) => CollectionItem.fromJson(e)).toList();
+        return items.take(9).toList(); // Limit to 9 items
+      } else {
+        throw Exception('No cached data available');
+      }
     }
   }
 
@@ -56,7 +81,10 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: SpinKitThreeBounce(
+                color: AppStyles.primaryColorStart,
+                size: 20.0,
+              ),
             );
           } else if (snapshot.hasError) {
             return Center(
@@ -128,4 +156,22 @@ class CollectionItem {
     required this.price,
     required this.id,
   });
+
+  factory CollectionItem.fromJson(Map<String, dynamic> json) {
+    return CollectionItem(
+      imageData: Uint8List.fromList(List<int>.from(json['imageData'])),
+      text: json['text'],
+      price: json['price'],
+      id: json['id'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'imageData': imageData.toList(),
+      'text': text,
+      'price': price,
+      'id': id,
+    };
+  }
 }

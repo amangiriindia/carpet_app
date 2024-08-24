@@ -97,7 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen>
         );
 
         // Hide the loading dialog
-        _hideLoadingDialog();
+        CommonFunction.hideLoadingDialog(context);
 
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
@@ -109,10 +109,10 @@ class _SignUpScreenState extends State<SignUpScreen>
             showToast(data['message'] ?? 'Registration successful!');
             await _saveUserInfo();
             // Show the loading dialog before navigating
-            _showLoadingDialog();
+            CommonFunction.showLoadingDialog(context);
             // Add a 2-second delay before navigating
             Future.delayed(Duration(seconds: 2), () {
-              _hideLoadingDialog();
+              CommonFunction.hideLoadingDialog(context);
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -136,28 +136,28 @@ class _SignUpScreenState extends State<SignUpScreen>
     }
   }
 
-  void _showLoadingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissal when tapping outside
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text('Loading...'),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _hideLoadingDialog() {
-    Navigator.of(context).pop(); // Close the dialog
-  }
+  // void _showLoadingDialog() {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false, // Prevent dismissal when tapping outside
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         content: Row(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             CircularProgressIndicator(),
+  //             SizedBox(width: 20),
+  //             Text('Loading...'),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+  //
+  // void _hideLoadingDialog() {
+  //   Navigator.of(context).pop(); // Close the dialog
+  // }
 
   void showToast(String message) {
     Fluttertoast.showToast(
@@ -418,12 +418,12 @@ class _SignUpScreenState extends State<SignUpScreen>
                     GestureDetector(
                       onTap: () {
                         // Show loading dialog before the delay (optional)
-                        _showLoadingDialog();
+                        CommonFunction.showLoadingDialog(context);
 
                         // Add a 2-second delay before navigation
                         Future.delayed(Duration(seconds: 2), () {
                           // Hide the loading dialog (optional)
-                          _hideLoadingDialog();
+                          CommonFunction.hideLoadingDialog(context);
 
                           // Navigate to the LoginScreen after the delay
                           Navigator.push(

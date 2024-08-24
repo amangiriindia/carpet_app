@@ -224,62 +224,7 @@ class _PlacementGuideListState extends State<PlacementGuideList> {
             },
           ),
         ),
-        Positioned(
-          left: 2,
-          top: 275.0, // Adjust this value to place the button in the middle vertically
-          child: GestureDetector(
-            onTap: _scrollLeft,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient( // Apply the gradient to the border
-                  colors: [Color(0xFF991F35), Color(0xFF330A12)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.5),
-                child: ShaderMask(  // Use ShaderMask to apply the gradient to the icon
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: const [Color(0xFF991F35), Color(0xFF330A12)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ).createShader(bounds),
-                  child: const Icon(Icons.arrow_back),
-                ),
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          right: 2,
-          top: 275.0, // Adjust this value to place the button in the middle vertically
-          child: GestureDetector(
-            onTap: _scrollRight,
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient( // Apply the gradient to the border
-                  colors: [Color(0xFF991F35), Color(0xFF330A12)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: CircleAvatar(
-                backgroundColor: Colors.white.withOpacity(0.5),
-                child: ShaderMask(  // Use ShaderMask to apply the gradient to the icon
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: const [Color(0xFF991F35), Color(0xFF330A12)],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ).createShader(bounds),
-                  child: const Icon(Icons.arrow_forward),
-                ),
-              ),
-            ),
-          ),
-        ),
+
       ],
     );
   }

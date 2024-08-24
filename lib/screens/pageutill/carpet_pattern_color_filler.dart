@@ -1,5 +1,5 @@
+import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -41,42 +41,10 @@ class _CarpetPatternColorFillerPageState
   @override
   void initState() {
     super.initState();
-    _showToastMessages();
     _fetchColors();
     _initializeSelectedColors();
     print(widget.patternId);
     print(widget.patternNumber);
-  }
-
-  void _showToastMessages() {
-    Fluttertoast.showToast(
-      msg: "Carpet ID: ${widget.carpetId}",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black54,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-
-    Fluttertoast.showToast(
-      msg: "Pattern ID: ${widget.patternId}",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black54,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-    Fluttertoast.showToast(
-      msg: "Pattern Number: ${widget.patternNumber}",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black54,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
   }
 
   Future<void> _fetchColors() async {
@@ -125,12 +93,8 @@ class _CarpetPatternColorFillerPageState
 
   void _onContinuePressed() {
     if (_selectedColors.values.any((color) => color == null)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please choose a color for all boxes'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      CommonFunction.showToast(context, "Please choose a color for all boxes");
+      return;
     } else {
       Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => CarpetShapeSizePage(
@@ -144,20 +108,21 @@ class _CarpetPatternColorFillerPageState
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final boxLabels = _getBoxLabels();
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppStyles.backgroundPrimary,
       appBar: const CustomAppBar(),
       drawer: const NotificationScreen(),
       endDrawer: const ProfileDrawer(),
       body: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12.0),
-            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 12.0),
             child: Row(
               children: [
                 const SizedBox(width: 12),
@@ -165,16 +130,16 @@ class _CarpetPatternColorFillerPageState
                   alignment: Alignment.center,
                   transform: Matrix4.rotationY(3.14),
                   child: IconButton(
-                    icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                    icon: const Icon(Icons.login_outlined,  color:AppStyles.secondaryTextColor),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
                 const SizedBox(width: 80),
-                const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                const Icon(Icons.color_lens, color: AppStyles.primaryTextColor),
                 const SizedBox(width: 4),
                 const Text(
                   'Choose Color',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: AppStyles.headingTextStyle,
                 ),
               ],
             ),
@@ -200,9 +165,12 @@ class _CarpetPatternColorFillerPageState
                           ),
                         ),
                         const SizedBox(height: 20.0),
-                        Text(
-                          widget.carpetName,
-                          style: const TextStyle(fontSize: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          child: Text(
+                            widget.carpetName,
+                            style: AppStyles.headingTextStyle,
+                          ),
                         ),
                         const SizedBox(height: 15.0),
                         Wrap(
@@ -221,10 +189,10 @@ class _CarpetPatternColorFillerPageState
                               },
                               builder: (context, candidateData, rejectedData) {
                                 return Container(
-                                  width: (MediaQuery.of(context).size.width - 65) / 4,
-                                  height: (MediaQuery.of(context).size.width - 65) / 4,
+                                  width: (MediaQuery.of(context).size.width - 80) / 4,
+                                  height: (MediaQuery.of(context).size.width - 80) / 4,
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.black, width: 2.0),
+                                    border: Border.all(color: AppStyles.primaryTextColor, width: 1.0),
                                     color: _selectedColors[box] != null
                                         ? Color(int.parse(
                                         _colorHexCodes[_colorsid.indexOf(_selectedColors[box]!)]
@@ -235,13 +203,7 @@ class _CarpetPatternColorFillerPageState
                                   child: Center(
                                     child: Text(
                                       box,
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: _selectedColors[box] != null
-                                            ? Colors.black
-                                            : Colors.grey,
-                                      ),
+                                      style: AppStyles.primaryBodyTextStyle,
                                     ),
                                   ),
                                 );
@@ -253,16 +215,15 @@ class _CarpetPatternColorFillerPageState
                       ],
                     ),
                   ),
-                  SizedBox(
+                  _isLoadingColors
+                      ? CommonFunction.showLoadingIndicator()
+                      : _colorErrorMessage.isNotEmpty
+                      ? Center(child: Text(_colorErrorMessage))
+                      : SizedBox(
                     height: MediaQuery.of(context).size.height * 0.2,
-                    child: _isLoadingColors
-                        ? const Center(child: CircularProgressIndicator())
-                        : _colorErrorMessage.isNotEmpty
-                        ? Center(child: Text(_colorErrorMessage))
-                        : GridView.builder(
+                    child: GridView.builder(
                       padding: const EdgeInsets.all(16.0),
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4,
                         crossAxisSpacing: 8.0,
                         mainAxisSpacing: 8.0,
@@ -299,7 +260,6 @@ class _CarpetPatternColorFillerPageState
                       },
                     ),
                   ),
-
                   Container(
                     color: Colors.white,
                     padding: const EdgeInsets.all(16.0),
@@ -324,7 +284,6 @@ class _CarpetPatternColorFillerPageState
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),

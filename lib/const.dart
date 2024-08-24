@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class APIConstants {
   static const String API_URL = 'https://oac.onrender.com';
@@ -41,7 +42,7 @@ class AppStyles {
   static const String secondaryFontFamily = 'Roboto';
 
   // Text Sizes
-  static const double headingTextSize = 24.0;
+  static const double headingTextSize = 18.0;
   static const double bodyTextSize = 16; // Adjusted for body text size
   static const double smallTextSize = 12.0;
 
@@ -49,7 +50,7 @@ class AppStyles {
   static const TextStyle headingTextStyle = TextStyle(
     fontFamily: primaryFontFamily,
     fontSize: headingTextSize,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w500,
     color: primaryTextColor,
   );
 
@@ -105,8 +106,29 @@ class CommonFunction {
       );
     },
   );
- 
+
   static void hideLoadingDialog(BuildContext context) {
     Navigator.of(context).pop(); // Close the dialog
+  }
+
+ static Widget showLoadingIndicator() {
+    return Center(
+      child: SpinKitThreeBounce(
+        color: AppStyles.primaryColorStart,
+        size: 20.0,
+      ),
+    );
+  }
+
+  static void showToast(BuildContext context, String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_LONG,
+      gravity: ToastGravity.TOP,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 }

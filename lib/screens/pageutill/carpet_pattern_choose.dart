@@ -1,5 +1,5 @@
+import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
@@ -32,17 +32,6 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
   void initState() {
     super.initState();
     _fetchPatterns();
-    Future.delayed(Duration.zero, () {
-      Fluttertoast.showToast(
-        msg: "Carpet ID: ${widget.carpetId}",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black54,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
-    });
   }
 
   Future<void> _fetchPatterns() async {
@@ -80,15 +69,7 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
 
   void _navigateToColorFillerPage() {
     if (_selectedPatternId == null) {
-      Fluttertoast.showToast(
-        msg: "Please select a pattern",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.black54,
-        textColor: Colors.white,
-        fontSize: 16.0,
-      );
+      CommonFunction.showToast(context, "Please select a pattern");
       return;
     }
 
@@ -111,7 +92,7 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Set the background color here
+      backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
       appBar: const CustomAppBar(), // Add an AppBar if it's missing
       drawer: const NotificationScreen(),
       endDrawer: const ProfileDrawer(),
@@ -127,22 +108,22 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(3.14),
                     child: IconButton(
-                      icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                      icon: const Icon(Icons.login_outlined, color:AppStyles.secondaryTextColor),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                   const SizedBox(width: 80),
-                  const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                  const Icon(Icons.grid_view, color:AppStyles.primaryTextColor),
                   const SizedBox(width: 4),
                   const Text(
                     'Choose Pattern',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                    style: AppStyles.headingTextStyle,
                   ),
                 ],
               ),
               const SizedBox(height: 20),
               _isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? CommonFunction.showLoadingIndicator()
                   : _errorMessage.isNotEmpty
                   ? Center(child: Text(_errorMessage))
                   : Expanded(
@@ -172,7 +153,7 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
                                 fit: BoxFit.contain,
                               ),
                               border: isSelected
-                                  ? Border.all(color: Colors.black, width: 3.0)
+                                  ? Border.all(color: AppStyles.primaryColorStart, width: 1.0)
                                   : null,
                             ),
                           ),
@@ -180,12 +161,12 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8.0),
-                                color: Colors.grey.withOpacity(0.5),
+                                color: AppStyles.secondaryTextColorAlt.withOpacity(0.5),
                               ),
                               child: const Center(
                                 child: Icon(
                                   Icons.check,
-                                  color: Colors.white,
+                                  color: AppStyles.primaryColorStart,
                                   size: 40,
                                 ),
                               ),
@@ -196,6 +177,7 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
                   },
                 ),
               ),
+
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.all(16.0),
@@ -212,10 +194,17 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                      'Continue',
+                      style: TextStyle(
+                        fontFamily: 'Poppins', // Font family
+                        fontSize: 14.51, // Font size
+                        fontWeight: FontWeight.w300, // Font weight
+                        height: 21.77 / 14.51, // Line height
+                        letterSpacing: 0.14, // Letter spacing
+                        color: AppStyles.backgroundPrimary, // Text color (black)
                       ),
+                    ),
                     ),
                   ),
                 ),

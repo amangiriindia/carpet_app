@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
 import '../notification_screen.dart';
@@ -21,7 +22,7 @@ class AboutUsScreen extends StatelessWidget {
           children: [
             // Title
             Container(
-              color: Colors.white,
+              color: AppStyles.backgroundSecondry,
               child: Row(
                 children: [
                   const SizedBox(width: 12),

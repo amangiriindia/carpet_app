@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const Center(child: SectionTitle(title: "Collections")),
                   ),
-                  const HorizontalImageList(),
+                  const CollectionGrid(),
                   const SizedBox(height: 10),
                   const Center(child: SectionTitle(title: "Recent Projects")),
                   RecentProjectsSection(),

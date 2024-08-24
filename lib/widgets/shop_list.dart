@@ -18,7 +18,7 @@ class ShopsToExploreList extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           children: [
 
-            HorizontalImageList()
+            CollectionGrid()
           ],
         ),
       ),

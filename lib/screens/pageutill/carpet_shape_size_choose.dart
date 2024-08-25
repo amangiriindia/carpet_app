@@ -269,11 +269,6 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
       body: Column(
         children: [
           // Fixed top row for color choice
-
-
-
-
-
           Container(
             padding: const EdgeInsets.all(12.0),
             child: Row(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
 import '../notification_screen.dart';
@@ -30,34 +31,20 @@ class CustomerSupportScreen extends StatelessWidget {
                   icon: Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.rotationY(3.14),
-                    child: const Icon(Icons.login_outlined, color: Colors.black54),
+                    child: const Icon(Icons.login_outlined, color:AppStyles.secondaryTextColor),
                   ),
                   onPressed: () => Navigator.of(context).pop(), // Handle back press
                 ),
                 const SizedBox(width: 80),
-                const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                const Icon(Icons.support_agent, color: AppStyles.primaryTextColor),
                 const SizedBox(width: 4),
                 const Text(
                   'Support Center',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: AppStyles.headingTextStyle,
                 ),
               ],
             ),
           ),
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.2, // Reduced opacity for subtle background
-              child: Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/login/sign_up_page_image.png'), // Replace with your image
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
           // Centered Content
           Center(
             child: SingleChildScrollView(
@@ -77,13 +64,6 @@ class CustomerSupportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Heading
-                        const Text(
-                          'Contact Customer Support',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
                         const SizedBox(height: 24),
 
                         // Heading Input

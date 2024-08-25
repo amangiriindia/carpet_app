@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
+import '../widgets/custom_app_bar.dart';
+import '../widgets/profile_drawer.dart';
+import 'notification_screen.dart';
+
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
   @override
@@ -94,9 +98,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final responseBody = json.decode(response.body);
       final user = responseBody['updatedUser'];
       if (response.statusCode == 200 && responseBody['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${user['firstName']} ${user['lastName']}, Profile changes saved successfully!')),
-        );
+        CommonFunction.showToast(context, '${user['firstName']} ${user['lastName']}, Profile changes saved successfully!');
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('firstName', user['firstName']);
@@ -107,22 +109,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
         // Optionally, you can refresh the user profile or navigate away
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save changes: ${responseBody['message']}')),
-        );
+        print('Failed to save changes: ${responseBody['message']}');
       }
     } catch (e) {
+      print('Error: $e');
       CommonFunction.hideLoadingDialog(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
     if (_isLoading) {
       return const Scaffold(
+        backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
+        appBar: const CustomAppBar(), // Add an AppBar if it's missing
+        drawer: const NotificationScreen(),
+        endDrawer: const ProfileDrawer(),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -130,9 +134,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
+        appBar: const CustomAppBar(), // Add an AppBar if it's missing
+        drawer: const NotificationScreen(),
+        endDrawer: const ProfileDrawer(),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 10),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal:5),
             child: Form(
               key: _formKey,
               child: Column(
@@ -144,16 +152,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         alignment: Alignment.center,
                         transform: Matrix4.rotationY(3.14),
                         child: IconButton(
-                          icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                          icon: const Icon(Icons.login_outlined,color:AppStyles.secondaryTextColor),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
                       const Spacer(),
-                      const Icon(Icons.mode_edit_outline_outlined, color: Colors.black54),
+                      const Icon(Icons.mode_edit_outline_outlined,  color:AppStyles.primaryTextColor),
                       const SizedBox(width: 4),
                       const Text(
                         'Edit Profile',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                         style: AppStyles.headingTextStyle,
                       ),
                       const Spacer(flex: 2),
                     ],
@@ -165,7 +173,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   _buildField('Last Name', _lastNameController, _lastNameFocus),
                   _buildField('Email', _emailController, _emailFocus),
                   _buildField('Phone No.', _phoneNumberController, _phoneNumberFocus),
-                  _buildField('Address', _addressController, _addressFocus),
                   const SizedBox(height: 40),
                   Center(
                     child: Container(

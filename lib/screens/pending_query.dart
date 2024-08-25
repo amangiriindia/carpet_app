@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../const.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
 import 'notification_screen.dart';
@@ -33,6 +34,7 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
   }
 
   Future<void> _fetchOrders() async {
+    CommonFunction.showLoadingDialog(context);
     final url = 'https://oac.onrender.com/api/v1/enquiry/user/enquiry-pending';
     final response = await http.post(
       Uri.parse(url),
@@ -41,6 +43,7 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
     );
 
     if (response.statusCode == 200) {
+      CommonFunction.hideLoadingDialog(context);
       final data = json.decode(response.body);
       if (data['success']) {
         setState(() {
@@ -50,7 +53,7 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
 
             return Order(
               imagePath: 'data:image/jpeg;base64,' + base64Encode(Uint8List.fromList(photoData)),
-              name: item['product']['name']?? 'Unknown',
+              name: item['product']['name'] ?? 'Unknown',
               price: item['product']['price']?.toDouble() ?? 0.0,
               size: item['productSize']['size'] ?? 'Unknown',
             );
@@ -59,6 +62,7 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
       }
     } else {
       // Handle errors if needed
+      CommonFunction.hideLoadingDialog(context);
       print('Failed to load orders');
     }
   }
@@ -71,46 +75,61 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
       drawer: const NotificationScreen(),
       endDrawer: const ProfileDrawer(),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: [
-                    Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.rotationY(3.14),
-                      child: IconButton(
-                        icon: const Icon(Icons.login_outlined, color: Colors.black54),
-                        onPressed: () => Navigator.of(context).pop(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Heading section
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: Row(
+                children: [
+                  Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.rotationY(3.14),
+                    child: IconButton(
+                      icon: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                  const SizedBox(width: 80),
+                  const Icon(Icons.hourglass_empty, color: AppStyles.primaryTextColor),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Pending Query',
+                    style: AppStyles.headingTextStyle,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: orders.isEmpty
+                      ? Center(
+                    child: Text(
+                      'Currently, No Pending Enquiries',
+                      style: AppStyles.headingTextStyle.copyWith(
+                        fontSize: 18,
+                        color: Colors.grey,
                       ),
                     ),
-                    const SizedBox(width: 80),
-                    const Icon(Icons.list_alt_outlined, color: Colors.black54),
-                    const SizedBox(width: 4),
-                    const Text(
-                      'Pending Query',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  )
+                      : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: List.generate(
+                      orders.length,
+                          (index) => OrderWidget(order: orders[index]),
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 20),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: orders.length,
-                  itemBuilder: (context, index) {
-                    return OrderWidget(order: orders[index]);
-                  },
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
-
     );
   }
 }
@@ -137,7 +156,7 @@ class OrderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: AppStyles.backgroundSecondry,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -149,7 +168,7 @@ class OrderWidget extends StatelessWidget {
               base64Decode(order.imagePath.split(',')[1]),
               width: 110,
               height: 140,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
             const SizedBox(width: 20),
             Expanded(
@@ -158,38 +177,33 @@ class OrderWidget extends StatelessWidget {
                 children: [
                   Text(
                     order.name,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black
-                    ),
+                    style: AppStyles.primaryBodyTextStyle,
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '₹${order.price.toStringAsFixed(2)}',  // Using INR symbol ₹
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    '₹${order.price.toStringAsFixed(2)}', // Using INR symbol ₹
+                    style: AppStyles.tertiaryBodyTextStyle,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     order.size,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: AppStyles.tertiaryBodyTextStyle,
                   ),
                   const SizedBox(height: 25),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      'Pending Query',
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black
+                  GestureDetector(
+                    onTap: () {
+                      CommonFunction.showToast(context, 'Your enquiry is pending and will be verified soon by our expert.');
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppStyles.primaryColorStart),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Text(
+                        'Pending Query',
+                        style: AppStyles.secondaryBodyTextStyle,
                       ),
                     ),
                   ),
@@ -201,5 +215,4 @@ class OrderWidget extends StatelessWidget {
       ),
     );
   }
-
 }

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../const.dart';
+import '../widgets/custom_app_bar.dart';
+import '../widgets/profile_drawer.dart';
+import 'notification_screen.dart';
+
 class OrderScreen extends StatefulWidget {
   const OrderScreen({Key? key, }) : super(key: key);
 
@@ -31,7 +36,10 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppStyles.backgroundPrimary ,
+      appBar: const CustomAppBar(),
+      drawer: const NotificationScreen(),
+      endDrawer: const ProfileDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -46,17 +54,16 @@ class _OrderScreenState extends State<OrderScreen> {
                       transform: Matrix4.rotationY(3.14),
                       child: IconButton(
                         icon: const Icon(Icons.login_outlined,
-                            color: Colors.black54),
+                            color:AppStyles.secondaryTextColor),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
                     const SizedBox(width: 80),
-                    const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                    const Icon(Icons.shopping_bag, color: AppStyles.primaryTextColor),
                     const SizedBox(width: 4),
                     const Text(
-                      'Orders',
-                      style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      'Order',
+                      style: AppStyles.headingTextStyle,
                     ),
                   ],
                 ),
@@ -104,7 +111,7 @@ class OrderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white, // Set the background color of the Card to white
+      color:AppStyles.backgroundSecondry, // Set the background color of the Card to white
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -125,24 +132,17 @@ class OrderWidget extends StatelessWidget {
                 children: [
                   Text(
                     order.name,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black
-                    ),
+                    style: AppStyles.primaryBodyTextStyle
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 3),
                   Text(
                     '\$${order.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: AppStyles.tertiaryBodyTextStyle
                   ),
                   const SizedBox(height: 4),
                   Text(
                     order.size,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: AppStyles.tertiaryBodyTextStyle,
                   ),
                   const SizedBox(height: 15),
                   Text(

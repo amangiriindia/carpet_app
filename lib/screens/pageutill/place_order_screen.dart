@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
+import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
 import '../notification_screen.dart';
@@ -44,8 +45,8 @@ class ConfirmOrderPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        Text(value, style: const TextStyle(fontSize: 16)),
+            style: AppStyles.secondaryBodyTextStyle),
+        Text(value, style: AppStyles.secondaryBodyTextStyle),
       ],
     );
   }
@@ -91,16 +92,17 @@ class ConfirmOrderPage extends StatelessWidget {
                   transform: Matrix4.rotationY(3.14),
                   child: IconButton(
                     icon:
-                        const Icon(Icons.login_outlined, color: Colors.black54),
+                        const Icon(Icons.login_outlined, color:AppStyles.secondaryTextColor),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
                 const SizedBox(width: 80),
-                const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                const Icon(Icons.receipt, color: AppStyles.primaryTextColor),
+
                 const SizedBox(width: 4),
                 const Text(
                   'Order Summary',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: AppStyles.headingTextStyle,
                 ),
               ],
             ),
@@ -125,27 +127,27 @@ class ConfirmOrderPage extends StatelessWidget {
                     )
                   else
                     const Center(
-                      child: Text('Error loading image'),
+                      child: Text('Error loading image'
+                      ,style: AppStyles.tertiaryBodyTextStyle,),
                     ),
                   const SizedBox(height: 24),
 
-                  // Carpet Name
-                  Text(
-
-                    carpetName,
-                    style: const TextStyle(
-                        fontSize: 18, ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0), // Adjust the value as needed
+                    child: Text(
+                      carpetName,
+                      style: AppStyles.headingTextStyle,
+                    ),
                   ),
-
 
                   // Details (Pattern, Size, Shape, Description) in a Dropdown
                   ExpansionTile(
                     title: const Text('Carpet Details',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: AppStyles.primaryBodyTextStyle,),
                     children: [
                       Card(
-                        elevation: 2,
+                        color: AppStyles.backgroundSecondry,
+                        elevation: 1,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -155,21 +157,14 @@ class ConfirmOrderPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildDetailRow('Pattern:', patternName),
-                              const SizedBox(height: 8),
-                              _buildDetailRow('Size:', size),
-                              const SizedBox(height: 8),
-                              _buildDetailRow('Shape:', shape),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Description:',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
                               const SizedBox(height: 4),
+                              _buildDetailRow('Size:', size),
+                              const SizedBox(height: 4),
+                              _buildDetailRow('Shape:', shape),
+                              const SizedBox(height: 8),
                               Text(
                                 description,
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.grey),
+                                style: AppStyles.tertiaryBodyTextStyle,
                               ),
                             ],
                           ),
@@ -179,7 +174,8 @@ class ConfirmOrderPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Card(
-                    elevation: 2,
+                    color: AppStyles.backgroundSecondry,
+                    elevation: 1,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 0.0), // No margin needed for full width
                     child: Padding(
@@ -224,13 +220,10 @@ class ConfirmOrderPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 const Text('Total Price:',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
+                                    style:AppStyles.primaryBodyTextStyle
+                                ),
                                 Text('₹${totalPrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold)),
+                                  style:AppStyles.primaryBodyTextStyle),
                               ],
                             ),
                           ),
@@ -272,8 +265,8 @@ class ConfirmOrderPage extends StatelessWidget {
   TableRow _buildTableRow(String label, String value) {
     return TableRow(
       children: [
-        Text(label, style: const TextStyle(fontSize: 14)),
-        Text(value, style: const TextStyle(fontSize: 14)),
+        Text(label, style: AppStyles.secondaryBodyTextStyle),
+        Text(value, style: AppStyles.secondaryBodyTextStyle),
       ],
     );
   }

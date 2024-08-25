@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
+import '../const.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
 import 'notification_screen.dart';
@@ -34,6 +35,8 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
   }
 
   Future<void> _fetchOrders() async {
+
+    CommonFunction.showLoadingDialog(context);
     if (_userId.isEmpty) {
       print('User ID is not initialized');
       return;
@@ -50,6 +53,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
     print(response.statusCode);
 
     if (response.statusCode == 200) {
+      CommonFunction.hideLoadingDialog(context);
       final data = json.decode(response.body);
       if (data['success']) {
         try {
@@ -97,6 +101,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
         }
       }
     } else {
+      CommonFunction.hideLoadingDialog(context);
       print('Failed to load orders');
     }
   }
@@ -106,7 +111,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppStyles.backgroundPrimary,
       appBar: const CustomAppBar(),
       drawer: const NotificationScreen(),
       endDrawer: const ProfileDrawer(),
@@ -123,23 +128,33 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(3.14),
                       child: IconButton(
-                        icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                        icon: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ),
                     const SizedBox(width: 80),
-                    const Icon(Icons.list_alt_outlined, color: Colors.black54),
+                    const Icon(Icons.check_circle_outline, color: AppStyles.primaryTextColor),
                     const SizedBox(width: 4),
                     const Text(
                       'Approved Query',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                      style: AppStyles.headingTextStyle,
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
-                ListView.builder(
+                orders.isEmpty
+                    ? Center(
+                  child: Text(
+                    'Awaiting Approved Enquiries',
+                    style: AppStyles.headingTextStyle.copyWith(
+                      fontSize: 18,
+                      color: Colors.grey,
+                    ),
+                  ),
+                )
+                    : ListView.builder(
                   shrinkWrap: true, // Use this property to limit the height
-                  physics: NeverScrollableScrollPhysics(), // Disable scrolling
+                  physics: const NeverScrollableScrollPhysics(), // Disable scrolling
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
                     return OrderWidget(order: orders[index]);
@@ -194,7 +209,7 @@ class OrderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: AppStyles.backgroundSecondry,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -205,9 +220,9 @@ class OrderWidget extends StatelessWidget {
             // Display image with error handling
             Image.memory(
               base64Decode(order.imagePath.split(',')[1]),
-              width: 110,
+              width: 130,
               height: 140,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) {
                 return const Center(child: Text('Error loading image'));
               },
@@ -219,29 +234,27 @@ class OrderWidget extends StatelessWidget {
                 children: [
                   Text(
                     order.carpetName,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.black
-                    ),
+                    style: AppStyles.primaryBodyTextStyle,
                   ),
                   const SizedBox(height: 5),
                   Text(
                     '₹${order.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: AppStyles.tertiaryBodyTextStyle,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     order.size,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    style: AppStyles.tertiaryBodyTextStyle,
                   ),
                   const SizedBox(height: 25),
                   Row(
                     children: [
-                      const Text('Approved', style: TextStyle(color: Colors.green)),
+                      Text(
+                        'Approved',
+                        style: AppStyles.primaryBodyTextStyle.copyWith(
+                          color: Colors.green, // Set the color to green
+                        ),
+                      ),
                       const SizedBox(width: 15),
                       InkWell(onTap: () {
                         Navigator.push(
@@ -266,19 +279,17 @@ class OrderWidget extends StatelessWidget {
                         );
                       },
 
+
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                           decoration: BoxDecoration(
-                            color: Colors.black,
-                            border: Border.all(color: Colors.black),
+                            color: Colors.white,
+                            border: Border.all(color: AppStyles.primaryTextColor),
                             borderRadius: BorderRadius.circular(5),
                           ),
-                          child: const Text(
-                            'Place Order',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white,
-                            ),
+                          child: Text(
+                            'Finalize Order',
+                            style: AppStyles.secondaryBodyTextStyle,
                           ),
                         ),
                       ),

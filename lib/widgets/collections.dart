@@ -30,7 +30,9 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
     final cachedData = prefs.getString(cacheKey);
     final cachedTimestamp = prefs.getInt(timestampKey);
 
-    final now = DateTime.now().millisecondsSinceEpoch;
+    final now = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     final cacheDuration = Duration(hours: 1); // Define cache duration
 
     // Check if cache is still valid
@@ -40,7 +42,8 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
       // Cache is valid
       final List<dynamic> allCollections = json.decode(cachedData);
       return allCollections.map((collection) {
-        List<int> imageData = List<int>.from(collection['photo']['data']['data']);
+        List<int> imageData = List<int>.from(
+            collection['photo']['data']['data']);
         return CollectionItem(
           imageData: Uint8List.fromList(imageData),
           text: collection['name'],
@@ -57,7 +60,8 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
         final jsonResponse = json.decode(response.body);
         List<dynamic> allCollections = jsonResponse['carpets'];
         List<CollectionItem> items = allCollections.map((collection) {
-          List<int> imageData = List<int>.from(collection['photo']['data']['data']);
+          List<int> imageData = List<int>.from(
+              collection['photo']['data']['data']);
           return CollectionItem(
             imageData: Uint8List.fromList(imageData),
             text: collection['name'],
@@ -98,10 +102,10 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+                crossAxisCount: 3, // Adjust to 2 columns for larger cards
                 crossAxisSpacing: 8.0,
                 mainAxisSpacing: 8.0,
-                childAspectRatio: 1.0, // Adjusted childAspectRatio
+                childAspectRatio: 0.7, // Adjust this to change card height/width ratio
               ),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
@@ -112,10 +116,11 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CarpetPatternPage(
-                          carpetId: snapshot.data![index].id,
-                          carpetName: snapshot.data![index].text,
-                        ),
+                        builder: (context) =>
+                            CarpetPatternPage(
+                              carpetId: snapshot.data![index].id,
+                              carpetName: snapshot.data![index].text,
+                            ),
                       ),
                     );
                   },
@@ -129,7 +134,7 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
   }
 }
 
-class CollectionGridItem extends StatelessWidget {
+  class CollectionGridItem extends StatelessWidget {
   final Uint8List imageData;
   final String text;
   final VoidCallback onTap;
@@ -145,6 +150,7 @@ class CollectionGridItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        height: 250.0, // Increase height here (adjust the value as needed)
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(color: Colors.grey.shade300),
@@ -156,10 +162,10 @@ class CollectionGridItem extends StatelessWidget {
             children: [
               Image.memory(
                 imageData,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 gaplessPlayback: true,
                 frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-                  if (wasSynchronouslyLoaded || frame != null) {
+                  if (wasSynchronouslyLoaded  != null) {
                     return child;
                   } else {
                     return CommonFunction.showLoadingIndicator();
@@ -170,20 +176,19 @@ class CollectionGridItem extends StatelessWidget {
                 color: Colors.black.withOpacity(0.3),
                 child: Center(
                   child: Container(
-                    // padding: const EdgeInsets.all(5.0), // Reduced padding
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.6),
-                      border: Border.all(color: Colors.white, width: 1),
+                      color: Colors.white.withOpacity(0.7),
+                      border: Border.all(color: AppStyles.primaryColorStart, width: 1),
                       borderRadius: BorderRadius.circular(5.0),
                     ),
-                    child: Text(
-                      text,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11.0,
-                        overflow: TextOverflow.ellipsis, // Control text overflow
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0), // Add padding here
+                      child: Text(
+                        text,
+                        style: AppStyles.secondaryBodyTextStyle.copyWith(
+                          color: Colors.black, // Overwrite the text color with black
+                        ),
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
@@ -195,6 +200,7 @@ class CollectionGridItem extends StatelessWidget {
     );
   }
 }
+
 
 class CollectionItem {
   final Uint8List imageData;

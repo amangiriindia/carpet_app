@@ -90,9 +90,11 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
                 gstPrecent: (item['product']['gst'] ?? 0.0).toDouble(),
                 shape: item['shape']['shape'] ?? 'Unknown',
                 shapePrice: (item['shape']['shapePrice'] ?? 0.0).toDouble(),
-                // colorPrice: (item['productColor']['colorPrice'] ?? 0.0).toDouble(),
-                 colorPrice: (item['productSize']['sizePrice'] ?? 0.0).toDouble(),
+                //colorPrice: (item['productColor']['colorPrice'] ?? 0.0).toDouble(),
+                  colorPrice: (item['productSize']['sizePrice'] ?? 0.0).toDouble(),
                 description: item['product']['description'] ?? 'No description available',
+                shippingPrice: (item['shippingPrice'] ?? 0.0).toDouble(),
+                quantity: (item['quantity'] ?? 0.0).toDouble(),
               );
             }).toList();
           });
@@ -175,6 +177,7 @@ class Order {
   final String carpetName;
   final String patternName;
   final double patternPrice;
+  final double quantity;
   final String size;
   final double sizePrice;
   final double price;
@@ -183,6 +186,7 @@ class Order {
   final double shapePrice;
   final double colorPrice;
   final String description;
+  final double shippingPrice;
 
   Order({
     required this.enquiryId,
@@ -198,6 +202,8 @@ class Order {
     required this.shapePrice,
     required this.colorPrice,
     required this.description,
+    required this.shippingPrice,
+    required this.quantity,
   });
 }
 
@@ -274,6 +280,8 @@ class OrderWidget extends StatelessWidget {
                               shapePrice: order.shapePrice,     // Added field
                               colorPrice: order.colorPrice,     // Added field
                               description: order.description,
+                              shippingPrice:order.shippingPrice,
+                                quantity:order.quantity,
                             ),
                           ),
                         );

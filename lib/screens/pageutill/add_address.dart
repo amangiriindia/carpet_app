@@ -81,30 +81,78 @@ class _AddAddressPageState extends State<AddAddressPage> {
         if (response.statusCode == 201) {
           final data = jsonDecode(response.body);
           if (data['success']) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(data['message'])),
-            );
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => AddressScreen()), // Replace AddressScreen with your actual screen
             );
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to create address')),
-            );
+            print('Failed to create address');
           }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Server error: ${response.statusCode}')),
-          );
+        }
+        else {
+         print( response.statusCode);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Network error: $e')),
-        );
+        print('Network error: $e');
       }
     }
   }
 
+  bool validateForm() {
+    CommonFunction.showLoadingDialog(context);
+    if (nameController.text.isEmpty) {
+      CommonFunction.showToast(context, 'Please enter your name');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (phoneController.text.isEmpty) {
+      CommonFunction.showToast(context,'Please enter your phone number');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (phoneController.text.length < 10) {
+      CommonFunction.showToast(context,'Phone number must be at least 10 digits');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (altPhoneController.text.isNotEmpty && altPhoneController.text.length < 10) {
+      CommonFunction.showToast(context,'Alternative phone number must be at least 10 digits');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (streetController.text.isEmpty) {
+      CommonFunction.showToast(context,'Please enter your street address');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (cityController.text.isEmpty) {
+      CommonFunction.showToast(context,'Please enter your city');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (stateController.text.isEmpty) {
+      CommonFunction.showToast(context,'Please enter your state');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (countryController.text.isEmpty) {
+      CommonFunction.showToast(context,'Please enter your country');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (postalCodeController.text.isEmpty) {
+      CommonFunction.showToast(context,'Please enter your postal code');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+    if (postalCodeController.text.length < 5) {
+      CommonFunction.showToast(context,'Postal code must be at least 5 digits');
+      CommonFunction.hideLoadingDialog(context);
+      return false;
+    }
+
+    _addAddress();
+    return true;
+  }
 
   @override
   void dispose() {
@@ -122,31 +170,24 @@ class _AddAddressPageState extends State<AddAddressPage> {
   Widget _buildTextField({
     required String hintText,
     required TextEditingController controller,
-    required String? Function(String?) validator,
     TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-    List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
   }) {
-    return Container(
-      height: 60, // Increased height to ensure consistent size
-      margin: EdgeInsets.symmetric(vertical: 8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
-        inputFormatters: inputFormatters,
-        obscureText: obscureText,
+        validator: validator,
         decoration: InputDecoration(
           hintText: hintText,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8.0),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.black),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 15.0), // Adjusted padding
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         ),
-        validator: validator,
       ),
     );
   }
@@ -156,189 +197,121 @@ class _AddAddressPageState extends State<AddAddressPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppStyles.backgroundPrimary,
         appBar: const CustomAppBar(),
         drawer: const NotificationScreen(),
         endDrawer: const ProfileDrawer(),
-        body: Stack(
+        body: Column(
           children: [
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.80,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/login/sign_up_page_image.png'),
-                      fit: BoxFit.cover,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                children: [
+                  Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.rotationY(3.14),
+                    child: IconButton(
+                      icon: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 80),
+                  const Icon(Icons.add_location_alt_outlined, color: AppStyles.primaryTextColor),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Add Address',
+                    style: AppStyles.headingTextStyle,
+                  ),
+                ],
               ),
             ),
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.rotationY(3.14),
-                          child: IconButton(
-                            icon: const Icon(Icons.login_outlined, color: Colors.black54),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        const SizedBox(width: 80),
-                        const Icon(Icons.list_alt_outlined, color: Colors.black54),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'Add Address',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white, // Set the background color to white
-                        borderRadius: BorderRadius.circular(8),
-                        // Removed boxShadow
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildTextField(
-                            hintText: 'Name',
-                            controller: nameController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your name';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'Phone Number',
-                            controller: phoneController,
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your phone number';
-                              }
-                              if (value.length < 10) {
-                                return 'Phone number must be at least 10 digits';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'Alternative Mobile Number',
-                            controller: altPhoneController,
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value != null && value.isNotEmpty && value.length < 10) {
-                                return 'Alternative phone number must be at least 10 digits';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'Street Address',
-                            controller: streetController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your street address';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'City',
-                            controller: cityController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your city';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'State',
-                            controller: stateController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your state';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'Country',
-                            controller: countryController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your country';
-                              }
-                              return null;
-                            },
-                          ),
-                          _buildTextField(
-                            hintText: 'Postal Code',
-                            controller: postalCodeController,
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your postal code';
-                              }
-                              if (value.length < 5) {
-                                return 'Postal code must be at least 5 digits';
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            height: 48.0,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment(-0.67, -1.0),
-                                end: Alignment(1.0, 1.91),
-                                colors: [Color(0xFF000000), Color(0xFF666666)],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _buildTextField(
+                              hintText: 'Name',
+                              controller: nameController,
                             ),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onPressed: () async {
-                                await _addAddress();
-                              },
-                              child: Text(
-                                'Add Address',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            _buildTextField(
+                              hintText: 'Phone Number',
+                              controller: phoneController,
+                              keyboardType: TextInputType.phone,
+                            ),
+                            _buildTextField(
+                              hintText: 'Alternative Mobile Number',
+                              controller: altPhoneController,
+                              keyboardType: TextInputType.phone,
+                            ),
+                            _buildTextField(
+                              hintText: 'Street Address',
+                              controller: streetController,
+                            ),
+                            _buildTextField(
+                              hintText: 'City',
+                              controller: cityController,
+                            ),
+                            _buildTextField(
+                              hintText: 'State',
+                              controller: stateController,
+                            ),
+                            _buildTextField(
+                              hintText: 'Country',
+                              controller: countryController,
+                            ),
+                            _buildTextField(
+                              hintText: 'Postal Code',
+                              controller: postalCodeController,
+                              keyboardType: TextInputType.number,
+                            ),
+                            SizedBox(height: 20),
+                            Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        await  validateForm();
+                                      }
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(vertical: 15.0),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Add Address',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

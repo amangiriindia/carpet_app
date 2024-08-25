@@ -1,3 +1,4 @@
+import 'package:OACrugs/const.dart';
 import 'package:OACrugs/screens/search_screen.dart';
 import 'package:OACrugs/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ class ThankYouScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppStyles.backgroundPrimary,
       appBar: CustomAppBar(),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: 2, // Set the appropriate index for the Thank You screen
@@ -55,13 +57,14 @@ class ThankYouScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFA80038), // Custom color
+                fontFamily: AppStyles.primaryFontFamily,
+                color: AppStyles.primaryColorStart, // Custom color
               ),
             ),
             SizedBox(height: 16),
             Text(
-              'Our Team will reach\n      you out shortly',
-              style: TextStyle(fontSize: 16, color: Colors.black),
+              'We appreciate your inquiry.\nOur team will be in touch soon!',
+              style:AppStyles.secondaryBodyTextStyle,
             ),
             SizedBox(height: 24),
             OutlinedButton(
@@ -84,7 +87,10 @@ class ThankYouScreen extends StatelessWidget {
               ),
               child: Text(
                 'Continue Exploring',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 14,
+                fontFamily: AppStyles.primaryFontFamily,
+                  
+                ),
               ),
             ),
           ],

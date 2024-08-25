@@ -74,12 +74,33 @@ class AppStyles {
 
   static const TextStyle tertiaryBodyTextStyle = TextStyle(
     fontFamily: primaryFontFamily,
-    fontSize: bodyTextSize, // 11.79px
+    fontSize: smallTextSize, // 11.79px
     fontWeight: FontWeight.w400,
     height: 1.5,
     textBaseline: TextBaseline.alphabetic,
     color: secondaryTextColorAlt,
   );
+
+  static InputDecoration textFieldDecoration(String hintText) {
+    return InputDecoration(
+      border: OutlineInputBorder(),
+      hintText: hintText,
+      hintStyle: const TextStyle(
+        color: secondaryTextColorAlt,
+        fontSize: bodyTextSize,      // Hint text font size
+        fontFamily: primaryFontFamily, // Hint text font family
+        height: 1.5,
+        textBaseline: TextBaseline.alphabetic,
+      ),
+      filled: true,
+      fillColor: backgroundPrimary,
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: primaryTextColor, // Focused border color (black instead of blue)
+        ),
+      ),
+    );
+  }
 
   // Padding, Margins, and Spacing
   static const double defaultPadding = 16.0;

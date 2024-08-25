@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../const.dart';
@@ -85,12 +84,7 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
         future: _allCollections,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: SpinKitRotatingCircle(
-                color: Colors.white,
-                size: 50.0,
-              ),
-            );
+            return CommonFunction.showLoadingIndicator();
           } else if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}'),
@@ -168,17 +162,7 @@ class CollectionGridItem extends StatelessWidget {
                   if (wasSynchronouslyLoaded || frame != null) {
                     return child;
                   } else {
-                    return Center(
-                      child: Container(
-                        width: 75,
-                        height: 75,
-                         child: SpinKitThreeBounce(
-                        color: AppStyles.primaryColorStart,
-                        size: 20.0,
-                      ),
-
-                  ),
-                    );
+                    return CommonFunction.showLoadingIndicator();
                   }
                 },
               ),

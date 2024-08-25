@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart'; // Import the spinkit package
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -92,13 +93,15 @@ class _RecentProjectsSectionState extends State<RecentProjectsSection> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<RecentProjectsitem>>(
       future: _recentprojectitems,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return CommonFunction.showLoadingIndicator();  // Use the custom loading indicator
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

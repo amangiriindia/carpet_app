@@ -1,5 +1,5 @@
+import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,10 +53,17 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   final _queryController = TextEditingController();
   DateTime? _expectedDeliveryDate;
   var _userId;
+  late String description = 'Description not available';
+  late String quality = 'Quality not specified';
+  late String material = 'Material information not provided';
+  late String disclaimer = 'Disclaimer not available';
+  late String care = 'Care instructions not available';
+
 
   @override
   void initState() {
     super.initState();
+    _fetchPatterns();
     // Initialize controllers with passed data
     _quantityController.text = widget.quantity;
     _queryController.text = widget.query;
@@ -64,16 +71,44 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
     _loadUserData();
   }
 
+  Future<void> _fetchPatterns() async {
+    String _errorMessage = '';
+    final url =
+        'https://oac.onrender.com/api/v1/carpet/single-carpet/${widget.carpetId}';
+    try {
+      final response = await http.get(Uri.parse(url));
+      print(response.body);
+      print(response.statusCode);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        description = data['getSingleCarpet']['description'];
+        quality = data['getSingleCarpet']['quality'];
+        material = data['getSingleCarpet']['material'];
+        disclaimer = data['getSingleCarpet']['disclaimer'];
+        care = data['getSingleCarpet']['care'];
+      } else {
+        setState(() {
+          _errorMessage = 'Failed to load patterns';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to load patterns';
+      });
+    }
+  }
+
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
     });
-
   }
 
   Future<void> _submitEnquiry() async {
-    final String apiUrl = 'https://oac.onrender.com/api/v1/enquiry/create-enquiry';
+    final String apiUrl =
+        'https://oac.onrender.com/api/v1/enquiry/create-enquiry';
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl))
@@ -83,10 +118,12 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
         ..fields['quantity'] = _quantityController.text
         ..fields['productSize'] = widget.dimensionId
         ..fields['shape'] = widget.shapeId
-        ..fields['productColor'] = jsonEncode(widget.hexCodes) // Encode as JSON array
+        ..fields['productColor'] =
+            jsonEncode(widget.hexCodes) // Encode as JSON array
         ..fields['query'] = _queryController.text
         ..fields['status'] = 'false'
-        ..fields['expectedDelivery'] = _expectedDeliveryDate?.toIso8601String() ?? ''
+        ..fields['expectedDelivery'] =
+            _expectedDeliveryDate?.toIso8601String() ?? ''
         ..fields['patternId'] = widget.patternId;
       // Check if the image is available and add it to the request
       if (widget.patternImage.isNotEmpty) {
@@ -95,7 +132,6 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
             'photo',
             widget.patternImage,
             filename: 'pattern_image.jpg',
-
           ),
         );
         print('Added file to request');
@@ -114,12 +150,6 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       print('Request fields: ${request.fields}');
       print('Response status code: ${response.statusCode}');
       print('Response body: ${responseBody.body}');
-
-      Fluttertoast.showToast(
-        msg: 'Response body: ${responseBody.body}',
-        toastLength: Toast.LENGTH_LONG, // Use Toast.LENGTH_LONG for a longer duration
-        gravity: ToastGravity.BOTTOM,
-      );
 
 
       if (response.statusCode == 201) {
@@ -149,22 +179,26 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
 
       // Show a generic error message to the user
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while submitting the enquiry.')),
+        SnackBar(
+            content: Text('An error occurred while submitting the enquiry.')),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorPickerProvider = Provider.of<ColorPickerProvider>(context, listen: false);
+    final colorPickerProvider =
+        Provider.of<ColorPickerProvider>(context, listen: false);
 
     // Load image and extract colors after the widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      ImageProvider imageProvider = MemoryImage(widget.patternImage); // Use the pattern image from previous page
+      ImageProvider imageProvider = MemoryImage(
+          widget.patternImage); // Use the pattern image from previous page
       await colorPickerProvider.extractColorsFromImage(imageProvider);
     });
 
     return Scaffold(
+      backgroundColor: AppStyles.backgroundPrimary,
       appBar: const CustomAppBar(),
       drawer: const NotificationScreen(),
       endDrawer: const ProfileDrawer(),
@@ -172,9 +206,30 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
         builder: (context, colorPickerProvider, child) {
           return Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(widget.carpetName, style: TextStyle(fontSize: 20)),
+              Container(
+                padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 12.0),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 12),
+                    Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(3.14),
+                      child: IconButton(
+                        icon: const Icon(Icons.login_outlined,
+                            color: AppStyles.secondaryTextColor),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                    const SizedBox(width: 80),
+                    const Icon(Icons.check_circle_outline,
+                        color: AppStyles.primaryTextColor),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Finalize Enquiry',
+                      style: AppStyles.headingTextStyle,
+                    ),
+                  ],
+                ),
               ),
               Image.memory(
                 widget.patternImage,
@@ -189,38 +244,66 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Container(
+                        child:Padding(
+                          padding: const EdgeInsets.only(left: 16.0), // Adjust the padding value as needed
+                          child: Text(
+                            '${widget.carpetName}',
+                            style: AppStyles.headingTextStyle,
+                          ),
+                        )
+
+                      ),
                       ExpansionTile(
-                        title: Text('Product Details'),
+                        title: Text('Product Details',
+                            style: AppStyles.primaryBodyTextStyle),
                         children: [
                           ListTile(
-                            title: Text('Dimension'),
-                            subtitle: Text(widget.dimensionId), // Show selected dimension
+                            title: Text('Description',
+                                style: AppStyles.secondaryBodyTextStyle),
+                            subtitle: Text(
+                              description,
+                              style: AppStyles.tertiaryBodyTextStyle,
+                            ), // Show selected dimension
                           ),
                           ListTile(
-                            title: Text('Quality'),
-                            subtitle: Text('Hand-knotted'), // Example data
+                            title: Text('Quality',
+                                style: AppStyles.secondaryBodyTextStyle),
+                            subtitle: Text(
+                              quality,
+                              style: AppStyles.tertiaryBodyTextStyle,
+                            ), // Example data
                           ),
                           ListTile(
-                            title: Text('Material'),
-                            subtitle: Text('Wool & silk on silk base'), // Example data
+                            title: Text('Material',
+                                style: AppStyles.secondaryBodyTextStyle),
+                            subtitle: Text(material,
+                                style: AppStyles
+                                    .tertiaryBodyTextStyle), // Example data
                           ),
                         ],
                       ),
                       ExpansionTile(
-                        title: Text('Care & Maintenance'),
+                        title: Text('Care & Maintenance',
+                            style: AppStyles.primaryBodyTextStyle),
                         children: [
                           ListTile(
-                            title: Text('Details'),
-                            subtitle: Text('Some details about care and maintenance'),
+                            title: Text('Details',
+                                style: AppStyles.secondaryBodyTextStyle),
+                            subtitle: Text(care,
+                                style: AppStyles.tertiaryBodyTextStyle),
                           ),
                         ],
                       ),
                       ExpansionTile(
-                        title: Text('Disclaimer'),
+                        title: Text('Disclaimer',
+                            style: AppStyles.primaryBodyTextStyle),
                         children: [
                           ListTile(
-                            title: Text('Details'),
-                            subtitle: Text('Some disclaimer details'),
+                            title: Text('Details',
+                                style: AppStyles.secondaryBodyTextStyle),
+                            subtitle: Text(disclaimer,
+                                style: AppStyles.tertiaryBodyTextStyle),
                           ),
                         ],
                       ),
@@ -229,32 +312,41 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Quantity'),
+                            Text('Quantity',
+                                style: AppStyles.primaryBodyTextStyle),
                             TextField(
                               controller: _quantityController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter quantity',
-                              ),
                               keyboardType: TextInputType.number,
+                              decoration: AppStyles.textFieldDecoration(
+                                  'Enter quantity'),
                             ),
                             SizedBox(height: 16),
-                            Text('Expected Delivery Date'),
+                            Text('Expected Delivery Date',
+                                style: AppStyles.primaryBodyTextStyle),
                             TextField(
-                              controller: TextEditingController(text: _expectedDeliveryDate?.toLocal().toString() ?? ''),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter delivery date',
+                              controller: TextEditingController(
+                                  text: _expectedDeliveryDate
+                                          ?.toLocal()
+                                          .toString() ??
+                                      ''),
+                              decoration: AppStyles.textFieldDecoration(
+                                _expectedDeliveryDate != null
+                                    ? '${_expectedDeliveryDate!.toLocal()}'
+                                        .split(' ')[0]
+                                    : 'Select date',
                               ),
                               onTap: () async {
-                                FocusScope.of(context).requestFocus(FocusNode());
+                                FocusScope.of(context)
+                                    .requestFocus(FocusNode());
                                 DateTime? selectedDate = await showDatePicker(
                                   context: context,
-                                  initialDate: _expectedDeliveryDate ?? DateTime.now(),
+                                  initialDate:
+                                      _expectedDeliveryDate ?? DateTime.now(),
                                   firstDate: DateTime(2000),
                                   lastDate: DateTime(2101),
                                 );
-                                if (selectedDate != null && selectedDate != _expectedDeliveryDate) {
+                                if (selectedDate != null &&
+                                    selectedDate != _expectedDeliveryDate) {
                                   setState(() {
                                     _expectedDeliveryDate = selectedDate;
                                   });
@@ -262,24 +354,45 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                               },
                             ),
                             SizedBox(height: 16),
-                            Text('Query'),
+                            Text('Query',
+                                style: AppStyles.primaryBodyTextStyle),
                             TextField(
                               controller: _queryController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                hintText: 'Enter your query',
-                              ),
-                              maxLines: 4,
+                              cursorColor: AppStyles.secondaryTextColor,
+                              decoration: AppStyles.textFieldDecoration(
+                                  'Enter your query here'),
+                              maxLines: 3,
                             ),
                             SizedBox(height: 16),
-                            Center(
-                              child: ElevatedButton(
-                                onPressed: _submitEnquiry, // Trigger the API call
-                                child: Text('Submit Enquiry'),
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor: Colors.black,
-                                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+
+                            Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(16.0),
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: _submitEnquiry,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                      padding: const EdgeInsets.symmetric(vertical: 15.0),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Submit Enquiry',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins', // Font family
+                                        fontSize: 14.51, // Font size
+                                        fontWeight: FontWeight.w300, // Font weight
+                                        height: 21.77 / 14.51, // Line height
+                                        letterSpacing: 0.14, // Letter spacing
+                                        color: AppStyles.backgroundPrimary, // Text color (black)
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -295,7 +408,8 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
         },
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: 2, // Set the appropriate index for the Enquiry form screen
+        currentIndex:
+            2, // Set the appropriate index for the Enquiry form screen
         onTap: (index) {
           // Handle navigation based on index
           if (index == 0) {

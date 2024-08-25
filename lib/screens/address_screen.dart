@@ -139,15 +139,7 @@ class _AddressScreenState extends State<AddressScreen> {
     );
   }
 
-  Future<void> _checkCarpetShapeSizeFlag() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool carpetShapeSizeFlag = prefs.getBool('carpetShapeSizeFlag') ?? false;
 
-    if (carpetShapeSizeFlag) {
-      prefs.setBool('carpetShapeSizeFlag', false); // Reset the flag
-      Navigator.of(context).pop(true); // Pop and pass true to indicate the flag was true
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +148,7 @@ class _AddressScreenState extends State<AddressScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppStyles.backgroundPrimary,
         appBar: const CustomAppBar(),
         drawer: const NotificationScreen(),
         endDrawer: const ProfileDrawer(),
@@ -175,16 +167,16 @@ class _AddressScreenState extends State<AddressScreen> {
                           alignment: Alignment.center,
                           transform: Matrix4.rotationY(3.14),
                           child: IconButton(
-                            icon: const Icon(Icons.login_outlined, color: Colors.black54),
+                            icon: const Icon(Icons.login_outlined, color:AppStyles.secondaryTextColor),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                         ),
                         const SizedBox(width: 80),
-                        const Icon(Icons.location_on_outlined, color: Colors.black54),
+                        const Icon(Icons.location_on_outlined, color:AppStyles.primaryTextColor),
                         const SizedBox(width: 4),
                         const Text(
                           'Address',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                          style: AppStyles.headingTextStyle,
                         ),
                       ],
                     ),
@@ -210,7 +202,7 @@ class _AddressScreenState extends State<AddressScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        icon: const Icon(Icons.add, color: Colors.white, size: 16),
+                        icon: const Icon(Icons.add_location_alt_outlined, color: AppStyles.backgroundPrimary, size: 16),
                         label: const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 22),
                           child: Text(
@@ -245,6 +237,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
     return Card(
       elevation: 2,
+      color: AppStyles.backgroundSecondry, // Set the background color to white
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -258,15 +251,15 @@ class _AddressScreenState extends State<AddressScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      Text(name, style: AppStyles.primaryBodyTextStyle),
                       const SizedBox(height: 8),
-                      Text(street, style: const TextStyle(fontSize: 14)),
+                      Text(street, style: AppStyles.secondaryBodyTextStyle),
                       const SizedBox(height: 4),
-                      Text('$city, $state $postalCode', style: const TextStyle(fontSize: 14)),
+                      Text('$city, $state ', style: AppStyles.secondaryBodyTextStyle),
                       const SizedBox(height: 4),
-                      Text(country, style: const TextStyle(fontSize: 14)),
+                      Text('$country  - $postalCode', style: AppStyles.secondaryBodyTextStyle),
                       const SizedBox(height: 4),
-                      Text('Phone: $phoneNumber', style: const TextStyle(fontSize: 14)),
+                      Text('Phone: $phoneNumber', style: AppStyles.secondaryBodyTextStyle),
                     ],
                   ),
                 ),
@@ -284,9 +277,6 @@ class _AddressScreenState extends State<AddressScreen> {
                       await prefs.setBool('CurrentSelectedAddressFlag', true);
                       Navigator.of(context).pop();  // Pops the current page
                     }
-
-
-
                   },
                 ),
               ],

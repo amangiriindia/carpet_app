@@ -13,24 +13,21 @@ class WishListScreen extends StatefulWidget {
 }
 
 class _WishListScreenState extends State<WishListScreen> {
-  late Future<List<CollectionItem>> _wishlistFuture;
+  late Future<void> _wishlistFuture;
 
   @override
   void initState() {
     super.initState();
-    _wishlistFuture = _getWishlistItems();
+    _wishlistFuture = _loadWishlistItems();
   }
 
-  Future<List<CollectionItem>> _getWishlistItems() async {
-    // Simulate a delay before fetching the items
-    await Future.delayed(const Duration(seconds: 1));
-    return WishlistHandle.wishlistItems;
+  Future<void> _loadWishlistItems() async {
+    await WishlistHandle.loadWishlistFromPrefs();
+    setState(() {});
   }
 
   Future<void> _refreshWishlist() async {
-    setState(() {
-      _wishlistFuture = _getWishlistItems();
-    });
+    await _loadWishlistItems();
   }
 
   @override
@@ -49,7 +46,7 @@ class _WishListScreenState extends State<WishListScreen> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<CollectionItem>>(
+            child: FutureBuilder<void>(
               future: _wishlistFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,11 +56,7 @@ class _WishListScreenState extends State<WishListScreen> {
                       size: 50.0,
                     ),
                   );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                } else if (WishlistHandle.wishlistItems.isEmpty) {
                   return const Center(
                     child: Text(
                       'No items in wishlist',
@@ -74,16 +67,18 @@ class _WishListScreenState extends State<WishListScreen> {
                     ),
                   );
                 } else {
-                  final wishlistItems = snapshot.data!;
+                  final wishlistItems = WishlistHandle.wishlistItems;
                   return GridView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.75,
                       crossAxisSpacing: 16.0,
                       mainAxisSpacing: 16.0,
                     ),
                     itemCount: wishlistItems.length,
+
+
                     itemBuilder: (context, index) {
                       final item = wishlistItems[index];
                       return GridItem(
@@ -100,13 +95,15 @@ class _WishListScreenState extends State<WishListScreen> {
                           );
                         },
                         onLikeToggle: () async {
-                          WishlistHandle.removeItem(item);
+                          await WishlistHandle.removeItem(item);
                           await _refreshWishlist();
                         },
                         isLiked: WishlistHandle.isItemInWishlist(item),
                       );
                     },
                   );
+
+
                 }
               },
             ),

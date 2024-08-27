@@ -6,31 +6,51 @@ import 'package:flutter/material.dart';
 import '../../const.dart';
 
 
-// Wishlist class to manage liked items
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 class WishlistHandle {
-  // Static list to store liked items
   static List<CollectionItem> _wishlistItems = [];
 
   // Method to add an item to the wishlist
-  static void addItem(CollectionItem item) {
-    if (!_wishlistItems.contains(item)) {
+  static Future<void> addItem(CollectionItem item) async {
+    if (!_wishlistItems.any((wishlistItem) => wishlistItem.id == item.id)) {
       _wishlistItems.add(item);
+      await _saveWishlistToPrefs();
     }
   }
 
   // Method to remove an item from the wishlist
-  static void removeItem(CollectionItem item) {
-    _wishlistItems.remove(item);
+  static Future<void> removeItem(CollectionItem item) async {
+    _wishlistItems.removeWhere((wishlistItem) => wishlistItem.id == item.id);
+    await _saveWishlistToPrefs();
   }
 
   // Method to check if an item is in the wishlist
   static bool isItemInWishlist(CollectionItem item) {
-    return _wishlistItems.contains(item);
+    return _wishlistItems.any((wishlistItem) => wishlistItem.id == item.id);
   }
 
   // Method to get the list of all wishlist items
   static List<CollectionItem> get wishlistItems => _wishlistItems;
+
+  // Save wishlist to SharedPreferences
+  static Future<void> _saveWishlistToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> wishlistData = _wishlistItems.map((item) => json.encode(item.toJson())).toList();
+    prefs.setStringList('wishlist_items', wishlistData);
+  }
+
+  // Load wishlist from SharedPreferences
+  static Future<void> loadWishlistFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? wishlistData = prefs.getStringList('wishlist_items');
+    if (wishlistData != null) {
+      _wishlistItems = wishlistData.map((item) => CollectionItem.fromJson(json.decode(item))).toList();
+    }
+  }
 }
+
 
 class GridItem extends StatelessWidget {
   final CollectionItem item;
@@ -81,14 +101,7 @@ class GridItem extends StatelessWidget {
                       color: isLiked ? Colors.redAccent : Colors.grey[600],
                       size: 24.0,
                     ),
-                    onPressed: () {
-                      if (isLiked) {
-                        WishlistHandle.removeItem(item);
-                      } else {
-                        WishlistHandle.addItem(item);
-                      }
-                      onLikeToggle();
-                    },
+                    onPressed: onLikeToggle, // Call the onLikeToggle callback
                   ),
                 ),
               ],
@@ -125,6 +138,7 @@ class GridItem extends StatelessWidget {
     );
   }
 }
+
 
 
 

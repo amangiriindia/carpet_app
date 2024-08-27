@@ -113,6 +113,7 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
                       childAspectRatio: 0.8,
                     ),
                     itemCount: itemCount,
+
                     itemBuilder: (context, index) {
                       CollectionItem item = snapshot.data![index];
                       bool isLiked = WishlistHandle.isItemInWishlist(item);
@@ -130,40 +131,29 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
                             ),
                           );
                         },
-                        onLikeToggle: () {
-                          setState(() {
+
+                        onLikeToggle: () async {
+                          setState(() async {
                             if (isLiked) {
-                              WishlistHandle.removeItem(item);
-                              Fluttertoast.showToast(
-                                msg: "Removed from wishlist",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.redAccent,
-                                textColor: Colors.white,
-                                fontSize: 16.0,
-                              );
+                              await WishlistHandle.removeItem(item);
+
                             } else {
-                              WishlistHandle.addItem(item);
-                              Fluttertoast.showToast(
-                                msg: "Added to wishlist",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.green,
-                                textColor: Colors.white,
-                                fontSize: 16.0,
-                              );
+                              await WishlistHandle.addItem(item);
+
                             }
+
                           });
                         },
                         isLiked: isLiked,
                       );
                     },
+
+
                   ),
                 );
               },
             );
+
           }
         },
       ),

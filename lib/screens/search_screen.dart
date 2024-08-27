@@ -121,9 +121,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildGridView() {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+     return  CommonFunction.showLoadingIndicator();
     }
 
     if (_filteredItems.isEmpty) {
@@ -144,9 +142,11 @@ class _SearchScreenState extends State<SearchScreen> {
           mainAxisSpacing: 16.0,
         ),
         itemCount: _filteredItems.length,
+
         itemBuilder: (context, index) {
           final item = _filteredItems[index];
-          final isLiked = _likedItemIds.contains(item.id);
+          bool isLiked = WishlistHandle.isItemInWishlist(item);
+
           return GridItem(
             item: item,
             onTap: () {
@@ -161,34 +161,46 @@ class _SearchScreenState extends State<SearchScreen> {
               );
             },
             onLikeToggle: () {
-              setState(() {
+              setState(() async {
                 if (isLiked) {
-                  WishlistHandle.removeItem(item);
+                  await WishlistHandle.removeItem(item);
                   Fluttertoast.showToast(
                     msg: "Removed from wishlist",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
                     backgroundColor: Colors.redAccent,
                     textColor: Colors.white,
                     fontSize: 16.0,
                   );
                 } else {
-                  WishlistHandle.addItem(item);
+                  await WishlistHandle.addItem(item);
                   Fluttertoast.showToast(
                     msg: "Added to wishlist",
                     toastLength: Toast.LENGTH_SHORT,
                     gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
                     backgroundColor: Colors.green,
                     textColor: Colors.white,
                     fontSize: 16.0,
                   );
                 }
+
+                // Update the isLiked variable after the operation
+                isLiked = WishlistHandle.isItemInWishlist(item);
               });
             },
             isLiked: isLiked,
           );
         },
+
+
+
+
       ),
+
+
+
     );
   }
 

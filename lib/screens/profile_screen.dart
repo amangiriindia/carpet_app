@@ -3,7 +3,6 @@ import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
 import 'notification_screen.dart';
@@ -176,42 +175,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 40),
                   Center(
                     child: Container(
-                      width: 181,
-                      height: 25.24,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF000000), Color(0xFF666666)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(2.74),
-                      ),
-                      child: ElevatedButton(
-                        onPressed: _saveProfileChanges,
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(2.74),
-                          ),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Save Changes',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Poppins',
-                              fontSize: 8.78,
-                              fontWeight: FontWeight.w300,
-                              letterSpacing: 0.14,
-                              height: 1.5,
+                      color: Colors.white,
+                      padding: const EdgeInsets.all(20.0),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _saveProfileChanges,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(vertical: 15.0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            child: const Text(
+                              'Save Changes',
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
                       ),
                     ),
+
+
+
+
+
+
                   ),
                 ],
               ),
@@ -228,7 +220,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return CircleAvatar(
       radius: 40,
-      backgroundColor: const Color(0xFF666666),
+      backgroundColor: AppStyles.primaryColorStart,
       child: Text(
         initial,
         style: const TextStyle(
@@ -242,7 +234,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildField(String label, TextEditingController controller, FocusNode focusNode) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Container(
         decoration: BoxDecoration(
           border: Border(
@@ -258,21 +250,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: TextFormField(
                 controller: controller,
                 focusNode: focusNode,
-                style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                  height: 1.5,
-                  color: Colors.black38,
-                ),
+                style: AppStyles.secondaryBodyTextStyle,
                 decoration: InputDecoration(
                   labelText: label,
-                  labelStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14.66,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black,
-                  ),
+                  labelStyle: AppStyles.headingTextStyle,
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
                 ),

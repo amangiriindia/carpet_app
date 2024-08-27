@@ -57,9 +57,13 @@ class CarpetItemCard extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
+
+
+
+                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
+
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4.0),

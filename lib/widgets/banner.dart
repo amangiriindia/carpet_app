@@ -163,7 +163,8 @@ class BannerImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(7.0),
         child: Image.memory(
           base64Decode(imageUrl),
-          fit: BoxFit.contain, // Ensure the full image is displayed
+          fit: BoxFit.cover
+          , // Ensure the full image is displayed
           width: MediaQuery.of(context).size.width * 0.8,
           height: 230.0,
         ),

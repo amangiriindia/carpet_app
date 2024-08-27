@@ -2,13 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:fluttertoast/fluttertoast.dart'; // For toast messages
+import 'package:http/http.dart' as http;
 import '../../const.dart';
-import '../collection_screen.dart';
 import 'carpet_pattern_choose.dart';
-import 'carpet_product_item.dart';
+import 'wishlisthandle.dart'; // Corrected import path for WishlistHandle
 
 class HomeCarpetItems extends StatefulWidget {
   const HomeCarpetItems({Key? key}) : super(key: key);
@@ -30,7 +29,7 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
     final prefs = await SharedPreferences.getInstance();
     final cacheKey = 'cached_carpet_items';
     final cacheTimestampKey = 'cache_timestamp';
-    final cacheDuration = Duration(minutes: 10); // Adjust cache duration as needed
+    final cacheDuration = const Duration(minutes: 10); // Adjust cache duration as needed
 
     final currentTimestamp = DateTime.now().millisecondsSinceEpoch;
     final lastCacheTimestamp = prefs.getInt(cacheTimestampKey) ?? 0;
@@ -45,16 +44,16 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
         final jsonResponse = json.decode(response.body);
         List<dynamic> allCollections = jsonResponse['carpets'];
         List<CollectionItem> items = allCollections.map((collection) {
-          List<int> imageData = List<int>.from(collection['photo']['data']['data']);
+          List<int> imageData = List<int>.from(collection['photo']['data']['data']); // Convert dynamic list to List<int>
           return CollectionItem(
-            imageData: Uint8List.fromList(imageData),
+            imageData: Uint8List.fromList(imageData), // Convert List<int> to Uint8List
             text: collection['name'],
-            price: collection['price'].toString(),
+            price: '₹${collection['price']}',
             id: collection['_id'],
           );
         }).toList();
 
-        prefs.setString(cacheKey, json.encode(items.map((e) => e.toJson()).toList()));
+        prefs.setString(cacheKey, json.encode(items.map((e) => e.toJson()).toList())); // Fixed JSON serialization
         prefs.setInt(cacheTimestampKey, currentTimestamp);
         return items.take(9).toList(); // Limit to 9 items
       } else {
@@ -64,7 +63,7 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
       final cachedData = prefs.getString(cacheKey);
       if (cachedData != null) {
         final List<dynamic> decodedData = json.decode(cachedData);
-        final List<CollectionItem> items = decodedData.map((e) => CollectionItem.fromJson(e)).toList();
+        final List<CollectionItem> items = decodedData.map((e) => CollectionItem.fromJson(e)).toList(); // Fixed deserialization
         return items.take(9).toList(); // Limit to 9 items
       } else {
         throw Exception('No cached data available');
@@ -97,40 +96,68 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
           } else {
             return LayoutBuilder(
               builder: (context, constraints) {
-                // Calculate the number of rows based on the number of items
                 int itemCount = snapshot.data!.length;
-                double itemHeight = 320.0; // Height of each item
-                int crossAxisCount = 2; // Number of items per row
+                double itemHeight = 250.0;
+                int crossAxisCount = 2;
                 int numberOfRows = (itemCount / crossAxisCount).ceil();
                 double totalHeight = itemHeight * numberOfRows;
 
                 return SizedBox(
                   height: totalHeight,
                   child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(), // Disable scroll for GridView
+                    physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // 2 items per row
+                      crossAxisCount: 2,
                       crossAxisSpacing: 0,
                       mainAxisSpacing: 0,
-                      childAspectRatio: 0.6,
+                      childAspectRatio: 0.8,
                     ),
                     itemCount: itemCount,
                     itemBuilder: (context, index) {
-                      return CarpetItemCard(
-                        imageData: snapshot.data![index].imageData,
-                        text: snapshot.data![index].text,
-                        price: snapshot.data![index].price,
+                      CollectionItem item = snapshot.data![index];
+                      bool isLiked = WishlistHandle.isItemInWishlist(item);
+
+                      return GridItem(
+                        item: item,
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => CarpetPatternPage(
-                                carpetId: snapshot.data![index].id,
-                                carpetName: snapshot.data![index].text,
+                                carpetId: item.id,
+                                carpetName: item.text,
                               ),
                             ),
                           );
                         },
+                        onLikeToggle: () {
+                          setState(() {
+                            if (isLiked) {
+                              WishlistHandle.removeItem(item);
+                              Fluttertoast.showToast(
+                                msg: "Removed from wishlist",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.redAccent,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                            } else {
+                              WishlistHandle.addItem(item);
+                              Fluttertoast.showToast(
+                                msg: "Added to wishlist",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.green,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                            }
+                          });
+                        },
+                        isLiked: isLiked,
                       );
                     },
                   ),
@@ -141,37 +168,5 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
         },
       ),
     );
-  }
-}
-
-class CollectionItem {
-  final Uint8List imageData;
-  final String text;
-  final String price;
-  final String id;
-
-  CollectionItem({
-    required this.imageData,
-    required this.text,
-    required this.price,
-    required this.id,
-  });
-
-  factory CollectionItem.fromJson(Map<String, dynamic> json) {
-    return CollectionItem(
-      imageData: Uint8List.fromList(List<int>.from(json['imageData'])),
-      text: json['text'],
-      price: json['price'],
-      id: json['id'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'imageData': imageData.toList(),
-      'text': text,
-      'price': price,
-      'id': id,
-    };
   }
 }

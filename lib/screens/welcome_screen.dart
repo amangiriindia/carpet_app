@@ -2,6 +2,7 @@ import 'package:OACrugs/screens/sign_up_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../const.dart';
 import 'login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -36,24 +37,13 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       // Welcome Text
                       const Text(
-                        'WELCOME',
-                        style: TextStyle(
-                          fontFamily: 'Impact',
-                          fontSize: 24.49,
-                          fontWeight: FontWeight.w900, // Make text more bold
-                          height: 1.22, // 29.87 / 24.49
-                          color: Color(0xFF292929),
-                        ),
+                        'Where Dreams Become Rugs',
+                        style: AppStyles.headingTextStyle
                       ),
                       const Text(
-                        'Our Personalized Carpet Design Destination\nLogin to Your Account',
+                        'Create Your Unique Carpet.\nSign In to Start Designing.',
                         textAlign: TextAlign.left,
-                        style: TextStyle(
-                          fontFamily: 'Poppins', // Set the font family
-                          fontSize: 11.79, // Set the font size
-                          fontWeight: FontWeight.w400, // Set the font weight
-                          height: 18.14 / 11.79, // Set the line height
-                        ),
+                        style: AppStyles.secondaryBodyTextStyle,
                       ),
                       const SizedBox(height: 20), // Spacing between the texts and buttons
                       // Buttons

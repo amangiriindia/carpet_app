@@ -61,6 +61,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     } else {
       // Handle error response
        CommonFunction.hideLoadingDialog(context);
+       CommonFunction.showToast(context, 'All field is requried.');
             print('Failed to create contact: ${responseData['message']}');
     }
 
@@ -79,87 +80,98 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         children: [
           Container(
             color: Colors.white,
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(width: 12),
-                IconButton(
-                  icon: Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.rotationY(3.14),
-                    child: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
+                // Row for Support Center title
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.only(top: 20, left: 12, right: 12),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.rotationY(3.14),
+                          child: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                      const SizedBox(width: 80),
+                      const Icon(Icons.support_agent, color: AppStyles.primaryTextColor),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'Support Center',
+                        style: AppStyles.headingTextStyle,
+                      ),
+                    ],
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
                 ),
-                const SizedBox(width: 80),
-                const Icon(Icons.support_agent, color: AppStyles.primaryTextColor),
-                const SizedBox(width: 4),
-                const Text(
-                  'Support Center',
-                  style: AppStyles.headingTextStyle,
-                ),
-              ],
-            ),
-          ),
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                // Spacer for padding
+                const SizedBox(height: 50),
+                // Form Container
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const SizedBox(height: 24),
-                        TextFormField(
-                          controller: headingController,
-                          decoration: const InputDecoration(
-                            labelText: 'Heading',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: detailsController,
-                          maxLines: 5,
-                          decoration: const InputDecoration(
-                            labelText: 'Details',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        isLoading
-                            ? CommonFunction.showLoadingIndicator()
-                            :
                         Container(
-                          color: Colors.white,
-                          padding: const EdgeInsets.all(16.0),
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: GradientButton(
-                                onPressed: _submitForm,
-                                buttonText: 'Submit',
+                          padding: const EdgeInsets.all(24.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              const SizedBox(height: 24),
+                              TextFormField(
+                                controller: headingController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Heading',
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: detailsController,
+                                maxLines: 7,
+                                decoration: const InputDecoration(
+                                  labelText: 'Details',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              isLoading
+                                  ? CommonFunction.showLoadingIndicator()
+                                  : Container(
+                                color: Colors.white,
+                                padding: const EdgeInsets.all(16.0),
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: GradientButton(
+                                      onPressed: _submitForm,
+                                      buttonText: 'Submit',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-
                       ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
 }

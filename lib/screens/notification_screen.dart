@@ -1,10 +1,10 @@
-import 'package:OACrugs/const.dart';
 import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart'; // For loading indicator
+import '../../const.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -51,12 +51,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
         _isLoading = false;
       });
     } else {
-      // Handle errors here
       setState(() {
         _isLoading = false;
       });
       print('Failed to load notifications');
     }
+  }
+
+  void _showNotificationDetails(dynamic notification) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(notification['message'] ?? 'No Title'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(notification['description'] ?? 'No Description'),
+              const SizedBox(height: 10),
+              // Add more details here if available
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget buildNotificationCard({
@@ -67,24 +91,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
     VoidCallback? onTap,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
       child: Card(
-        color: AppStyles.backgroundSecondry,
-        elevation: 1, // Add elevation for a modern shadow effect
+        color: Colors.white,
+        elevation: 5, // Slightly elevated for modern shadow effect
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15), // Rounded corners
+          borderRadius: BorderRadius.circular(12), // Rounded corners
         ),
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(15), // Apply the same border radius
+          borderRadius: BorderRadius.circular(12), // Apply the same border radius
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Icon(
-                  iconData,
-                  size: 28, // Slightly larger icon for emphasis
-                  color: status ? AppStyles.successColor : AppStyles.errorColor, // Modern color for status
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: status ? AppStyles.successColor.withOpacity(0.2) : AppStyles.errorColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Icon(
+                    iconData,
+                    size: 30, // Slightly larger icon for emphasis
+                    color: status ? AppStyles.successColor : AppStyles.errorColor, // Modern color for status
+                  ),
                 ),
                 const SizedBox(width: 20),
                 Expanded(
@@ -98,7 +129,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 3), // Spacing between title and description
+                      const SizedBox(height: 4), // Spacing between title and description
                       Text(
                         description,
                         style: AppStyles.secondaryBodyTextStyle,
@@ -127,7 +158,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
             padding: EdgeInsets.only(top: 70.0), // Adjust the value to your needs
             child: SectionTitle(title: "Notification"),
           ),
-
           const Divider(height: 1),
           _isLoading
               ? Center(
@@ -156,11 +186,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   buildNotificationCard(
                     iconData: Icons.notifications,
                     title: notification['message'] ?? 'No Title',
-                    description:
-                    notification['description'] ?? 'No Description',
+                    description: notification['description'] ?? 'No Description',
                     status: status,
                     onTap: () {
-                      // Handle notification tap
+                      _showNotificationDetails(notification);
                     },
                   ),
                 ],

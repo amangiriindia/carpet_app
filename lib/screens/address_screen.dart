@@ -3,11 +3,8 @@ import 'package:OACrugs/screens/pageutill/add_address.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
-
 import '../components/home_app_bar.dart';
 import '../const.dart';
-import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
 import 'notification_screen.dart';
 
@@ -56,19 +53,15 @@ class _AddressScreenState extends State<AddressScreen> {
             _addresses = data['addresses'];
           });
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to fetch addresses: ${data['message']}')),
-          );
+          print('Failed to fetch addresses: ${data['message']}');
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to fetch addresses. Please try again later.')),
-        );
+        print('Failed to fetch addresses. Please try again later.');
+
       }
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $error')),
-      );
+
+      print('An error occurred: $error');
     }
   }
 
@@ -87,15 +80,6 @@ class _AddressScreenState extends State<AddressScreen> {
           setState(() {
             _addresses.removeWhere((address) => address['_id'] == addressId);
           });
-          Fluttertoast.showToast(
-            msg: data['message'],
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.black,
-            textColor: Colors.white,
-            fontSize: 16.0,
-          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to delete address: ${data['message']}')),
@@ -118,17 +102,26 @@ class _AddressScreenState extends State<AddressScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Delete Address"),
-          content: Text("Are you sure you want to delete this address?"),
+          backgroundColor: AppStyles.backgroundPrimary,
+          title: Text("Delete Address",
+              style:AppStyles.headingTextStyle,
+          ),
+          content: Text("Are you sure you want to delete this address?",
+            style: AppStyles.secondaryBodyTextStyle,
+          ),
           actions: [
             TextButton(
-              child: Text("Cancel"),
+              child: Text("Cancel",
+                  style: AppStyles.primaryBodyTextStyle,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Delete"),
+              child: Text("Delete",
+                style: AppStyles.primaryBodyTextStyle,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
                 _deleteAddress(addressId);
@@ -189,7 +182,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       );
                     }).toList(),
                     const SizedBox(height: 40),
-                    
+
                     Center(
                       child: DecoratedBox(
                         decoration: BoxDecoration(
@@ -256,8 +249,8 @@ class _AddressScreenState extends State<AddressScreen> {
     String phoneNumber = address['number'] ?? '';
 
     return Card(
-      elevation: 2,
-      color: AppStyles.backgroundSecondry, // Set the background color to white
+      elevation: 5,
+      color: AppStyles.backgroundPrimary, // Set the background color to white
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
@@ -306,7 +299,7 @@ class _AddressScreenState extends State<AddressScreen> {
             top: 0,
             right: 0,
             child: IconButton(
-              icon: const Icon(Icons.delete, color: Colors.black54),
+              icon: const Icon(Icons.delete, color: AppStyles.primaryColorStart),
               onPressed: () {
                 _confirmDelete(context, _id);
               },

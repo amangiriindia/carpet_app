@@ -170,7 +170,7 @@ class GridItem extends StatelessWidget {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            'Custmize now',
+                            'Customize Now',
                             style: AppStyles.secondaryBodyTextStyle.copyWith(
                               color: Colors.white, // Override the text color to white
                             ),

@@ -2,7 +2,6 @@ import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:OACrugs/splash_screen/custom_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/enquiry_form.dart';
 import 'screens/home_screen.dart';
 import 'screens/search_screen.dart';
 import 'screens/wishlist_screen.dart';
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:  HomeScreen(),
+      home:  CustomSplashScreen(),
 
       routes: {
          '/home': (context) => const HomeScreen(),

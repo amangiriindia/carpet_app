@@ -3,6 +3,7 @@ import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../components/home_app_bar.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
 import 'notification_screen.dart';
@@ -123,9 +124,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
-        appBar: const CustomAppBar(), // Add an AppBar if it's missing
-        drawer: const NotificationScreen(),
-        endDrawer: const ProfileDrawer(),
+        appBar: const CustomNormalAppBar(), // Add an AppBar if it's missing
+        endDrawer: const NotificationScreen(),
+        drawer: const ProfileDrawer(),
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -134,9 +135,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
-        appBar: const CustomAppBar(), // Add an AppBar if it's missing
-        drawer: const NotificationScreen(),
-        endDrawer: const ProfileDrawer(),
+        appBar: const CustomNormalAppBar(), // Add an AppBar if it's missing
+        endDrawer: const NotificationScreen(),
+        drawer: const ProfileDrawer(),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal:5),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../components/home_app_bar.dart';
 import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
@@ -12,9 +13,9 @@ class AboutUsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: SingleChildScrollView( // Allow scrolling if content overflows
         padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
         child: Column(

@@ -50,15 +50,18 @@ class WelcomeScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+
+
+
                           Container(
                             width: 352,
                             height: 42,
                             margin: const EdgeInsets.only(bottom: 8),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment(-0.67, -1.0),
-                                end: Alignment(1.0, 1.91),
-                                colors: [Color(0xFF000000), Color(0xFF666666)],
+                              gradient: LinearGradient(
+                                colors: [AppStyles.primaryColorStart, AppStyles.primaryColorEnd],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
                               borderRadius: BorderRadius.circular(8),
                               boxShadow: [
@@ -97,6 +100,8 @@ class WelcomeScreen extends StatelessWidget {
                               ),
                             ),
                           ),
+
+
                           const SizedBox(height: 16),
                           SizedBox(
                             width: 352,

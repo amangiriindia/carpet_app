@@ -9,6 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../const.dart';
 import 'package:OACrugs/screens/pageutill/carpet_pattern_choose.dart';
 
+import '../widgets/profile_drawer.dart';
+import 'notification_screen.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -29,6 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _loadLikedItems();
     _fetchCollections();
   }
+
 
   Future<void> _fetchCollections() async {
     try {
@@ -132,6 +136,7 @@ class _SearchScreenState extends State<SearchScreen> {
           childAspectRatio: 0.56,
         ),
         itemCount: _filteredItems.length,
+
         itemBuilder: (context, index) {
           final item = _filteredItems[index];
           bool isLiked = WishlistHandle.isItemInWishlist(item);
@@ -224,10 +229,8 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
         ),
-
-
-
-
+        endDrawer: const NotificationScreen(),
+        drawer: const ProfileDrawer(),
         backgroundColor: AppStyles.backgroundSecondry,
         body: Padding(
           padding: const EdgeInsets.fromLTRB(15.0, 3.0, 15.0, 15.0),

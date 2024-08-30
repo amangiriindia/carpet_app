@@ -21,8 +21,8 @@ class BaseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: child,
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: selectedIndex,

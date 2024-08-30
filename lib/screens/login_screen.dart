@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../components/gradient_button.dart';
 import '../const.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
@@ -235,31 +236,20 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           ),
                           SizedBox(height: 10),
                           Container(
-                            width: double.infinity,
-                            height: 41.72,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment(-0.67, -1.0),
-                                end: Alignment(1.0, 1.91),
-                                colors: [Color(0xFF000000), Color(0xFF666666)],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: GradientButton(
+                                  onPressed: _login,
+                                  buttonText: 'Login',
                                 ),
-                              ),
-                              onPressed: _login,
-                              child: Text(
-                                'Login',
-                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           ),
+
+
+
                         ],
                       ),
                     ),

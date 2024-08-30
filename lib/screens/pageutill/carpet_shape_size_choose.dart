@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../components/gradient_button.dart';
+import '../../components/home_app_bar.dart';
 import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
@@ -263,9 +265,9 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.backgroundPrimary,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: Column(
         children: [
           // Fixed top row for color choice
@@ -408,38 +410,47 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
                   // Button to select address
 
                   Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool('checkCarpetFlag', true);
-                        // Navigate to the AddressScreen
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const AddressScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [AppStyles.primaryColorEnd,AppStyles.primaryColorStart],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      icon: const Icon(Icons.add_location_alt_outlined, color: AppStyles.backgroundPrimary, size: 16),
-                      label: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 22),
-                        child: Text(
-                          'Select Addres',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('checkCarpetFlag', true);
+                          // Navigate to the AddressScreen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const AddressScreen()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent, // Make button background transparent
+                          shadowColor: Colors.transparent, // Remove button shadow
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.add_location_alt_outlined, color: AppStyles.backgroundPrimary, size: 16),
+                        label: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 22),
+                          child: Text(
+                            'Select Address',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 15.0), // Reduced spacing between buttons
-
                   Container(
                     color: Colors.white,
                     padding: const EdgeInsets.all(16.0),
@@ -447,24 +458,13 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
                       alignment: Alignment.bottomCenter,
                       child: SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
+                        child: GradientButton(
                           onPressed: _getIdFormAddressScreen,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Continue',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          buttonText: 'Continue',
                         ),
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),

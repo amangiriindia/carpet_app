@@ -124,6 +124,7 @@ class _SearchScreenState extends State<SearchHomePage> {
     }
 
     return Expanded(
+
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -131,6 +132,7 @@ class _SearchScreenState extends State<SearchHomePage> {
           mainAxisSpacing: 0,
           childAspectRatio: 0.56,
         ),
+
         itemCount: _filteredItems.length,
         itemBuilder: (context, index) {
           final item = _filteredItems[index];
@@ -152,24 +154,8 @@ class _SearchScreenState extends State<SearchHomePage> {
             onLikeToggle: () async {
               if (isLiked) {
                 await WishlistHandle.removeItem(item);
-                Fluttertoast.showToast(
-                  msg: "Removed from wishlist",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  backgroundColor: Colors.redAccent,
-                  textColor: Colors.white,
-                  fontSize: 16.0,
-                );
               } else {
                 await WishlistHandle.addItem(item);
-                Fluttertoast.showToast(
-                  msg: "Added to wishlist",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  backgroundColor: Colors.green,
-                  textColor: Colors.white,
-                  fontSize: 16.0,
-                );
               }
               setState(() {});
             },
@@ -177,6 +163,7 @@ class _SearchScreenState extends State<SearchHomePage> {
           );
         },
       ),
+
     );
   }
 

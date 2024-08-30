@@ -100,3 +100,65 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(100.0);
 }
+
+
+
+
+class CustomNormalAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const CustomNormalAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      elevation: 0,
+      centerTitle: true,
+      title: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0), // Adjust vertical padding here
+        child: Container(
+          color: AppStyles.backgroundSecondry,
+          child: Image.asset(
+            'assets/logos/center_image.png',
+            height: 90.0,
+          ),
+        ),
+      ),
+      leading: IconButton(
+        icon: const Icon(
+          Icons.menu,
+          color: AppStyles.backgroundSecondry,
+          size: 30.0,
+        ),
+        onPressed: () {
+          Scaffold.of(context).openDrawer();
+        },
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.notification_important_sharp,
+            color: AppStyles.backgroundSecondry,
+            size: 30.0,
+          ),
+          onPressed: () {
+            Scaffold.of(context).openEndDrawer();
+          },
+        ),
+      ],
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppStyles.primaryColorEnd, AppStyles.primaryColorStart],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(65.0);
+}
+
+
+

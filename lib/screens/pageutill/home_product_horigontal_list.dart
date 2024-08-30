@@ -112,6 +112,9 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
                       mainAxisSpacing: 0,
                       childAspectRatio: 0.6,
                     ),
+
+
+
                     itemCount: itemCount,
 
                     itemBuilder: (context, index) {
@@ -133,17 +136,14 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
                         },
 
                         onLikeToggle: () async {
-                          setState(() async {
-                            if (isLiked) {
-                              await WishlistHandle.removeItem(item);
-
-                            } else {
-                              await WishlistHandle.addItem(item);
-
-                            }
-
-                          });
+                          if (isLiked) {
+                            await WishlistHandle.removeItem(item);
+                          } else {
+                            await WishlistHandle.addItem(item);
+                          }
+                          setState(() {}); // Call setState synchronously
                         },
+
                         isLiked: isLiked,
                       );
                     },

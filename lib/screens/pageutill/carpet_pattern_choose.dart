@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import '../../components/gradient_button.dart';
+import '../../components/home_app_bar.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
 import '../notification_screen.dart';
@@ -93,9 +95,9 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
-      appBar: const CustomAppBar(), // Add an AppBar if it's missing
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(), // Add an AppBar if it's missing
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
@@ -185,26 +187,9 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
                   alignment: Alignment.bottomCenter,
                   child: SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: GradientButton(
                       onPressed: _navigateToColorFillerPage,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 15.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                      child: Text(
-                      'Continue',
-                      style: TextStyle(
-                        fontFamily: 'Poppins', // Font family
-                        fontSize: 14.51, // Font size
-                        fontWeight: FontWeight.w300, // Font weight
-                        height: 21.77 / 14.51, // Line height
-                        letterSpacing: 0.14, // Letter spacing
-                        color: AppStyles.backgroundPrimary, // Text color (black)
-                      ),
-                    ),
+                      buttonText: 'Continue',
                     ),
                   ),
                 ),

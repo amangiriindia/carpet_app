@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+import '../../components/gradient_button.dart';
+import '../../components/home_app_bar.dart';
 import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
@@ -70,9 +72,9 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: Stack(
         children: [
           Container(
@@ -132,17 +134,23 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                         ),
                         const SizedBox(height: 24),
                         isLoading
-                            ? const Center(child: CircularProgressIndicator())
-                            : ElevatedButton(
-                          onPressed: _submitForm,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            textStyle: const TextStyle(fontSize: 18),
+                            ? CommonFunction.showLoadingIndicator()
+                            :
+                        Container(
+                          color: Colors.white,
+                          padding: const EdgeInsets.all(16.0),
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: GradientButton(
+                                onPressed: _submitForm,
+                                buttonText: 'Submit',
+                              ),
+                            ),
                           ),
-                          child: const Text('Submit'),
                         ),
+
                       ],
                     ),
                   ),

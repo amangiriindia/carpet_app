@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../../components/gradient_button.dart';
+import '../../components/home_app_bar.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
 import '../notification_screen.dart';
@@ -116,9 +118,9 @@ class _CarpetPatternColorFillerPageState
 
     return Scaffold(
       backgroundColor: AppStyles.backgroundPrimary,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: Column(
         children: [
           Container(
@@ -260,6 +262,7 @@ class _CarpetPatternColorFillerPageState
                       },
                     ),
                   ),
+
                   Container(
                     color: Colors.white,
                     padding: const EdgeInsets.all(16.0),
@@ -267,23 +270,14 @@ class _CarpetPatternColorFillerPageState
                       alignment: Alignment.bottomCenter,
                       child: SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
+                        child: GradientButton(
                           onPressed: _onContinuePressed,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Continue',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          buttonText: 'Continue',
                         ),
                       ),
                     ),
                   ),
+
                 ],
               ),
             ),

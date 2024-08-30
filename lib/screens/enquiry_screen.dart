@@ -9,6 +9,7 @@ import '../../widgets/profile_drawer.dart';
 import 'package:OACrugs/screens/wishlist_screen.dart'; // Correct import statement
 import 'dart:typed_data';
 
+import '../components/home_app_bar.dart';
 import 'home_screen.dart';
 import 'notification_screen.dart'; // Import for Uint8List
 
@@ -51,9 +52,9 @@ class EnquiryScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: Consumer<ColorPickerProvider>(
         builder: (context, colorPickerProvider, child) {
           return Column(

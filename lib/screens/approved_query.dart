@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
+import '../components/home_app_bar.dart';
 import '../const.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
@@ -114,9 +115,9 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.backgroundPrimary,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

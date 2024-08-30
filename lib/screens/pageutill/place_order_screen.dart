@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../components/gradient_button.dart';
+import '../../components/home_app_bar.dart';
 import '../../const.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
@@ -149,9 +151,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -309,19 +311,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                       alignment: Alignment.bottomCenter,
                       child: SizedBox(
                         width: double.infinity,
-                        child: ElevatedButton(
+                        child: GradientButton(
                           onPressed: () => _createOrder(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 15.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Confirm Order',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          buttonText: 'Continue',
                         ),
                       ),
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../components/gradient_button.dart';
 import '../const.dart';
 import 'login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast
@@ -54,19 +55,9 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
     super.dispose();
   }
 
-  void _showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,  // Change gravity to top
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-  }
 
   Future<void> _changePassword() async {
-    _showLoadingDialog();
+    CommonFunction.showLoadingDialog(context);
     if (newPasswordController.text == confirmPasswordController.text) {
       final response = await http.post(
         Uri.parse('${APIConstants.API_URL}/api/v1/user/verify-otp'),
@@ -82,7 +73,7 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
         }),
 
       );
-      _hideLoadingDialog();
+
       // Debug print statements to check the response
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
@@ -92,60 +83,40 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
       if (response.statusCode == 200) {
         if (data['success'] == true) {
 
-          _showToast('Your password has been changed successfully.');
+          CommonFunction.showToast(context,'Your password has been changed successfully.');
 
-          _showLoadingDialog();
 
-          // Add a 2-second delay before navigation
-          Future.delayed(Duration(seconds: 2), () {
             // Hide the loading dialog (optional)
-            _hideLoadingDialog();
 
+            CommonFunction.hideLoadingDialog(context);
             // Navigate to the LoginScreen after the delay
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => LoginScreen()),
                   (Route<dynamic> route) => false,
             );
-          });
+
 
         } else {
-          _showToast(data['message'] ?? 'An error occurred');
+          CommonFunction.hideLoadingDialog(context);
+          CommonFunction.showToast(context,data['message'] ?? 'An error occurred');
         }
       } else if (response.statusCode == 400) {
-        _showToast(data['message'] ?? 'Invalid request. Please check your input.');
+        CommonFunction.hideLoadingDialog(context);
+        CommonFunction.showToast(context,data['message'] ?? 'Invalid request. Please check your input.');
       } else {
-        _showToast('Failed to change password. Please try again.');
+        CommonFunction.hideLoadingDialog(context);
+        CommonFunction.showToast(context,'Failed to change password. Please try again.');
       }
     } else {
+      CommonFunction.hideLoadingDialog(context);
       setState(() {
         _rePasswordErrorText = 'Passwords do not match';
       });
     }
   }
 
-  void _showLoadingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissal when tapping outside
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text('Loading...'),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
-  void _hideLoadingDialog() {
-    Navigator.of(context).pop(); // Close the dialog
-  }
 
   Widget _buildTextField({
     required String hintText,
@@ -271,37 +242,36 @@ class _ConfirmPasswordScreenState extends State<ConfirmPasswordScreen> {
                             ],
                           ),
                           SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            height: 41.72,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment(-0.67, -1.0),
-                                end: Alignment(1.0, 1.91),
-                                colors: [Color(0xFF000000), Color(0xFF666666)],
+                          Align(
+                            alignment: Alignment.center,
+                            child: SizedBox(
+                              width: 300.0, // Set your desired width here
+                              child: GradientButton(
+                                onPressed: _changePassword,
+                                buttonText: 'Change Password',
                               ),
-                              borderRadius: BorderRadius.circular(8),
                             ),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onPressed: _changePassword,
-                              child: Center(
-                                child: Text(
-                                  'Change Password',
-                                  style: TextStyle(color: Colors.white),
+                          ),
+                          Container(
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: GradientButton(
+                                  onPressed: _changePassword,
+                                  buttonText: 'Change Password',
                                 ),
                               ),
                             ),
                           ),
+
                         ],
                       ),
                     ),
+
+
+
+
                     SizedBox(height: 20),
                     GestureDetector(
                       onTap: () {

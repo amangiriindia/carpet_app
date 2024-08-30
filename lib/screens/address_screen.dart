@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../components/home_app_bar.dart';
 import '../const.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
@@ -149,9 +150,9 @@ class _AddressScreenState extends State<AddressScreen> {
       },
       child: Scaffold(
         backgroundColor: AppStyles.backgroundPrimary,
-        appBar: const CustomAppBar(),
-        drawer: const NotificationScreen(),
-        endDrawer: const ProfileDrawer(),
+        appBar: const CustomNormalAppBar(),
+        endDrawer: const NotificationScreen(),
+        drawer: const ProfileDrawer(),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -188,33 +189,52 @@ class _AddressScreenState extends State<AddressScreen> {
                       );
                     }).toList(),
                     const SizedBox(height: 40),
+                    
                     Center(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) =>  AddAddressPage()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppStyles.primaryColorStart, AppStyles.primaryColorEnd],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        icon: const Icon(Icons.add_location_alt_outlined, color: AppStyles.backgroundPrimary, size: 16),
-                        label: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 22),
-                          child: Text(
-                            'Add Address',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => AddAddressPage()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent, // Make button background transparent
+                            shadowColor: Colors.transparent, // Remove button shadow
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          icon: const Icon(
+                            Icons.add_location_alt_outlined,
+                            color: Colors.white, // Set icon color to white
+                            size: 16,
+                          ),
+                          label: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 22),
+                            child: Text(
+                              'Add Address',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
+
+
+
                   ],
                 ),
               ),

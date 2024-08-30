@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../components/gradient_button.dart';
 import '../const.dart';
 import 'forgot_confirm_password.dart';
 import 'login_screen.dart';
@@ -225,34 +226,21 @@ _hideLoadingDialog();
                               ),
                             ),
                           SizedBox(height: 20),
+
                           Container(
-                            width: double.infinity,
-                            height: 41.72,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment(-0.67, -1.0),
-                                end: Alignment(1.0, 1.91),
-                                colors: [Color(0xFF000000), Color(0xFF666666)],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onPressed: _sendOtp,
-                              child: Center(
-                                child: Text(
-                                  'Send OTP',
-                                  style: TextStyle(color: Colors.white),
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: GradientButton(
+                                  onPressed: _sendOtp,
+                                  buttonText: 'Send OTP',
                                 ),
                               ),
                             ),
                           ),
+
+
                         ],
                       ),
                     ),
@@ -260,12 +248,12 @@ _hideLoadingDialog();
                     GestureDetector(
                       onTap: () {
                         // Show loading dialog before the delay (optional)
-                        _showLoadingDialog();
+                       CommonFunction.showLoadingDialog(context);
 
                         // Add a 2-second delay before navigation
                         Future.delayed(Duration(seconds: 2), () {
                           // Hide the loading dialog (optional)
-                          _hideLoadingDialog();
+                          CommonFunction.hideLoadingDialog(context);
 
                           // Navigate to the LoginScreen after the delay
                           Navigator.push(

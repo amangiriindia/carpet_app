@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../components/gradient_button.dart';
 import '../const.dart';
 import 'login_screen.dart';
 
@@ -106,7 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen>
 
         if (response.statusCode == 201) {
           if (data['success'] == true) {
-            showToast(data['message'] ?? 'Registration successful!');
+            CommonFunction.showToast(context,data['message'] ?? 'Registration successful!');
             await _saveUserInfo();
             // Show the loading dialog before navigating
             CommonFunction.showLoadingDialog(context);
@@ -119,12 +119,12 @@ class _SignUpScreenState extends State<SignUpScreen>
               );
             });
           } else {
-            showToast(data['message'] ?? 'An error occurred');
+            CommonFunction.showToast (context,data['message'] ?? 'An error occurred');
           }
         } else if (response.statusCode == 400) {
-          showToast(data['message'] ?? 'Bad request. Please check your input.');
+          CommonFunction.showToast(context,data['message'] ?? 'Bad request. Please check your input.');
         } else {
-          showToast('Failed to sign up. Please try again.');
+          CommonFunction.showToast(context,'Failed to sign up. Please try again.');
         }
       } else {
         setState(() {
@@ -132,44 +132,12 @@ class _SignUpScreenState extends State<SignUpScreen>
         });
       }
     } else {
-      showToast('You must accept the terms and conditions to sign up.');
+      CommonFunction.showToast(context,'You must accept the terms and conditions to sign up.');
     }
   }
 
-  // void _showLoadingDialog() {
-  //   showDialog(
-  //     context: context,
-  //     barrierDismissible: false, // Prevent dismissal when tapping outside
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: Row(
-  //           mainAxisSize: MainAxisSize.min,
-  //           children: [
-  //             CircularProgressIndicator(),
-  //             SizedBox(width: 20),
-  //             Text('Loading...'),
-  //           ],
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-  //
-  // void _hideLoadingDialog() {
-  //   Navigator.of(context).pop(); // Close the dialog
-  // }
 
-  void showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-  }
+
 
   Future<void> _saveUserInfo() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -381,34 +349,26 @@ class _SignUpScreenState extends State<SignUpScreen>
                             padding: EdgeInsets.all(16.0),
                             child: _buildEmailForm(),
                           ),
+
+
+
+
+
+
+
                           Container(
-                            width: 359.16,
-                            height: 41.72,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment(-0.67, -1.0),
-                                end: Alignment(1.0, 1.91),
-                                colors: [Color(0xFF000000), Color(0xFF666666)],
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              onPressed: _signUp,
-                              child: Center(
-                                child: Text(
-                                  'Sign Up',
-                                  style: TextStyle(color: Colors.white),
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: GradientButton(
+                                  onPressed: _signUp,
+                                  buttonText: 'Sign Up',
                                 ),
                               ),
                             ),
                           ),
+
                         ],
                       ),
                     ),

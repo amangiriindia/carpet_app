@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert'; // For JSON encoding
 import 'dart:typed_data'; // Import for Uint8List
+import '../../components/gradient_button.dart';
+import '../../components/home_app_bar.dart';
 import '../../widgets/color_picker.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_navigation_bar.dart';
@@ -200,9 +202,9 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
 
     return Scaffold(
       backgroundColor: AppStyles.backgroundPrimary,
-      appBar: const CustomAppBar(),
-      drawer: const NotificationScreen(),
-      endDrawer: const ProfileDrawer(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       body: Consumer<ColorPickerProvider>(
         builder: (context, colorPickerProvider, child) {
           return Column(
@@ -373,30 +375,14 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                                 alignment: Alignment.bottomCenter,
                                 child: SizedBox(
                                   width: double.infinity,
-                                  child: ElevatedButton(
+                                  child: GradientButton(
                                     onPressed: _submitEnquiry,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.black,
-                                      padding: const EdgeInsets.symmetric(vertical: 15.0),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Submit Enquiry',
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins', // Font family
-                                        fontSize: 14.51, // Font size
-                                        fontWeight: FontWeight.w300, // Font weight
-                                        height: 21.77 / 14.51, // Line height
-                                        letterSpacing: 0.14, // Letter spacing
-                                        color: AppStyles.backgroundPrimary, // Text color (black)
-                                      ),
-                                    ),
+                                    buttonText: 'Submit Enquiry',
                                   ),
                                 ),
                               ),
                             ),
+
                           ],
                         ),
                       ),

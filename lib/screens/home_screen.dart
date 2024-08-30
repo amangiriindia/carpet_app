@@ -1,3 +1,4 @@
+import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:OACrugs/const.dart';
 import 'package:OACrugs/screens/pageutill/home_product_horigontal_list.dart';
@@ -92,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           // Search Screen Page
-          const SearchScreen(),
+          const SearchHomePage(),
           // Wishlist Screen Page
           const WishListScreen(),
           // Collection Screen Page

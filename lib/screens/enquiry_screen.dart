@@ -1,3 +1,4 @@
+import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:OACrugs/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -154,7 +155,7 @@ class EnquiryScreen extends StatelessWidget {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (_, __, ___) => const SearchScreen(),
+                pageBuilder: (_, __, ___) => const SearchHomePage(),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

@@ -134,7 +134,7 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
   }
 }
 
-  class CollectionGridItem extends StatelessWidget {
+class CollectionGridItem extends StatelessWidget {
   final Uint8List imageData;
   final String text;
   final VoidCallback onTap;
@@ -150,56 +150,72 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 250.0, // Increase height here (adjust the value as needed)
+        height: 250.0, // Set a fixed height for the card
         decoration: BoxDecoration(
+          color: Colors.white, // Set the background color to white
           borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: AppStyles.primaryColorStart), // Add a black border to the card
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12.0),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.memory(
-                imageData,
-                fit: BoxFit.contain,
-                gaplessPlayback: true,
-                frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-                  if (wasSynchronouslyLoaded  != null) {
-                    return child;
-                  } else {
-                    return CommonFunction.showLoadingIndicator();
-                  }
-                },
-              ),
-              Container(
-                color: Colors.black.withOpacity(0.3),
-                child: Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
-                      border: Border.all(color: AppStyles.primaryColorStart, width: 1),
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0), // Add padding here
-                      child: Text(
-                        text,
-                        style: AppStyles.secondaryBodyTextStyle.copyWith(
-                          color: Colors.black, // Overwrite the text color with black
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)), // Round the top corners of the image
+                child: Image.memory(
+                  imageData,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  gaplessPlayback: true,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey.shade200, // Set a fallback background color
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
+                            SizedBox(height: 8),
+                            Text("Image failed to load", style: TextStyle(color: Colors.grey)),
+                          ],
                         ),
                       ),
-                    ),
-                  ),
+                    );
+                  },
+                  frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                    if (wasSynchronouslyLoaded) {
+                      return child;
+                    } else {
+                      return AnimatedOpacity(
+                        opacity: frame == null ? 0 : 1,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOut,
+                        child: child,
+                      );
+                    }
+                  },
                 ),
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0), // Padding around the text
+              child: Text(
+                text,
+                style: AppStyles.secondaryBodyTextStyle.copyWith(
+                  color: Colors.black, // Use black color for the text
+                  fontWeight: FontWeight.bold, // Make the text bold
+                ),
+                textAlign: TextAlign.center, // Center align the text
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
+
 
 
 class CollectionItem {

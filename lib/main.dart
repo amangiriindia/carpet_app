@@ -1,3 +1,4 @@
+import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:OACrugs/splash_screen/custom_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,14 +31,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home:  CustomSplashScreen(),
+      home:  HomeScreen(),
 
       routes: {
          '/home': (context) => const HomeScreen(),
         // '/collection_screen': (context) => const CollectionScreen(collectionId: '', collectionName: '',),
-        '/search_screen': (context) => const SearchScreen(),
+        '/search_screen': (context) => const SearchHomePage(),
         '/wishlist_screen': (context) => const WishListScreen(),
-        '/enquiry_form': (context) => const EnquiryFormScreen(),
+
 
       },
 

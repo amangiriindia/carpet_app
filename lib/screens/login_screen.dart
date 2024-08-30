@@ -1,7 +1,6 @@
 import 'package:OACrugs/screens/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -55,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
         'password': passwordController.text,
       }),
     );
-    CommonFunction.hideLoadingDialog(context);
+
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -70,53 +69,25 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       await prefs.setString('mobileNumber', user['mobileNumber']);
       await prefs.setBool('isVerified', user['isVerified']);
       await prefs.setBool('isLoggedIn', true);
-
-
-
-      // Add a 2-second delay before navigation
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-              (Route<dynamic> route) => false,
-        );
-      });
+      CommonFunction.hideLoadingDialog(context);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+            (Route<dynamic> route) => false,
+      );
     } else if (response.statusCode == 400) {
+
       final data = jsonDecode(response.body);
-      _showToast(data['message']);
+      CommonFunction.hideLoadingDialog(context);
+      CommonFunction.showToast(context, data['message']);
     } else {
-      _showToast('Unable to login. Please try again later.');
+      CommonFunction.hideLoadingDialog(context);
+      CommonFunction.showToast(context, 'Unable to login. Please try again later.');
     }
   }
 
-  void _showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.TOP,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-      fontSize: 16.0,
-    );
-  }
 
-  void _showErrorDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildTextField({
     required String hintText,

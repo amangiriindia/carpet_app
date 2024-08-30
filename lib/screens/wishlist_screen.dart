@@ -72,9 +72,9 @@ class _WishListScreenState extends State<WishListScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 16.0,
-                      mainAxisSpacing: 16.0,
+                      crossAxisSpacing: 0,
+                      mainAxisSpacing: 0,
+                      childAspectRatio: 0.56,
                     ),
                     itemCount: wishlistItems.length,
 

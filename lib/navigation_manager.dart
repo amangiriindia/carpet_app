@@ -1,3 +1,4 @@
+import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:OACrugs/widgets/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:OACrugs/screens/home_screen.dart';
@@ -15,7 +16,7 @@ class _NavigationManagerState extends State<NavigationManager> {
   // List of screens to display
   final List<Widget> _screens = [
     HomeScreen(),
-    SearchScreen(),
+    SearchHomePage(),
     WishListScreen(),
   ];
 

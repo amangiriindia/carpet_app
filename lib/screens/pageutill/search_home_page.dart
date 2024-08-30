@@ -9,14 +9,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../const.dart';
 import 'package:OACrugs/screens/pageutill/carpet_pattern_choose.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class SearchHomePage  extends StatefulWidget {
+  const SearchHomePage({super.key});
 
   @override
   _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
+class _SearchScreenState extends State<SearchHomePage> {
   List<CollectionItem> _items = [];
   List<CollectionItem> _filteredItems = [];
   String _searchQuery = '';
@@ -152,10 +152,24 @@ class _SearchScreenState extends State<SearchScreen> {
             onLikeToggle: () async {
               if (isLiked) {
                 await WishlistHandle.removeItem(item);
-
+                Fluttertoast.showToast(
+                  msg: "Removed from wishlist",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: Colors.redAccent,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
               } else {
                 await WishlistHandle.addItem(item);
-
+                Fluttertoast.showToast(
+                  msg: "Added to wishlist",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  backgroundColor: Colors.green,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
               }
               setState(() {});
             },
@@ -175,55 +189,6 @@ class _SearchScreenState extends State<SearchScreen> {
     return GestureDetector(
       onTap: () => _unfocusKeyboard(context),
       child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          centerTitle: true,
-          title: Container(
-            color: AppStyles.backgroundSecondry,
-            child: Image.asset(
-              'assets/logos/center_image.png',
-              height: 70.0,
-            ),
-          ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: AppStyles.backgroundSecondry,
-              size: 30.0,
-            ),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: const Icon(
-                Icons.notification_important_sharp,
-                color: AppStyles.backgroundSecondry,
-                size: 30.0,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openEndDrawer();
-              },
-            ),
-          ],
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppStyles.primaryColorEnd, AppStyles.primaryColorStart],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(60.0),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-              child: _buildSearchBar(),
-            ),
-          ),
-        ),
 
 
 

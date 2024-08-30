@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../const.dart';
+import '../screens/search_screen.dart';
+
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
@@ -8,25 +9,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor:AppStyles.backgroundPrimary,
+      elevation: 0,
+      centerTitle: true,
+      title: Container(
+        color: AppStyles.backgroundSecondry,
+        child: Image.asset(
+          'assets/logos/center_image.png',
+          height: 70.0,
+        ),
+      ),
       leading: IconButton(
-        icon: const Stack(
-          children: [
-            Icon(
-              Icons.notifications_none, // Outlined bell icon
-              color: Colors.black,
-              size: 30.0,
-            ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: Icon(
-                Icons.circle,
-                color: Colors.red,
-                size: 8.0, // Size of the red dot
-              ),
-            ),
-          ],
+        icon: const Icon(
+          Icons.menu,
+          color: AppStyles.backgroundSecondry,
+          size: 30.0,
         ),
         onPressed: () {
           Scaffold.of(context).openDrawer();
@@ -35,19 +31,71 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         IconButton(
           icon: const Icon(
-            Icons.person,
-            color: Colors.black,
+            Icons.notification_important_sharp,
+            color: AppStyles.backgroundSecondry,
             size: 30.0,
           ),
           onPressed: () {
-            Scaffold.of(context).openEndDrawer(); // Open the drawer
+            Scaffold.of(context).openEndDrawer();
           },
         ),
       ],
-      elevation: 0,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppStyles.primaryColorEnd, AppStyles.primaryColorStart],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SearchScreen()),
+              );
+            },
+            child: Container(
+              height: 45.0,
+              decoration: BoxDecoration(
+                color: AppStyles.backgroundSecondry,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 0,
+                    blurRadius: 4,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16.0),
+                  const Expanded(
+                    child: Text(
+                      'Search...',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.search, color: Colors.grey),
+                  const SizedBox(width: 16.0),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(100.0);
 }

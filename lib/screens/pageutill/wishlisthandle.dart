@@ -69,80 +69,130 @@ class GridItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap, // Use onTap for navigation
+      onTap: onTap,
       hoverColor: Colors.grey[200],
       child: Card(
         color: AppStyles.backgroundPrimary,
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
+          side: BorderSide(
+            color: AppStyles.primaryColorStart,
+            width: 1.0,
+          ),
         ),
-        elevation: 2.0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12.0)),
-                  child: Image.memory(
-                    item.imageData,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: 150.0,
-                  ),
-                ),
-                Positioned(
-                  right: 8.0,
-                  top: 8.0,
-                  child: IconButton(
-                    icon: Icon(
-                      isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: isLiked ? Colors.redAccent : Colors.grey[600],
-                      size: 24.0,
-                    ),
-                    onPressed: onLikeToggle, // Call the onLikeToggle callback
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        elevation: 1.0,
+        child: Container(
+          constraints: const BoxConstraints(
+            minHeight: 200.0, // Set a minimum height to avoid overflow
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
                 children: [
-                  Text(
-                    item.text,
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: AppStyles.primaryTextColor,
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12.0),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    child: Image.memory(
+                      item.imageData,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 185,
+                    ),
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    'Price: ${item.price}',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: AppStyles.secondaryTextColor,
+                  Positioned(
+                    right: 8.0,
+                    top: 8.0,
+                    child: IconButton(
+                      icon: Icon(
+                        isLiked ? Icons.favorite : Icons.favorite_border,
+                        color: isLiked ? Colors.redAccent : Colors.grey[600],
+                        size: 24.0,
+                      ),
+                      onPressed: onLikeToggle,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.text,
+                      style: AppStyles.primaryBodyTextStyle,
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      '${item.price}',
+                      style: AppStyles.secondaryBodyTextStyle,
+                    ),
+                    const SizedBox(height: 8.0),
+                    ElevatedButton(
+                      onPressed: onTap,
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                          EdgeInsets.zero,
+                        ),
+                        backgroundColor: MaterialStateProperty.resolveWith(
+                              (states) {
+                            return Colors.transparent;
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<
+                            RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        elevation: MaterialStateProperty.all(3.0),
+                      ),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              AppStyles.primaryColorStart,
+                              AppStyles.primaryColorEnd,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10.0,
+                            horizontal: 10.0,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Custmize now',
+                            style: AppStyles.secondaryBodyTextStyle.copyWith(
+                              color: Colors.white, // Override the text color to white
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 }
 
 
 
-
-class CollectionItem {
+  class CollectionItem {
   final Uint8List imageData;
   final String text;
   final String price;

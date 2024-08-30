@@ -1,4 +1,5 @@
 import 'package:OACrugs/const.dart';
+import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -425,7 +426,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
             Navigator.pushReplacement(
               context,
               PageRouteBuilder(
-                pageBuilder: (_, __, ___) => const SearchScreen(),
+                pageBuilder: (_, __, ___) => const SearchHomePage(),
                 transitionDuration: Duration.zero,
                 reverseTransitionDuration: Duration.zero,
               ),

@@ -3,6 +3,7 @@ import 'package:OACrugs/const.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import '../components/gradient_button.dart';
 import '../components/home_app_bar.dart';
 import '../widgets/custom_app_bar.dart';
 import '../widgets/profile_drawer.dart';
@@ -175,34 +176,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   _buildField('Phone No.', _phoneNumberController, _phoneNumberFocus),
                   const SizedBox(height: 40),
                   Center(
-                    child: Container(
+                    child:
+
+
+                    Container(
                       color: Colors.white,
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Align(
                         alignment: Alignment.bottomCenter,
                         child: SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton(
+                          child: GradientButton(
                             onPressed: _saveProfileChanges,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              padding: const EdgeInsets.symmetric(vertical: 15.0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                            child: const Text(
-                              'Save Changes',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            buttonText: 'Continue',
                           ),
                         ),
                       ),
                     ),
-
-
-
-
 
 
                   ),
@@ -261,10 +251,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             Container(
-              width: 18,
-              height: 18,
-              decoration: const BoxDecoration(
-                color: Color(0xFF1D1D1D),
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppStyles.primaryColorEnd,AppStyles.primaryColorStart], // Define your gradient colors here
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -274,7 +268,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   padding: EdgeInsets.zero,
                 ),
               ),
-            ),
+            )
+
           ],
         ),
       ),
@@ -285,282 +280,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 
 
-
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
-
-  @override
-  _ProfilePageState createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  bool _isAppBarCollapsed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: NotificationListener<ScrollNotification>(
-        onNotification: (scrollInfo) {
-          if (scrollInfo is ScrollUpdateNotification) {
-            setState(() {
-              _isAppBarCollapsed =
-                  scrollInfo.metrics.pixels > 200; // Adjust threshold as needed
-            });
-          }
-          return true;
-        },
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 350, // Adjust as needed
-              flexibleSpace: FlexibleSpaceBar(
-                background: _TopPortion(),
-                title: _isAppBarCollapsed
-                    ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(width: 8),
-                    const Text("My Profile"),
-                  ],
-                )
-                    : null,
-                centerTitle: false,
-                collapseMode: CollapseMode.parallax,
-              ),
-              pinned: true,
-              floating: true, // Allows the app bar to reappear on scroll up
-              snap: true, // Makes the app bar snap into view
-            ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16),
-                        const Divider(),
-                        _SectionHeader(text: 'Ads'),
-                        _ProfileOptionItem(
-                          icon: Icons.add_circle_outline,
-                          text: 'Post Ad',
-                          onTap: () {
-
-                          },
-                        ),
-                        _ProfileOptionItem(
-                          icon: Icons.shopping_bag,
-                          text: 'My Ads',
-                          onTap: () {
-
-                          },
-                        ),
-
-                        const Divider(),
-                        _SectionHeader(text: 'Subscription Plans'),
-                        _ProfileOptionItem(
-                          icon: Icons.new_releases,
-                          text: 'New Plan',
-                          onTap: () {
-
-                          },
-                        ),
-                        _ProfileOptionItem(
-                          icon: Icons.subscriptions,
-                          text: 'My Subscription',
-                          onTap: () {
-
-                          },
-                        ),
-                        const Divider(),
-                        _SectionHeader(text: 'Ads Reviews'),
-                        _ProfileOptionItem(
-                          icon: Icons.rate_review,
-                          text: 'My Ads Reviews',
-                          onTap: () {
-
-                          },
-                        ),
-                        const Divider(),
-                        _SectionHeader(text: 'Profile & Settings'),
-                        _ProfileOptionItem(
-                          icon: Icons.person,
-                          text: 'Profile',
-                          onTap: () {
-
-                          },
-                        ),
-                        _ProfileOptionItem(
-                          icon: Icons.settings,
-                          text: 'Settings',
-                          onTap: () {
-
-                          },
-                        ),
-                        const Divider(),
-                        _SectionHeader(text: 'My Chats'),
-                        _ProfileOptionItem(
-                          icon: Icons.request_page,
-                          text: 'Rent Request',
-                          onTap: () {
-
-                          },
-                        ),
-                        _ProfileOptionItem(
-                          icon: Icons.search,
-                          text: 'Looking For',
-                          onTap: () {
-
-                          },
-                        ),
-
-                        const Divider(),
-                        _ProfileOptionItem(
-                          icon: Icons.logout,
-                          text: 'Logout',
-                          onTap: () {
-                          //   Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => SplashScreen(),
-                          //     ),
-                          //   );
-                          },
-                        ),
-
-                        const SizedBox(
-                            height: 100), // Add some padding at the bottom
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-
-    );
-  }
-}
-
-
-
-class _SectionHeader extends StatelessWidget {
-  final String text;
-  const _SectionHeader({Key? key, required this.text}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(
-        text,
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium
-            ?.copyWith(fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-}
-
-class _ProfileOptionItem extends StatelessWidget {
-  final IconData icon;
-  final String text;
-  final VoidCallback onTap;
-
-  const _ProfileOptionItem({
-    Key? key,
-    required this.icon,
-    required this.text,
-    required this.onTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.black),
-      title: Text(
-        text,
-        style: Theme.of(context).textTheme.bodyLarge,
-      ),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: onTap,
-    );
-  }
-}
-
-class _TopPortion extends StatelessWidget {
-  const _TopPortion({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppStyles.primaryColorStart,
-            AppStyles.primaryColorStart,
-          ],
-        ),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(50),
-          bottomRight: Radius.circular(50),
-        ),
-      ),
-      child: Center(
-        child: SizedBox(
-          width: 150,
-          height: 150,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    'A', // Replace 'A' with dynamic text if needed
-                    style: TextStyle(
-                      fontSize: 80,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  child: IconButton(
-                    icon: const Icon(
-                      Icons.edit,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => UpdateProfilePage(),
-                      //   ),
-                      // );
-                      // Add your edit action here
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 

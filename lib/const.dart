@@ -45,6 +45,7 @@ class AppStyles {
   static const double headingTextSize = 18.0;
   static const double bodyTextSize = 16; // Adjusted for body text size
   static const double smallTextSize = 12.0;
+  static const double bodysmallTextSize = 14.0;
 
   // Text Styles
   static const TextStyle headingTextStyle = TextStyle(
@@ -65,7 +66,7 @@ class AppStyles {
 
   static const TextStyle secondaryBodyTextStyle = TextStyle(
     fontFamily: primaryFontFamily,
-    fontSize: smallTextSize, // 11.79px
+    fontSize: bodysmallTextSize, // 11.79px
     fontWeight: FontWeight.w400,
     height: 1.5,
     textBaseline: TextBaseline.alphabetic,

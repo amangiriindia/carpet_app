@@ -208,26 +208,15 @@ class RecentProjectItemWithImage extends StatelessWidget {
                     child: Text(
                       projectName,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 12.49,
-                        fontWeight: FontWeight.w500,
-                        height: 18.74 / 12.49,
-                      ),
+                      style: AppStyles.secondaryBodyTextStyle
                     ),
                   ),
                   SizedBox(height: 4.0),
                   Text(
                     projectDescription,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 8.0,
-                      fontWeight: FontWeight.w300,
-                      height: 12.0 / 8.0,
-                      color: Colors.black,
-                    ),
-                  ),
+                    textAlign: TextAlign.start,
+                    style: AppStyles.tertiaryBodyTextStyle.copyWith(color: Colors.black),
+                  )
                 ],
               ),
             ),

@@ -225,9 +225,6 @@ class _AddressScreenState extends State<AddressScreen> {
                         ),
                       ),
                     ),
-
-
-
                   ],
                 ),
               ),
@@ -284,11 +281,20 @@ class _AddressScreenState extends State<AddressScreen> {
                       _selectedAddressId = value;
                     });
                     final SharedPreferences prefs = await SharedPreferences.getInstance();
+                    final SharedPreferences prefsadd = await SharedPreferences.getInstance();
                     await prefs.setString('CurrentSelectedAddress', _id);
-
-                    if (prefs.get('checkCarpetFlag') != null) {
+                    if (prefs.get('checkCarpetFlag') != false) {
                       await prefs.setBool('CurrentSelectedAddressFlag', true);
                       Navigator.of(context).pop();  // Pops the current page
+
+                      if (prefsadd.getBool('addressFlag') != false) {
+                        await prefsadd.setBool('addressFlag', false);
+                        await prefs.setBool('CurrentSelectedAddressFlag', true);
+                        int count = 0;
+                        Navigator.of(context).popUntil((route) {
+                          return count++ == 2;  // Pop until 2 screens are popped (total 3 screens)
+                        });
+                      }
                     }
                   },
                 ),

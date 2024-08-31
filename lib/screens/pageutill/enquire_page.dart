@@ -102,6 +102,45 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
     }
   }
 
+
+  Future<void> _selectExpectedDeliveryDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.black, // Header background color (month/year)
+            colorScheme: ColorScheme.light(
+              primary: Colors.black, // Circle color for the selected date
+              onSurface: Colors.black, // Text color (dates)
+            ),
+            dialogBackgroundColor: Colors.white, // Background color of the date picker
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // OK/Cancel button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked != _expectedDeliveryDate) {
+      setState(() {
+        _expectedDeliveryDate = picked;
+      });
+    }
+
+
+
+  }
+
+
+
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -324,38 +363,22 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
                                   'Enter quantity'),
                             ),
                             SizedBox(height: 16),
-                            Text('Expected Delivery Date',
-                                style: AppStyles.primaryBodyTextStyle),
+
+                            const Text(
+                              'Expected Delivery Date',
+                              style: AppStyles.primaryBodyTextStyle,
+                            ),
                             TextField(
-                              controller: TextEditingController(
-                                  text: _expectedDeliveryDate
-                                          ?.toLocal()
-                                          .toString() ??
-                                      ''),
+                              readOnly: true,
+                              onTap: _selectExpectedDeliveryDate,
+                              cursorColor: Colors.black, // Cursor color set to black
                               decoration: AppStyles.textFieldDecoration(
                                 _expectedDeliveryDate != null
-                                    ? '${_expectedDeliveryDate!.toLocal()}'
-                                        .split(' ')[0]
+                                    ? '${_expectedDeliveryDate!.toLocal()}'.split(' ')[0]
                                     : 'Select date',
                               ),
-                              onTap: () async {
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-                                DateTime? selectedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate:
-                                      _expectedDeliveryDate ?? DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2101),
-                                );
-                                if (selectedDate != null &&
-                                    selectedDate != _expectedDeliveryDate) {
-                                  setState(() {
-                                    _expectedDeliveryDate = selectedDate;
-                                  });
-                                }
-                              },
                             ),
+
                             SizedBox(height: 16),
                             Text('Query',
                                 style: AppStyles.primaryBodyTextStyle),

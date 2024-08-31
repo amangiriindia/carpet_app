@@ -26,11 +26,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
       stateController,
       countryController,
       postalCodeController;
-
   late String _userId;
-
   final _formKey = GlobalKey<FormState>();
-
   @override
   void initState() {
     super.initState();
@@ -42,14 +39,16 @@ class _AddAddressPageState extends State<AddAddressPage> {
     stateController = TextEditingController();
     countryController = TextEditingController();
     postalCodeController = TextEditingController();
-
     _loadUserData(); // Load user data on initialization
   }
 
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    final SharedPreferences prefsadd = await SharedPreferences.getInstance();
     setState(() {
+      if (prefs.get('checkCarpetFlag') != null) {
+        prefsadd.setBool('addressFlag', true);
+      }
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c'; // Fallback user ID if not found
       nameController.text = prefs.getString('firstName') ?? '';
       phoneController.text = prefs.getString('mobileNumber') ?? '';

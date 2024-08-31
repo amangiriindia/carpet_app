@@ -97,7 +97,7 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
             return LayoutBuilder(
               builder: (context, constraints) {
                 int itemCount = snapshot.data!.length;
-                double itemHeight = 320;
+                double itemHeight = 330;
                 int crossAxisCount = 2;
                 int numberOfRows = (itemCount / crossAxisCount).ceil();
                 double totalHeight = itemHeight * numberOfRows;
@@ -110,7 +110,7 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 0,
                       mainAxisSpacing: 0,
-                      childAspectRatio: 0.6,
+                      childAspectRatio: 0.59,
                     ),
 
 

@@ -48,7 +48,10 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
     super.initState();
     _fetchCarpetDetails();
     print(widget.hexCodes);
+
+
   }
+
 
   void _getIdFormAddressScreen() async {
 
@@ -249,16 +252,37 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
   Future<void> _selectExpectedDeliveryDate() async {
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _expectedDeliveryDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: Colors.black, // Header background color (month/year)
+            colorScheme: ColorScheme.light(
+              primary: Colors.black, // Circle color for the selected date
+              onSurface: Colors.black, // Text color (dates)
+            ),
+            dialogBackgroundColor: Colors.white, // Background color of the date picker
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // OK/Cancel button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
+
     if (picked != null && picked != _expectedDeliveryDate) {
       setState(() {
         _expectedDeliveryDate = picked;
       });
     }
   }
+
+
 
 
   @override
@@ -375,6 +399,7 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
 
                   const SizedBox(height: 20.0),
 
+                  // Expected Delivery Date
                   // Expected Delivery Date
                   const Text(
                     'Expected Delivery Date',

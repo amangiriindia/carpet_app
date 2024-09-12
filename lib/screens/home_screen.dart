@@ -7,7 +7,6 @@ import 'home/banner.dart';
 import 'home/collections.dart';
 import 'home/placement_guide_list.dart';
 import 'home/recent_projects.dart';
-import '../widgets/shop_list.dart';
 import 'base/base_screen.dart';
 import 'search_screen.dart';
 import 'wishlist_screen.dart';

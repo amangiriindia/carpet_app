@@ -37,7 +37,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       _isLoading = true;
     });
 
-    final url = 'https://oac.onrender.com/api/v1/notification/user/notification';
+    final url = '${APIConstants.API_URL}api/v1/notification/user/notification';
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},

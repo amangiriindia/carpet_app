@@ -36,7 +36,7 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
 
   Future<void> _fetchOrders() async {
     CommonFunction.showLoadingDialog(context);
-    final url = 'https://oac.onrender.com/api/v1/enquiry/user/enquiry-pending';
+    final url = '${APIConstants.API_URL}api/v1/enquiry/user/enquiry-pending';
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},

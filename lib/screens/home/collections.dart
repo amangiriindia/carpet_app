@@ -53,7 +53,7 @@ class _CollectionGridState extends State<CollectionGrid> with TickerProviderStat
     } else {
       // Cache is expired or not available, fetch from API
       final response = await http.get(
-        Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
+        Uri.parse('${APIConstants.API_URL}api/v1/carpet/all-carpet'),
       );
 
       if (response.statusCode == 200) {

@@ -38,7 +38,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Future<void> _fetchAddresses() async {
     CommonFunction.showLoadingDialog(context);
-    final url = '${APIConstants.API_URL}/api/v1/address/user-address';
+    final url = '${APIConstants.API_URL}api/v1/address/user-address';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -67,7 +67,7 @@ class _AddressScreenState extends State<AddressScreen> {
 
   Future<void> _deleteAddress(String addressId) async {
     CommonFunction.showLoadingDialog(context);
-    final url = '${APIConstants.API_URL}/api/v1/address/delete-address/$addressId';
+    final url = '${APIConstants.API_URL}api/v1/address/delete-address/$addressId';
     try {
       final response = await http.delete(
         Uri.parse(url),

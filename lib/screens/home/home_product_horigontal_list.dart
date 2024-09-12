@@ -37,7 +37,7 @@ class _HomeCarpetItemsState extends State<HomeCarpetItems> {
 
     if (shouldFetchFromServer) {
       final response = await http.get(
-        Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
+        Uri.parse('${APIConstants.API_URL}api/v1/carpet/all-carpet'),
       );
 
       if (response.statusCode == 200) {

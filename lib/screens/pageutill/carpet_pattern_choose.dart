@@ -36,7 +36,7 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
   }
 
   Future<void> _fetchPatterns() async {
-    final url = 'https://oac.onrender.com/api/v1/carpet/single-carpet/${widget.carpetId}';
+    final url = '${APIConstants.API_URL}api/v1/carpet/single-carpet/${widget.carpetId}';
     try {
       final response = await http.get(Uri.parse(url));
 

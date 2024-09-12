@@ -17,10 +17,11 @@ class ApprovedQueryScreen extends StatefulWidget {
   @override
   State<ApprovedQueryScreen> createState() => _ApprovedQueryScreenState();
 }
-
 class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
   late String _userId;
   List<Order> orders = [];
+  Map<String, ColorInfo> colorInfoMap = {}; // Store color info
+  late double colorPrice=0.0;
 
   @override
   void initState() {
@@ -31,74 +32,83 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
-    // Once userId is loaded, fetch orders
     _fetchOrders();
   }
 
   Future<void> _fetchOrders() async {
-
     CommonFunction.showLoadingDialog(context);
     if (_userId.isEmpty) {
       print('User ID is not initialized');
       return;
     }
 
-    final url = 'https://oac.onrender.com/api/v1/enquiry/user/enquiry-approve';
+    final url = '${APIConstants.API_URL}api/v1/enquiry/user/enquiry-approve';
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({"user": _userId}),
     );
 
-    print(response.body);
-    print(response.statusCode);
-
     if (response.statusCode == 200) {
       CommonFunction.hideLoadingDialog(context);
       final data = json.decode(response.body);
+
       if (data['success']) {
+        print(response.statusCode);
+        print(response.body);
         try {
-          setState(() {
-            orders = (data['enquiries'] as List).map((item) {
-              // Debugging
-              print(item);
+          if (data['enquiries'] is List) {
+            List<Order> fetchedOrders = [];
+            for (var item in data['enquiries']) {
+              final photoData = item['photo']?['data']?['data'] ?? [];
+              List<int> photoBytes = (photoData is List) ? List<int>.from(photoData) : [];
 
-              // Ensure `item['photo']['data']['data']` is a List<int>
-              final photoData = item['photo']['data']['data'];
-              List<int> photoBytes;
+              var productColor = item['productColor'];
+              List<String> colorIds;
 
-              if (photoData is List) {
-                // Convert List<dynamic> to List<int>
-                photoBytes = List<int>.from(photoData);
-              } else if (photoData is String) {
-                // Handle case where photoData is a Base64 string
-                photoBytes = base64Decode(photoData);
+              if (productColor is String) {
+                try {
+                  colorIds = List<String>.from(json.decode(productColor));
+                } catch (e) {
+                  print('Error decoding productColor: $e');
+                  colorIds = [];
+                }
+              } else if (productColor is List) {
+                colorIds = List<String>.from(productColor);
               } else {
-                // Handle unexpected type
-                photoBytes = [];
-                print('Unexpected type for photoData: ${photoData.runtimeType}');
+                colorIds = [];
               }
 
-              return Order(
+              double totalColorPrice = 0.0;
+              for (String colorId in colorIds) {
+                totalColorPrice += await _fetchColorInfo(colorId);
+              }
+
+              fetchedOrders.add(Order(
                 enquiryId: item['_id'] ?? 'Unknown',
                 imagePath: 'data:image/jpeg;base64,' + base64Encode(Uint8List.fromList(photoBytes)),
-                carpetName: item['product']['name'] ?? 'Unknown',
-                patternName: item['patternId']['name'] ?? 'Unknown',
-                patternPrice: (item['patternId']['collectionPrice'] ?? 0.0).toDouble(),
-                size: item['productSize']['size'] ?? 'Unknown',
-                sizePrice: (item['productSize']['sizePrice'] ?? 0.0).toDouble(),
-                price: (item['product']['price'] ?? 0.0).toDouble(),
-                gstPrecent: (item['product']['gst'] ?? 0.0).toDouble(),
-                shape: item['shape']['shape'] ?? 'Unknown',
-                shapePrice: (item['shape']['shapePrice'] ?? 0.0).toDouble(),
-                //colorPrice: (item['productColor']['colorPrice'] ?? 0.0).toDouble(),
-                  colorPrice: (item['productSize']['sizePrice'] ?? 0.0).toDouble(),
-                description: item['product']['description'] ?? 'No description available',
+                carpetName: item['product']?['name'] ?? 'Unknown',
+                patternName: item['patternId']?['name'] ?? 'Unknown',
+                patternPrice: (item['patternId']?['collectionPrice'] ?? 0.0).toDouble(),
+                size: item['productSize']?['size'] ?? 'Unknown',
+                sizePrice: (item['productSize']?['sizePrice'] ?? 0.0).toDouble(),
+                price: (item['product']?['price'] ?? 0.0).toDouble(),
+                gstPrecent: (item['product']?['gst'] ?? 0.0).toDouble(),
+                shape: item['shape']?['shape'] ?? 'Unknown',
+                shapePrice: (item['shape']?['shapePrice'] ?? 0.0).toDouble(),
+                colorPrice: totalColorPrice,
+                description: item['product']?['description'] ?? 'No description available',
                 shippingPrice: (item['shippingPrice'] ?? 0.0).toDouble(),
                 quantity: (item['quantity'] ?? 0.0).toDouble(),
-              );
-            }).toList();
-          });
+              ));
+            }
+            // Update state after processing all orders
+            setState(() {
+              orders = fetchedOrders;
+            });
+          } else {
+            print('Error: enquiries is not a list.');
+          }
         } catch (e) {
           print('Error parsing orders: $e');
         }
@@ -110,6 +120,20 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
   }
 
 
+
+  Future<int> _fetchColorInfo(String colorId) async {
+    final url = '${APIConstants.API_URL}api/v1/color/single-color/$colorId';
+    final response = await http.get(Uri.parse(url));
+    print(response.statusCode);
+    print(response.body);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final colorData = data['singleColor'];
+      return colorData['colorPrice'] ;
+    } else {
+      throw Exception('Failed to fetch color');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,8 +180,8 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
                   ),
                 )
                     : ListView.builder(
-                  shrinkWrap: true, // Use this property to limit the height
-                  physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: orders.length,
                   itemBuilder: (context, index) {
                     return OrderWidget(order: orders[index]);
@@ -170,6 +194,17 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
       ),
     );
   }
+}
+
+// Data class for color information
+class ColorInfo {
+  final String name;
+  final double colorPrice;
+
+  ColorInfo({
+    required this.name,
+    required this.colorPrice,
+  });
 }
 
 class Order {
@@ -263,32 +298,31 @@ class OrderWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      InkWell(onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ConfirmOrderPage(
-                              enquiryId: order.enquiryId,
-                              imagePath: order.imagePath,
-                              carpetName: order.carpetName,
-                              patternName: order.patternName,
-                              patternPrice: order.patternPrice, // Added field
-                              size: order.size,
-                              sizePrice: order.sizePrice,       // Added field
-                              price: order.price,
-                              gstPercent: order.gstPrecent,      // Added field
-                              shape: order.shape,
-                              shapePrice: order.shapePrice,     // Added field
-                              colorPrice: order.colorPrice,     // Added field
-                              description: order.description,
-                              shippingPrice:order.shippingPrice,
-                                quantity:order.quantity,
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ConfirmOrderPage(
+                                enquiryId: order.enquiryId,
+                                imagePath: order.imagePath,
+                                carpetName: order.carpetName,
+                                patternName: order.patternName,
+                                patternPrice: order.patternPrice,
+                                size: order.size,
+                                sizePrice: order.sizePrice,
+                                price: order.price,
+                                gstPercent: order.gstPrecent,
+                                shape: order.shape,
+                                shapePrice: order.shapePrice,
+                                description: order.description,
+                                shippingPrice: order.shippingPrice,
+                                quantity: order.quantity,
+                                colorPrice: order.colorPrice, // Pass colorPrice
+                              ),
                             ),
-                          ),
-                        );
-                      },
-
-
+                          );
+                        },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                           decoration: BoxDecoration(

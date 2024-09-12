@@ -77,7 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     CommonFunction.showLoadingDialog(context);
 
-    final url = 'https://oac.onrender.com/api/v1/user/update-user/$_userId';
+    final url = '${APIConstants.API_URL}api/v1/user/update-user/$_userId';
 
     try {
       final response = await http.put(

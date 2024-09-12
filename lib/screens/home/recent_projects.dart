@@ -67,7 +67,7 @@ class _RecentProjectsSectionState extends State<RecentProjectsSection> {
     } else {
       // Cache is expired or not available, fetch from API
       final response = await http.get(
-        Uri.parse('${APIConstants.API_URL}/api/v1/recent/all-recent'),
+        Uri.parse('${APIConstants.API_URL}api/v1/recent/all-recent'),
       );
 
       if (response.statusCode == 200) {

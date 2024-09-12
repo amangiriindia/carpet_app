@@ -68,7 +68,7 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
   }
 
   Future<void> _fetchCarpetDetails() async {
-    final url = 'https://oac.onrender.com/api/v1/carpet/single-carpet/${widget.carpetId}';
+    final url = '${APIConstants.API_URL}api/v1/carpet/single-carpet/${widget.carpetId}';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {

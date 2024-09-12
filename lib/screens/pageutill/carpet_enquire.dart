@@ -77,7 +77,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   Future<void> _fetchPatterns() async {
     String _errorMessage = '';
     final url =
-        'https://oac.onrender.com/api/v1/carpet/single-carpet/${widget.carpetId}';
+        '${APIConstants.API_URL}api/v1/carpet/single-carpet/${widget.carpetId}';
     try {
       final response = await http.get(Uri.parse(url));
       print(response.body);
@@ -150,7 +150,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
 
   Future<void> _submitEnquiry() async {
     final String apiUrl =
-        'https://oac.onrender.com/api/v1/enquiry/create-enquiry';
+        '${APIConstants.API_URL}api/v1/enquiry/create-enquiry';
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl))

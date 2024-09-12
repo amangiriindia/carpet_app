@@ -57,7 +57,7 @@ class _BannerSectionState extends State<BannerSection> {
       });
     } else {
       // Cache is expired or not available, fetch from API
-      final url = '${APIConstants.API_URL}/api/v1/slider/all-slider';
+      final url = '${APIConstants.API_URL}api/v1/slider/all-slider';
       try {
         final response = await http.get(Uri.parse(url));
 

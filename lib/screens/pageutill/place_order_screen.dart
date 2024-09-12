@@ -78,7 +78,7 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
 
   Future<void> _createOrder(BuildContext context) async {
     CommonFunction.showLoadingDialog(context);
-    final String apiUrl = 'https://oac.onrender.com/api/v1/order/create-order';
+    final String apiUrl = '${APIConstants.API_URL}api/v1/order/create-order';
 
     try {
       final response = await http.post(

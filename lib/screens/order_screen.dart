@@ -36,7 +36,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Future<void> _fetchOrders() async {
-    final url = 'https://oac.onrender.com/api/v1/order/user/order';
+    final url = '${APIConstants.API_URL}api/v1/order/user/order';
     try {
       final response = await http.post(
         Uri.parse(url),

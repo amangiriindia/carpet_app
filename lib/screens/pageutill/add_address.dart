@@ -58,7 +58,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
   Future<void> _addAddress() async {
     if (_formKey.currentState!.validate()) {
       CommonFunction.showLoadingDialog(context);
-      final String apiUrl = '${APIConstants.API_URL}/api/v1/address/create-address/';
+      final String apiUrl = '${APIConstants.API_URL}api/v1/address/create-address/';
 
       Map<String, dynamic> addressData = {
         "userId": _userId,

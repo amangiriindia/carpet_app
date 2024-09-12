@@ -49,7 +49,7 @@ class _CarpetPatternColorFillerPageState
   }
 
   Future<void> _fetchColors() async {
-    final url = 'https://oac.onrender.com/api/v1/color/all-color';
+    final url = '${APIConstants.API_URL}api/v1/color/all-color';
     try {
       final response = await http.get(Uri.parse(url));
 

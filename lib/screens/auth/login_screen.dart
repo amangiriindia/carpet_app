@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   Future<void> _login() async {
     CommonFunction.showLoadingDialog(context);
     final response = await http.post(
-      Uri.parse('${APIConstants.API_URL}/api/v1/user/login'),
+      Uri.parse('${APIConstants.API_URL}api/v1/user/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },

@@ -41,7 +41,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   Future<void> _submitForm() async {
     CommonFunction.showLoadingDialog(context);
 
-    final url = Uri.parse('https://oac.onrender.com/api/v1/contact/create-contact');
+    final url = Uri.parse('${APIConstants.API_URL}api/v1/contact/create-contact');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},

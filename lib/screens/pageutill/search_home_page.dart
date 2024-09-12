@@ -33,7 +33,7 @@ class _SearchScreenState extends State<SearchHomePage> {
   Future<void> _fetchCollections() async {
     try {
       final response = await http.get(
-        Uri.parse('${APIConstants.API_URL}/api/v1/carpet/all-carpet'),
+        Uri.parse('${APIConstants.API_URL}api/v1/carpet/all-carpet'),
       );
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);

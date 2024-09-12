@@ -1,11 +1,11 @@
 import 'package:OACrugs/constant/const.dart';
 import 'package:OACrugs/screens/pageutill/search_home_page.dart';
-import 'package:OACrugs/screens/search_screen.dart';
 import 'package:OACrugs/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import '../../components/home_app_bar.dart';
-import '../../components/custom_app_bar.dart';
 import '../base/custom_navigation_bar.dart';
+import '../base/notification_screen.dart';
+import '../base/profile_drawer.dart';
 import '../home_screen.dart'; // Import the HomeScreen
 
 class ThankYouScreen extends StatelessWidget {
@@ -15,7 +15,9 @@ class ThankYouScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppStyles.backgroundPrimary,
-      appBar: CustomNormalAppBar(),
+      appBar: const CustomNormalAppBar(),
+      endDrawer: const NotificationScreen(),
+      drawer: const ProfileDrawer(),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: 2, // Set the appropriate index for the Thank You screen
         onTap: (index) {

@@ -10,6 +10,7 @@ import '../../components/custom_app_bar.dart';
 import '../base/profile_drawer.dart';
 import '../base/notification_screen.dart';
 import 'thanks_screen.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class ConfirmOrderPage extends StatefulWidget {
   final String enquiryId;
@@ -52,20 +53,31 @@ class ConfirmOrderPage extends StatefulWidget {
 }
 
 class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
-  late double subtotal=0.0;
-  late double gstAmount=0.0;
-  late double totalPrice=0.0;
+  late double subtotal = 0.0;
+  late double gstAmount = 0.0;
+  late double totalPrice = 0.0;
   late String _userId;
+  late Razorpay _razorpay;
+
 
   @override
   void initState() {
     super.initState();
-    // Calculate initial values
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+
+    // Existing code
     _loadUserData();
     subtotal = (widget.price + widget.patternPrice + widget.sizePrice + widget.shapePrice + widget.colorPrice) * widget.quantity;
     gstAmount = subtotal * (widget.gstPercent / 100);
     totalPrice = subtotal + gstAmount + widget.shippingPrice;
+  }
 
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
   }
 
   Future<void> _loadUserData() async {
@@ -75,6 +87,45 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
 
 
   }
+
+
+  void _openCheckout() async {
+    // Sample image URL and color
+    final String imageUrl = 'https://example.com/path/to/your/image.jpg'; // Replace with actual image URL
+    final String color = '#FF5733'; // Replace with actual color code
+
+    var options = {
+      'key': 'rzp_test_CuliiG2TEdEno7',
+      'amount': (totalPrice * 100).toString(), // Amount in paise
+      'name': 'Order Payment',
+      'description': 'Order Payment Description - Image: $imageUrl, Color: $color',
+      'prefill': {
+        'contact': '8888888888',
+        'email': 'test@razorpay.com'
+      },
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Call _createOrder method here
+    _createOrder(context);
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Show error message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Payment failed: ${response.message}')),
+    );
+  }
+
+
 
   Future<void> _createOrder(BuildContext context) async {
     CommonFunction.showLoadingDialog(context);
@@ -107,8 +158,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
 
       if (response.statusCode == 201 && jsonResponse['success']) {
         // Order created successfully
-      // Order created successfully
-      CommonFunction.hideLoadingDialog(context);
+        // Order created successfully
+        CommonFunction.hideLoadingDialog(context);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ThankYouScreen()),
@@ -139,7 +190,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
     // Decode base64 string
     Uint8List? decodedImage;
     try {
-      if (widget.imagePath.startsWith('data:image/') && widget.imagePath.contains(';base64,')) {
+      if (widget.imagePath.startsWith('data:image/') &&
+          widget.imagePath.contains(';base64,')) {
         decodedImage = base64Decode(widget.imagePath.split(',')[1]);
       } else {
         throw FormatException('Invalid image format');
@@ -166,7 +218,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                   alignment: Alignment.center,
                   transform: Matrix4.rotationY(3.14),
                   child: IconButton(
-                    icon: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
+                    icon: const Icon(Icons.login_outlined,
+                        color: AppStyles.secondaryTextColor),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
@@ -262,21 +315,33 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                               1: FlexColumnWidth(1),
                             },
                             children: [
-                              _buildTableRow('Carpet Price:', '₹${widget.price.toStringAsFixed(2)}'),
-                              _buildTableRow('Pattern Price:', '₹${widget.patternPrice.toStringAsFixed(2)}'),
-                              _buildTableRow('Size Price:', '₹${widget.sizePrice.toStringAsFixed(2)}'),
-                              _buildTableRow('Shape Price:', '₹${widget.shapePrice.toStringAsFixed(2)}'),
-                              _buildTableRow('Color Price:', '₹${widget.colorPrice.toStringAsFixed(2)}'),
-                              _buildTableRow('Quantity: X', '${widget.quantity.toStringAsFixed(2)}'),
+                              _buildTableRow('Carpet Price:',
+                                  '₹${widget.price.toStringAsFixed(2)}'),
+                              _buildTableRow('Pattern Price:',
+                                  '₹${widget.patternPrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Size Price:',
+                                  '₹${widget.sizePrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Shape Price:',
+                                  '₹${widget.shapePrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Color Price:',
+                                  '₹${widget.colorPrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Quantity: X',
+                                  '${widget.quantity.toStringAsFixed(2)}'),
                               TableRow(
                                 children: [
                                   const SizedBox(height: 10),
                                   Container(),
                                 ],
                               ),
-                              _buildTableRow('Subtotal:', '₹${subtotal.toStringAsFixed(2)}'),
-                              _buildTableRow('GST (${widget.gstPercent.toStringAsFixed(0)}%):', '₹${gstAmount.toStringAsFixed(2)}'),
-                              _buildTableRow('Shipping Price:', '₹${widget.shippingPrice.toStringAsFixed(2)}'),
+                              _buildTableRow('Subtotal:',
+                                  '₹${subtotal.toStringAsFixed(2)}'),
+                              _buildTableRow(
+                                  'GST (${widget.gstPercent.toStringAsFixed(
+                                      0)}%):',
+                                  '₹${gstAmount.toStringAsFixed(2)}'),
+                              _buildTableRow('Shipping Price:',
+                                  '₹${widget.shippingPrice.toStringAsFixed(
+                                      2)}'),
                             ],
                           ),
                           const Divider(color: Colors.black54),
@@ -290,8 +355,8 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                                   style: AppStyles.primaryBodyTextStyle,
                                 ),
                                 Text(
-                                  '₹${totalPrice.toStringAsFixed(2)}',
-                                  style: AppStyles.headingTextStyle
+                                    '₹${totalPrice.toStringAsFixed(2)}',
+                                    style: AppStyles.headingTextStyle
                                 ),
                               ],
                             ),
@@ -311,9 +376,9 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
                       child: SizedBox(
                         width: double.infinity,
                         child: GradientButton(
-                          onPressed: () => _createOrder(context),
-                          buttonText: 'Continue',
-                        ),
+                          onPressed: _openCheckout,
+                          buttonText: 'Pay Now',
+                        )
                       ),
                     ),
                   ),
@@ -349,20 +414,4 @@ class _ConfirmOrderPageState extends State<ConfirmOrderPage> {
     );
   }
 
-  Widget _buildPaymentMethodOption(String imagePath, String title) {
-    return Column(
-      children: [
-        Image.asset(
-          imagePath,
-          width: 60,
-          height: 60,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          title,
-          style: AppStyles.tertiaryBodyTextStyle,
-        ),
-      ],
-    );
-  }
 }

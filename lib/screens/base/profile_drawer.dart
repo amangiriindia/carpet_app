@@ -1,16 +1,18 @@
 import 'package:OACrugs/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import '../const.dart';
-import '../screens/address_screen.dart';
-import '../screens/approved_query.dart';
-import '../screens/order_screen.dart';
-import '../screens/pageutill/about_us_screen.dart';
-import '../screens/pageutill/custmer_support_screen.dart';
-import '../screens/profile_screen.dart';
-import '../screens/pending_query.dart';
+import '../../constant/const.dart';
+import '../address_screen.dart';
+import '../approved_query_screen.dart';
+import '../order_screen.dart';
+import '../about_us_screen.dart';
+import '../custmer_support_screen.dart';
+import '../profile_screen.dart';
+import '../pending_query_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../splash_screen/custom_splash_screen.dart';
+
 
 class ProfileDrawer extends StatefulWidget {
   const ProfileDrawer({super.key});

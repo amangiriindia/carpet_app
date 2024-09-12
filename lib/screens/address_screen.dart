@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../components/home_app_bar.dart';
-import '../const.dart';
-import '../widgets/profile_drawer.dart';
-import 'notification_screen.dart';
+import '../constant/const.dart';
+import 'base/profile_drawer.dart';
+import 'base/notification_screen.dart';
 
 class AddressScreen extends StatefulWidget {
   const AddressScreen({super.key});

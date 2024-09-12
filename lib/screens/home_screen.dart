@@ -1,14 +1,14 @@
 import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:OACrugs/const.dart';
-import 'package:OACrugs/screens/pageutill/home_product_horigontal_list.dart';
-import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
-import '../widgets/banner.dart';
-import '../widgets/collections.dart';
-import '../widgets/placement_guide_list.dart';
-import '../widgets/recent_projects.dart';
+import 'package:OACrugs/constant/const.dart';
+import 'package:OACrugs/screens/home/home_product_horigontal_list.dart';
+import 'package:OACrugs/components/home_title_heading.dart';
+import 'home/banner.dart';
+import 'home/collections.dart';
+import 'home/placement_guide_list.dart';
+import 'home/recent_projects.dart';
 import '../widgets/shop_list.dart';
-import 'base_screen.dart';
+import 'base/base_screen.dart';
 import 'search_screen.dart';
 import 'wishlist_screen.dart';
 

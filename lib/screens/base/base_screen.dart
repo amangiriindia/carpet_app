@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/custom_app_bar.dart';
-import '../widgets/custom_navigation_bar.dart';
-import '../widgets/profile_drawer.dart';
+import '../../components/custom_app_bar.dart';
+import 'custom_navigation_bar.dart';
+import 'profile_drawer.dart';
 import 'notification_screen.dart';
 
 

@@ -5,9 +5,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // For toast messages
 import 'package:http/http.dart' as http;
-import '../../const.dart';
-import 'carpet_pattern_choose.dart';
-import 'wishlisthandle.dart'; // Corrected import path for WishlistHandle
+import '../../constant/const.dart';
+import '../pageutill/carpet_pattern_choose.dart';
+import '../pageutill/wishlisthandle.dart'; // Corrected import path for WishlistHandle
 
 class HomeCarpetItems extends StatefulWidget {
   const HomeCarpetItems({Key? key}) : super(key: key);

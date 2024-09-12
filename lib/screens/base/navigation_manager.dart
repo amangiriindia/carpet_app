@@ -1,5 +1,5 @@
 import 'package:OACrugs/screens/pageutill/search_home_page.dart';
-import 'package:OACrugs/widgets/custom_navigation_bar.dart';
+import 'package:OACrugs/screens/base/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:OACrugs/screens/home_screen.dart';
 import 'package:OACrugs/screens/search_screen.dart';

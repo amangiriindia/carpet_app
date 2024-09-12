@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/home_app_bar.dart';
-import '../const.dart';
-import '../widgets/custom_app_bar.dart';
-import '../widgets/profile_drawer.dart';
-import 'notification_screen.dart';
+import '../constant/const.dart';
+import '../components/custom_app_bar.dart';
+import 'base/profile_drawer.dart';
+import 'base/notification_screen.dart';
 
 class PendingOueryScreen extends StatefulWidget {
   const PendingOueryScreen({Key? key}) : super(key: key);

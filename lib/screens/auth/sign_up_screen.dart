@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../components/gradient_button.dart';
-import '../const.dart';
+import '../../components/gradient_button.dart';
+import '../../constant/const.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {

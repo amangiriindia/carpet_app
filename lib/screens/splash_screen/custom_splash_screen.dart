@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
-import '../const.dart';
-import '../screens/home_screen.dart';
-import '../screens/pageutill/onboarding_screen.dart';
-import '../screens/welcome_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../constant/const.dart';
+import '../home_screen.dart';
+import 'onboarding_screen.dart'; // Import SharedPreferences
+
 
 
 class CustomSplashScreen extends StatefulWidget {

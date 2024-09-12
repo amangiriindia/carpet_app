@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../const.dart';
+import '../constant/const.dart';
 
 class GradientButton extends StatelessWidget {
   final VoidCallback onPressed;

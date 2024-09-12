@@ -1,13 +1,13 @@
-import 'package:OACrugs/screens/sign_up_screen.dart';
+import 'package:OACrugs/screens/auth/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../components/gradient_button.dart';
-import '../const.dart';
+import '../../components/gradient_button.dart';
+import '../../constant/const.dart';
 import 'forgot_password_screen.dart';
-import 'home_screen.dart';
+import '../home_screen.dart';
 
 
 class LoginScreen extends StatefulWidget {

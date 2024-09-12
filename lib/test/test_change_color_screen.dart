@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
-import '../const.dart';
+import '../constant/const.dart';
 
 class ChangeColorScreen extends StatefulWidget {
   final String imageBase64; // The labeled image in base64 format

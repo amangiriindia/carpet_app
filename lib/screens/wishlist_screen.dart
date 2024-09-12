@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:OACrugs/screens/pageutill/carpet_pattern_choose.dart';
-import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
+import 'package:OACrugs/components/home_title_heading.dart';
 import 'package:OACrugs/screens/pageutill/wishlisthandle.dart';
-import '../../const.dart';
+import '../constant/const.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class WishListScreen extends StatefulWidget {

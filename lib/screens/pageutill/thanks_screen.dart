@@ -1,12 +1,12 @@
-import 'package:OACrugs/const.dart';
+import 'package:OACrugs/constant/const.dart';
 import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:OACrugs/screens/search_screen.dart';
 import 'package:OACrugs/screens/wishlist_screen.dart';
 import 'package:flutter/material.dart';
-import '../components/home_app_bar.dart';
-import '../widgets/custom_app_bar.dart';
-import '../widgets/custom_navigation_bar.dart';
-import 'home_screen.dart'; // Import the HomeScreen
+import '../../components/home_app_bar.dart';
+import '../../components/custom_app_bar.dart';
+import '../base/custom_navigation_bar.dart';
+import '../home_screen.dart'; // Import the HomeScreen
 
 class ThankYouScreen extends StatelessWidget {
   const ThankYouScreen({super.key});

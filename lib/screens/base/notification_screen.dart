@@ -1,10 +1,10 @@
-import 'package:OACrugs/screens/pageutill/home_title_heading.dart';
+import 'package:OACrugs/components/home_title_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart'; // For loading indicator
-import '../../const.dart';
+import '../../constant/const.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});

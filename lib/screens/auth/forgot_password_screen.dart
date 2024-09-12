@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../components/gradient_button.dart';
-import '../const.dart';
+import '../../components/gradient_button.dart';
+import '../../constant/const.dart';
 import 'forgot_confirm_password.dart';
 import 'login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart'; // Import fluttertoast

@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../const.dart';
+import '../constant/const.dart';
 import 'package:OACrugs/screens/pageutill/carpet_pattern_choose.dart';
 
-import '../widgets/profile_drawer.dart';
-import 'notification_screen.dart';
+import 'base/profile_drawer.dart';
+import 'base/notification_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

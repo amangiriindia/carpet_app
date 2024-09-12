@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../const.dart';
+import '../constant/const.dart';
 import '../screens/search_screen.dart';
 
 

@@ -4,7 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../const.dart';
+import '../../constant/const.dart';
 
 class BannerSection extends StatefulWidget {
   @override

@@ -1,9 +1,10 @@
-import 'package:OACrugs/screens/sign_up_screen.dart';
+import 'package:OACrugs/screens/auth/sign_up_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../const.dart';
-import 'login_screen.dart';
+import '../../constant/const.dart';
+import '../auth/login_screen.dart';
+
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});

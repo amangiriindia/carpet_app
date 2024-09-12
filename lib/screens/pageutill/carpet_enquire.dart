@@ -1,4 +1,4 @@
-import 'package:OACrugs/const.dart';
+import 'package:OACrugs/constant/const.dart';
 import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -8,16 +8,16 @@ import 'dart:convert'; // For JSON encoding
 import 'dart:typed_data'; // Import for Uint8List
 import '../../components/gradient_button.dart';
 import '../../components/home_app_bar.dart';
-import '../../widgets/color_picker.dart';
-import '../../widgets/custom_app_bar.dart';
-import '../../widgets/custom_navigation_bar.dart';
-import '../../widgets/profile_drawer.dart';
+import '../../components/color_picker.dart';
+import '../../components/custom_app_bar.dart';
+import '../base/custom_navigation_bar.dart';
+import '../base/profile_drawer.dart';
 import '../home_screen.dart';
-import '../notification_screen.dart';
+import '../base/notification_screen.dart';
 import '../search_screen.dart';
 import 'package:OACrugs/screens/wishlist_screen.dart';
 
-import '../thanks_screen.dart'; // Correct import statement
+import 'thanks_screen.dart'; // Correct import statement
 
 class EnquiryScreen extends StatefulWidget {
   final String carpetId;

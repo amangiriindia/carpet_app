@@ -1,4 +1,4 @@
-import 'package:OACrugs/const.dart';
+import 'package:OACrugs/constant/const.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {

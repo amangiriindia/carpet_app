@@ -1,9 +1,10 @@
-import 'package:OACrugs/screens/welcome_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../components/button.dart';
-import '../../const.dart';
+import '../../constant/const.dart';
+import 'welcome_screen.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   final VoidCallback onDone;

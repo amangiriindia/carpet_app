@@ -1,4 +1,4 @@
-import 'package:OACrugs/const.dart';
+import 'package:OACrugs/constant/const.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -6,8 +6,8 @@ import 'dart:typed_data';
 
 import '../../components/gradient_button.dart';
 import '../../components/home_app_bar.dart';
-import '../../widgets/profile_drawer.dart';
-import '../notification_screen.dart';
+import '../base/profile_drawer.dart';
+import '../base/notification_screen.dart';
 import 'carpet_pattern_color_filler.dart';
 
 class CarpetPatternPage extends StatefulWidget {

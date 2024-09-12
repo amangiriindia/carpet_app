@@ -10,6 +10,7 @@ dependencies:
   provider: ^6.1.2
   flutter_colorpicker: ^1.1.0
   image_pixels: ^3.0.2
+  image_picker: ^0.8.5+3
   palette_generator: ^0.3.3
   flutter_launcher_icons: ^0.13.1
   image: ^4.2.0

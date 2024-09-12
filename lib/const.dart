@@ -3,8 +3,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class APIConstants {
-  static const String API_URL = 'https://oac.onrender.com';
+  static const String API_URL = 'https://oac.onrender.com/';
+  static const String AI_MODEL_URL = 'https://carpet-editor.onrender.com/';
+  static const String LOCALHOST= 'http://192.168.1.39:5000/';
 }
+
 
 class AppStyles {
   // Colors

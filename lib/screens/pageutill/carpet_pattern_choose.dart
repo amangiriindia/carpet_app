@@ -6,7 +6,6 @@ import 'dart:typed_data';
 
 import '../../components/gradient_button.dart';
 import '../../components/home_app_bar.dart';
-import '../../widgets/custom_app_bar.dart';
 import '../../widgets/profile_drawer.dart';
 import '../notification_screen.dart';
 import 'carpet_pattern_color_filler.dart';

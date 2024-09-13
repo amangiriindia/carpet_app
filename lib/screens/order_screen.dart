@@ -1,4 +1,5 @@
 import 'dart:convert';  // For JSON decoding
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;  // For HTTP requests
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,7 @@ import '../constant/const.dart';
 import '../components/custom_app_bar.dart';
 import 'base/profile_drawer.dart';
 import 'base/notification_screen.dart';
+import 'pageutill/order_details_screen.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({Key? key}) : super(key: key);
@@ -44,41 +46,34 @@ class _OrderScreenState extends State<OrderScreen> {
         body: json.encode({'userId': _userId}),
       );
 
-      print('${response.statusCode}');
-      print('${response.body}');
-
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {
           final ordersJson = data['orders'] as List<dynamic>;
           setState(() {
             _orders = ordersJson.map((json) {
-              final photoData = json['enquiryId']['photo']['data']['data'] as List<dynamic>?;
-              final imageBytes = photoData != null ? base64Encode(photoData.cast<int>()) : '';
-              final imagePath = photoData != null ? 'data:image/jpeg;base64,$imageBytes' : 'assets/login/welcome.png';
+              final imageData = json['enquiryId']['photo']?['data']?['data'] as List<dynamic>? ?? [];
+              final Uint8List imageBytes = Uint8List.fromList(imageData.cast<int>());
 
               return Order(
-                imagePath: imagePath,
-                name: json['enquiryId']['product'] ?? 'Unknown Product',
-                price: json['totalPrice']?.toDouble() ?? 0.0,
-                size: json['enquiryId']['productSize'] ?? 'Unknown Size',
-                quantity : json['enquiryId']['quantity'] ?? 0,
-                deliveryDate: json['enquiryId']['expectedDelivery'] ?? 'Unknown Date',
-                isDelivered: json['status'] ?? 'Unknown Status',
+                imagePath: imageBytes,  // Use the decoded image bytes
+                name: json['enquiryId']['product']['name'] ?? 'Unknown',  // Handle null name
+                price: (json['totalPrice'] ?? 0).toDouble(),  // Handle null price
+                size: json['enquiryId']['productSize']['size'] ?? 'Unknown',  // Handle null size
+                deliveryDate: json['updatedAt'] ?? 'Unknown',  // Handle null delivery date
+                isDelivered: json['status'] ?? 'Unknown',    // Handle null delivery status
+                quantity: json['enquiryId']['quantity'] ?? 1,  // Handle null quantity
               );
             }).toList();
             _isLoading = false;
           });
         } else {
-          // Handle the case when success is false
           print('Failed to fetch orders: ${data['message']}');
         }
       } else {
-        // Handle HTTP error
         print('Failed to fetch orders. Status code: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle network error
       print('Error fetching orders: $e');
     }
   }
@@ -93,51 +88,47 @@ class _OrderScreenState extends State<OrderScreen> {
       body: SafeArea(
         child: _isLoading
             ? CommonFunction.showLoadingIndicator()
-            : SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  children: [
-                    Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.rotationY(3.14),
-                      child: IconButton(
-                        icon: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ),
-                    const SizedBox(width: 80),
-                    const Icon(Icons.shopping_bag, color: AppStyles.primaryTextColor),
-                    const SizedBox(width: 4),
-                    const Text(
-                      'Order',
-                      style: AppStyles.headingTextStyle,
-                    ),
-                  ],
+            : Column(
+          children: [
+            Row(
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(3.14),
+                  child: IconButton(
+                    icon: const Icon(Icons.login_outlined, color: AppStyles.secondaryTextColor),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                 ),
-                const SizedBox(height: 20),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: _orders.length,
-                  itemBuilder: (context, index) {
-                    return OrderWidget(order: _orders[index]);
-                  },
+                const SizedBox(width: 80),
+                const Icon(Icons.shopping_bag, color: AppStyles.primaryTextColor),
+                const SizedBox(width: 4),
+                const Text(
+                  'Order',
+                  style: AppStyles.headingTextStyle,
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 20),
+            Expanded(  // Use Expanded here to allow scrolling
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+                itemCount: _orders.length,
+                itemBuilder: (context, index) {
+                  return OrderWidget(order: _orders[index]);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
+
 class Order {
-  final String imagePath;
+  final dynamic imagePath;
   final String name;
   final double price;
   final String size;
@@ -165,57 +156,67 @@ class OrderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      color: AppStyles.backgroundPrimary,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(
-          children: [
-            // Display image based on imagePath type
-            order.imagePath.startsWith('data:image/jpeg;base64,')
-                ? Image.memory(
-              base64Decode(order.imagePath.split(',')[1]),
-              width: 110,
-              height: 140,
-              fit: BoxFit.cover,
-            )
-                : Image.asset(
-              'assets/login/welcome.png',
-              width: 110,
-              height: 140,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    order.name,
-                    style: AppStyles.primaryBodyTextStyle,
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    '\$${order.price.toStringAsFixed(2)}',
-                    style: AppStyles.tertiaryBodyTextStyle,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    order.size,
-                    style: AppStyles.tertiaryBodyTextStyle,
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    '${order.isDelivered}\n${order.deliveryDate}',
-                  ),
-                ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => OrderDetailsPage(order: order),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 3,
+        color: AppStyles.backgroundPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: Row(
+            children: [
+              // Display image based on imagePath type
+              order.imagePath is Uint8List
+                  ? Image.memory(
+                order.imagePath as Uint8List,
+                width: 110,
+                height: 140,
+                fit: BoxFit.contain,
+              )
+                  : Image.asset(
+                'assets/login/welcome.png',
+                width: 110,
+                height: 140,
+                fit: BoxFit.contain,
               ),
-            ),
-          ],
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.name,
+                      style: AppStyles.primaryBodyTextStyle,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '₹${order.price.toStringAsFixed(2)}',
+                      style: AppStyles.tertiaryBodyTextStyle,
+                    ),
+
+                    const SizedBox(height: 4),
+                    Text(
+                      order.size,
+                      style: AppStyles.tertiaryBodyTextStyle,
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      '${order.isDelivered}\n${order.deliveryDate}',
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

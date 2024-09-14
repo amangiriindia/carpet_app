@@ -49,7 +49,8 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
             return Pattern(
               patternId: item['_id'].toString(),
               patternNumber: item['patternNumber'].toString(),
-              image: Uint8List.fromList(List<int>.from(item['photo']['data']['data'] as List<dynamic>)),
+              layoutimage: Uint8List.fromList(List<int>.from(item['photo']['data']['data'] as List<dynamic>)),
+              image: Uint8List.fromList(List<int>.from(item['photoThumb']['data']['data'] as List<dynamic>)),
             );
           }).toList();
           _isLoading = false;
@@ -84,7 +85,8 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
           patternId: selectedPattern.patternId,
           carpetName: widget.carpetName,
           patternImage: selectedPattern.image,
-          patternNumber: int.parse(selectedPattern.patternNumber),
+          patternLayoutImage: selectedPattern.layoutimage,
+          patternNumber: int.parse(selectedPattern.patternNumber)-1,
         ),
       ),
     );
@@ -204,11 +206,13 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
 class Pattern {
   final String patternId;
   final String patternNumber;
+  final Uint8List layoutimage;
   final Uint8List image;
 
   Pattern({
     required this.patternId,
     required this.patternNumber,
+    required this.layoutimage,
     required this.image,
   });
 }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../components/gradient_button.dart';
+import '../../components/gradient_icon_button.dart';
 import '../../components/home_app_bar.dart';
 import '../base/profile_drawer.dart';
 import '../base/notification_screen.dart';
@@ -14,6 +15,7 @@ class CarpetPatternColorFillerPage extends StatefulWidget {
   final String patternId;
   final String carpetName;
   final Uint8List patternImage;
+  final Uint8List patternLayoutImage;
   final int patternNumber;
 
   const CarpetPatternColorFillerPage({
@@ -22,6 +24,7 @@ class CarpetPatternColorFillerPage extends StatefulWidget {
     required this.carpetName,
     required this.patternImage,
     required this.patternNumber,
+    required this.patternLayoutImage,
   });
 
   @override
@@ -38,11 +41,17 @@ class _CarpetPatternColorFillerPageState
   String _colorErrorMessage = '';
   Map<String, String?> _selectedColors = {};
   List<Map<String, String>> _selectionOrder = [];
+  List<String> afterResetFillColorsInBox = [];
+  late Uint8List screenShowImage =widget.patternImage;
+  String targetColor = ''; // To store the target color on which user drops the color
+  Uint8List? modifiedImage;
+  bool _isResetFlag =false;
 
   @override
   void initState() {
     super.initState();
     _fetchColors();
+    fetchColorsFromAPI();
     _initializeSelectedColors();
     print(widget.patternId);
     print(widget.patternNumber);
@@ -92,6 +101,150 @@ class _CarpetPatternColorFillerPageState
     return labels;
   }
 
+  Future<void> _onResetPressed() async {
+    CommonFunction.showLoadingDialog(context);
+    print("Reset icon clicked");
+    _isResetFlag =true;
+    // Get the box labels and number of boxes
+    final boxLabels = _getBoxLabels();
+    final numBoxes = boxLabels.length;
+
+    // Ensure the number of colors matches the number of boxes
+    assert(afterResetFillColorsInBox.length == numBoxes, "The number of colors should match the number of boxes");
+    await Future.delayed(Duration(seconds: 1)); // Adding 1-second delay
+    setState(() {
+      _selectedColors.clear(); // Clear previous selections
+
+      // Loop through and assign colors to each box from the afterResetFillColorsInBox list
+      for (int i = 0; i < numBoxes; i++) {
+        _selectedColors[boxLabels[i]] = afterResetFillColorsInBox[i];
+      }
+
+      // Update the selection order (optional)
+      _selectionOrder = _selectedColors.entries.map((entry) {
+        final colorIndex = _colors.indexOf(entry.value ?? '');
+        return {
+          'label': entry.key,
+          'colorId': colorIndex != -1 ? _colorsid[colorIndex] : '',
+        };
+      }).toList();
+
+      // Update the screenShowImage
+      screenShowImage = widget.patternLayoutImage;
+    });
+
+    print("Unique colors after reset: $afterResetFillColorsInBox");
+    CommonFunction.hideLoadingDialog(context);
+  }
+
+
+
+
+  Future<void> replaceColorAPI(String targetColor, String replacementColor) async {
+
+     CommonFunction.showLoadingDialog(context);
+    print("Call replace color api");
+    try {
+      Uint8List imageBytes;
+
+      // Check if there's a modified image, if not, use the original from assets
+      if (modifiedImage == null) {
+
+        imageBytes = widget.patternLayoutImage;
+      } else {
+        // Use the modified image for subsequent requests
+        imageBytes = modifiedImage!;
+      }
+      if(_isResetFlag){
+        imageBytes =widget.patternLayoutImage;
+        _isResetFlag =false;
+      }
+      // Create a multipart request for the replace-color API
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${APIConstants.LOCALHOST}replace-color'),
+      );
+
+      // Add the modified image and color details
+      request.files.add(http.MultipartFile.fromBytes(
+        'image',
+        imageBytes,
+        filename: 'modifiedImage.png', // Dynamically send modified image
+      ));
+      request.fields['target_color'] = targetColor;
+      request.fields['replacement_color'] = replacementColor;
+
+      // Send the request and capture the response
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        CommonFunction.hideLoadingDialog(context);
+        final data = json.decode(response.body);
+
+        // Check if 'modified_image' key exists and is not null
+        if (data.containsKey('modified_image') && data['modified_image'] != null) {
+          String base64Image = data['modified_image'];
+
+          // Decode the base64 image and store it as the new modified image
+          setState(() {
+            modifiedImage = base64Decode(base64Image); // Store the updated image
+            screenShowImage =modifiedImage!;
+            targetColor = replacementColor; // Update target color
+          });
+        } else {
+          print('API Error: Missing or null "modified_image" key');
+        }
+      } else {
+        CommonFunction.hideLoadingDialog(context);
+        print('API Error: ${response.statusCode} - ${response.body}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+
+  Future<void> fetchColorsFromAPI() async {
+    try {
+      // Load the image from assets initially
+      print("Call color list api");
+      final Uint8List imageBytes =  widget.patternLayoutImage;
+
+      // Create a multipart request to fetch unique colors
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${APIConstants.LOCALHOST}get-unique-colors'),
+      );
+
+      // Add the image as a file field named 'image'
+      request.files.add(http.MultipartFile.fromBytes(
+        'image',
+        imageBytes,
+        filename: 'patternLayoutImage.png',
+      ));
+
+      // Send the request and capture the response
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      print(response.statusCode);
+      print(response.body);
+      // Check the status code and decode the body if successful
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        setState(() {
+          afterResetFillColorsInBox = List<String>.from(data['unique_colors']);
+        });
+      } else {
+        print('API Error: ${response.statusCode} - ${response.body}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
   void _onContinuePressed() {
     if (_selectedColors.values.any((color) => color == null)) {
       CommonFunction.showToast(context, "Please choose a color for all boxes");
@@ -102,7 +255,7 @@ class _CarpetPatternColorFillerPageState
           carpetId: widget.carpetId,
           patternId: widget.patternId,
           carpetName: widget.carpetName,
-          patternImage: widget.patternImage,
+          patternImage: screenShowImage,
           hexCodes: _selectionOrder.map((selection) => selection['colorId']!).toList(),
         ),
       ));
@@ -160,18 +313,28 @@ class _CarpetPatternColorFillerPageState
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
                             image: DecorationImage(
-                              image: MemoryImage(widget.patternImage),
+                              image: MemoryImage(screenShowImage),
                               fit: BoxFit.contain,
                             ),
                           ),
                         ),
                         const SizedBox(height: 20.0),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5.0),
-                          child: Text(
-                            widget.carpetName,
-                            style: AppStyles.headingTextStyle,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Text(
+                                widget.carpetName,
+                                style: AppStyles.headingTextStyle,
+                              ),
+                            ),
+                            GradientIconButton(
+                              onPressed: _onResetPressed,
+                              child: const Icon(Icons.refresh),
+                              gradientColors: [AppStyles.primaryColorStart, AppStyles.primaryColorEnd],
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 15.0),
                         Wrap(
@@ -179,26 +342,37 @@ class _CarpetPatternColorFillerPageState
                           runSpacing: 8.0,
                           children: boxLabels.map((box) {
                             return DragTarget<String>(
-                              onAccept: (colorId) {
+                              onAccept: (replacementColor) {
                                 setState(() {
-                                  _selectedColors[box] = colorId;
+                                  final targetColor = _selectedColors[box]; // The current color in the box before replacement
+
+                                  if (targetColor != null && targetColor != replacementColor) {
+                                    // Call the replaceColorAPI to update the image based on the target and replacement colors
+                                    replaceColorAPI(targetColor, replacementColor);
+                                  }
+
+                                  // Update the box with the new selected color
+                                  _selectedColors[box] = replacementColor;
+
+                                  // Add to the selection order for tracking
                                   _selectionOrder.add({
                                     'label': box,
-                                    'colorId': colorId,
+                                    'colorId': replacementColor,
                                   });
                                 });
                               },
                               builder: (context, candidateData, rejectedData) {
+                                final hexColor = _selectedColors[box];
+                                final color = hexColor != null
+                                    ? Color(int.parse(hexColor.replaceFirst('#', '0xFF')))
+                                    : Colors.white;
+
                                 return Container(
                                   width: (MediaQuery.of(context).size.width - 80) / 4,
                                   height: (MediaQuery.of(context).size.width - 80) / 4,
                                   decoration: BoxDecoration(
                                     border: Border.all(color: AppStyles.primaryTextColor, width: 1.0),
-                                    color: _selectedColors[box] != null
-                                        ? Color(int.parse(
-                                        _colorHexCodes[_colorsid.indexOf(_selectedColors[box]!)]
-                                            .replaceFirst('#', '0xFF')))
-                                        : Colors.white,
+                                    color: color,
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   child: Center(
@@ -212,6 +386,9 @@ class _CarpetPatternColorFillerPageState
                             );
                           }).toList(),
                         ),
+
+
+
                         const SizedBox(height: 10.0),
                       ],
                     ),
@@ -233,31 +410,24 @@ class _CarpetPatternColorFillerPageState
                       itemBuilder: (context, index) {
                         final colorHex = _colorHexCodes[index];
                         final colorId = _colorsid[index];
-                        return Draggable<String>(
-                          data: colorId,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Color(int.parse(colorHex
-                                  .replaceFirst('#', '0xFF'))),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
+                        return  Draggable<String>(
+                          data: colorHex, // Drag the hex color string
                           feedback: Container(
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Color(int.parse(colorHex
-                                  .replaceFirst('#', '0xFF'))),
-                              borderRadius: BorderRadius.circular(8.0),
+                              color: Color(int.parse(colorHex.replaceFirst('#', '0xFF'))), // Parse hex to color
+                              shape: BoxShape.circle,
                             ),
                           ),
-                          childWhenDragging: Container(
+                          child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(8.0),
+                              color: Color(int.parse(colorHex.replaceFirst('#', '0xFF'))),
+                              shape: BoxShape.circle,
                             ),
                           ),
                         );
+
                       },
                     ),
                   ),

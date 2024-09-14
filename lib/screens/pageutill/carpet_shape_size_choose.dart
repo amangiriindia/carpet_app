@@ -3,14 +3,14 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import '../../components/custom_size_input_box.dart';
 import '../../components/gradient_button.dart';
 import '../../components/home_app_bar.dart';
 import '../../constant/const.dart';
-import '../../components/custom_app_bar.dart';
 import '../base/profile_drawer.dart';
 import '../address_screen.dart';
 import '../base/notification_screen.dart';
-import 'carpet_enquire.dart'; // Import the EnquirePage
+import 'carpet_enquire.dart';
 
 class CarpetShapeSizePage extends StatefulWidget {
   final String carpetId;
@@ -42,6 +42,7 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
   final TextEditingController _queryController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
   DateTime? _expectedDeliveryDate;
+  late String customSize ="";
 
   @override
   void initState() {
@@ -242,6 +243,7 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
           quantity: _quantityController.text,
           expectedDeliveryDate: _expectedDeliveryDate,
           query: _queryController.text,
+            customSize :customSize,
         ),
       ),
     );
@@ -361,7 +363,41 @@ class _CarpetShapeSizePageState extends State<CarpetShapeSizePage> {
                     ),
                   ),
                   const SizedBox(height: 20.0),
-
+                  Center(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [AppStyles.primaryColorStart,AppStyles.primaryColorEnd],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          customSize = customSizeInput(context) as String;
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent, // Make button background transparent
+                          shadowColor: Colors.transparent, // Remove button shadow
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.aspect_ratio, color: AppStyles.backgroundPrimary, size: 16),
+                        label: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 0),
+                          child: Text(
+                            'custom size',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   // Displaying shapes
                   const Text(
                     'Select Shape',

@@ -31,6 +31,7 @@ class EnquiryScreen extends StatefulWidget {
   final String quantity;
   final DateTime? expectedDeliveryDate;
   final String query;
+  final String customSize;
 
   const EnquiryScreen({
     super.key,
@@ -45,6 +46,7 @@ class EnquiryScreen extends StatefulWidget {
     required this.quantity,
     this.expectedDeliveryDate,
     required this.query,
+    required this.customSize,
   });
 
   @override
@@ -156,6 +158,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl))
         ..fields['user'] = _userId
         ..fields['address'] = widget.addressId
+        ..fields['customSize'] =  widget.customSize
         ..fields['product'] = widget.carpetId
         ..fields['quantity'] = _quantityController.text
         ..fields['productSize'] = widget.dimensionId

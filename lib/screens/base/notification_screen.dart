@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:OACrugs/components/home_title_heading.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -5,6 +6,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart'; // For loading indicator
 import '../../constant/const.dart';
+import '../../test/notification_service.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -13,15 +15,24 @@ class NotificationScreen extends StatefulWidget {
   _NotificationScreenState createState() => _NotificationScreenState();
 }
 
+
 class _NotificationScreenState extends State<NotificationScreen> {
   String? _userId;
   List<dynamic> _notifications = [];
   bool _isLoading = true;
+  Timer? _timer; // Timer for periodic polling
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _startPolling(); // Start polling for notifications
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the screen is disposed
+    super.dispose();
   }
 
   Future<void> _loadUserData() async {
@@ -30,6 +41,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
     });
     _fetchNotifications();
+  }
+
+  void _startPolling() {
+    _timer = Timer.periodic(Duration(seconds: 30), (timer) async {
+      // Poll every 30 seconds for new notifications
+      await _fetchNotifications();
+    });
   }
 
   Future<void> _fetchNotifications() async {
@@ -46,10 +64,25 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      final List<dynamic> newNotifications = data['notifications'];
+
       setState(() {
-        _notifications = data['notifications'];
+        _notifications = newNotifications;
         _isLoading = false;
       });
+
+      // Check if there are new notifications
+      for (var notification in newNotifications) {
+        // Replace with your logic to determine if it's a new notification
+        if (notification['isNew'] == true) {
+          NotificationService().showNotification(
+            id: notification['id'],
+            body: notification['description'] ?? 'No Description',
+            payload: 'now',
+            title: notification['message'] ?? 'New Notification',
+          );
+        }
+      }
     } else {
       setState(() {
         _isLoading = false;
@@ -58,26 +91,36 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
+
+
   void _showNotificationDetails(dynamic notification) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(notification['message'] ?? 'No Title'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          elevation: 0,
+          backgroundColor: Colors.white,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(notification['description'] ?? 'No Description'),
+              // Custom close button on top right (adjusted positioning)
+              Positioned(
+                right: 10.0, // Adjust right padding for desired centering
+                top: 10.0, // Adjust top padding for desired centering
+                child: IconButton(
+                  icon: Icon(Icons.close, color: Colors.black), // Built-in close icon
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(notification['message'] ?? 'No Title', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              Text(notification['description'] ?? 'No Description', style: TextStyle(fontSize: 16)),
               const SizedBox(height: 10),
               // Add more details here if available
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
         );
       },
     );

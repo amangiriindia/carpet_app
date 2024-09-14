@@ -5,9 +5,12 @@ import 'package:provider/provider.dart';
 import 'screens/splash_screen/custom_splash_screen.dart';
 import 'screens/wishlist_screen.dart';
 import 'components/color_picker.dart';
+import 'test/notification_service.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  final NotificationService notificationService = NotificationService();
+  await notificationService.initNotification();
   runApp(
     MultiProvider(
       providers: [

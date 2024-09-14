@@ -33,7 +33,6 @@ class _SearchScreenState extends State<SearchScreen> {
     _fetchCollections();
   }
 
-
   Future<void> _fetchCollections() async {
     try {
       final response = await http.get(
@@ -136,7 +135,6 @@ class _SearchScreenState extends State<SearchScreen> {
           childAspectRatio: 0.56,
         ),
         itemCount: _filteredItems.length,
-
         itemBuilder: (context, index) {
           final item = _filteredItems[index];
           bool isLiked = WishlistHandle.isItemInWishlist(item);
@@ -157,10 +155,8 @@ class _SearchScreenState extends State<SearchScreen> {
             onLikeToggle: () async {
               if (isLiked) {
                 await WishlistHandle.removeItem(item);
-
               } else {
                 await WishlistHandle.addItem(item);
-
               }
               setState(() {});
             },
@@ -190,26 +186,30 @@ class _SearchScreenState extends State<SearchScreen> {
               height: 70.0,
             ),
           ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: AppStyles.backgroundSecondry,
-              size: 30.0,
-            ),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-          actions: [
-            IconButton(
+          leading: Builder(
+            builder: (context) => IconButton(
               icon: const Icon(
-                Icons.notification_important_sharp,
+                Icons.menu,
                 color: AppStyles.backgroundSecondry,
                 size: 30.0,
               ),
               onPressed: () {
-                Scaffold.of(context).openEndDrawer();
+                Scaffold.of(context).openDrawer();
               },
+            ),
+          ),
+          actions: [
+            Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(
+                  Icons.notification_important_sharp,
+                  color: AppStyles.backgroundSecondry,
+                  size: 30.0,
+                ),
+                onPressed: () {
+                  Scaffold.of(context).openEndDrawer();
+                },
+              ),
             ),
           ],
           flexibleSpace: Container(

@@ -40,12 +40,15 @@ class _CarpetPatternColorFillerPageState
   bool _isLoadingColors = true;
   String _colorErrorMessage = '';
   Map<String, String?> _selectedColors = {};
+  Map<String, String?> _selectedColorsTargetTemp = {};
   List<Map<String, String>> _selectionOrder = [];
   List<String> afterResetFillColorsInBox = [];
   late Uint8List screenShowImage =widget.patternImage;
   String targetColor = ''; // To store the target color on which user drops the color
   Uint8List? modifiedImage;
   bool _isResetFlag =false;
+  Map<String,String>color_map ={};
+
 
   @override
   void initState() {
@@ -90,6 +93,7 @@ class _CarpetPatternColorFillerPageState
     final boxLabels = _getBoxLabels();
     setState(() {
       _selectedColors = {for (var label in boxLabels) label: null};
+      _selectedColorsTargetTemp =  {for (var label in boxLabels) label: null};
     });
   }
 
@@ -117,7 +121,9 @@ class _CarpetPatternColorFillerPageState
 
       // Loop through and assign colors to each box from the afterResetFillColorsInBox list
       for (int i = 0; i < numBoxes; i++) {
-        _selectedColors[boxLabels[i]] = afterResetFillColorsInBox[i];
+        _selectedColors[boxLabels[i]] = "#ffffff";
+        _selectedColorsTargetTemp[boxLabels[i]] = afterResetFillColorsInBox[i];
+        print(afterResetFillColorsInBox[i]);
       }
 
       // Update the selection order (optional)
@@ -129,8 +135,9 @@ class _CarpetPatternColorFillerPageState
         };
       }).toList();
 
+
       // Update the screenShowImage
-      screenShowImage = widget.patternLayoutImage;
+      screenShowImage = widget.patternImage;
     });
 
     print("Unique colors after reset: $afterResetFillColorsInBox");
@@ -145,20 +152,17 @@ class _CarpetPatternColorFillerPageState
      CommonFunction.showLoadingDialog(context);
     print("Call replace color api");
     try {
-      Uint8List imageBytes;
 
-      // Check if there's a modified image, if not, use the original from assets
-      if (modifiedImage == null) {
+      if (_isResetFlag) {
+        // Reset all values in the color_map to '#ffffff'
+        color_map.forEach((key, value) {
+          color_map[key] = '#ffffff';
+        });
 
-        imageBytes = widget.patternLayoutImage;
-      } else {
-        // Use the modified image for subsequent requests
-        imageBytes = modifiedImage!;
+        // Set the flag to false after resetting
+        _isResetFlag = false;
       }
-      if(_isResetFlag){
-        imageBytes =widget.patternLayoutImage;
-        _isResetFlag =false;
-      }
+
       // Create a multipart request for the replace-color API
       final request = http.MultipartRequest(
         'POST',
@@ -168,11 +172,17 @@ class _CarpetPatternColorFillerPageState
       // Add the modified image and color details
       request.files.add(http.MultipartFile.fromBytes(
         'image',
-        imageBytes,
+        widget.patternLayoutImage,
         filename: 'modifiedImage.png', // Dynamically send modified image
       ));
-      request.fields['target_color'] = targetColor;
-      request.fields['replacement_color'] = replacementColor;
+      color_map[targetColor] = replacementColor;
+
+      print(color_map);
+      // Convert the color map to a JSON string
+      String colorMapJson = jsonEncode(color_map);
+
+      // Add the color map JSON as a field in the request
+      request.fields['color_map'] = colorMapJson;
 
       // Send the request and capture the response
       final streamedResponse = await request.send();
@@ -191,7 +201,6 @@ class _CarpetPatternColorFillerPageState
           setState(() {
             modifiedImage = base64Decode(base64Image); // Store the updated image
             screenShowImage =modifiedImage!;
-            targetColor = replacementColor; // Update target color
           });
         } else {
           print('API Error: Missing or null "modified_image" key');
@@ -209,8 +218,8 @@ class _CarpetPatternColorFillerPageState
   Future<void> fetchColorsFromAPI() async {
     try {
       // Load the image from assets initially
-      print("Call color list api");
-      final Uint8List imageBytes =  widget.patternLayoutImage;
+      print("Call color list API");
+      final Uint8List imageBytes = widget.patternLayoutImage;
 
       // Create a multipart request to fetch unique colors
       final request = http.MultipartRequest(
@@ -230,13 +239,22 @@ class _CarpetPatternColorFillerPageState
       final response = await http.Response.fromStream(streamedResponse);
       print(response.statusCode);
       print(response.body);
+
       // Check the status code and decode the body if successful
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
+        // Create a map with unique colors from the API as keys and white hex code as values
         setState(() {
           afterResetFillColorsInBox = List<String>.from(data['unique_colors']);
+          color_map = {
+            for (var color in afterResetFillColorsInBox) color: '#ffffff'
+          };
+          _onResetPressed();
         });
+
+        print('Color Map: $color_map'); // For debugging purposes
+
       } else {
         print('API Error: ${response.statusCode} - ${response.body}');
       }
@@ -244,6 +262,7 @@ class _CarpetPatternColorFillerPageState
       print('Error: $error');
     }
   }
+
 
   void _onContinuePressed() {
     if (_selectedColors.values.any((color) => color == null)) {
@@ -344,8 +363,10 @@ class _CarpetPatternColorFillerPageState
                             return DragTarget<String>(
                               onAccept: (replacementColor) {
                                 setState(() {
-                                  final targetColor = _selectedColors[box]; // The current color in the box before replacement
-
+                                  final targetColor =  _selectedColorsTargetTemp[box]; // The current color in the box before replacement
+                                  print(box) ;
+                                  print(_selectedColors);
+                                  print(_selectedColorsTargetTemp);
                                   if (targetColor != null && targetColor != replacementColor) {
                                     // Call the replaceColorAPI to update the image based on the target and replacement colors
                                     replaceColorAPI(targetColor, replacementColor);

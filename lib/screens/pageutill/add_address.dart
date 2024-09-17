@@ -45,9 +45,13 @@ class _AddAddressPageState extends State<AddAddressPage> {
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final SharedPreferences prefsadd = await SharedPreferences.getInstance();
+
     setState(() {
       if (prefs.get('checkCarpetFlag') != null) {
         prefsadd.setBool('addressFlag', true);
+      }else{
+        prefsadd.setBool('addressFlag', false);
+        prefs.setBool('checkCarpetFlag',false );
       }
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c'; // Fallback user ID if not found
       nameController.text = prefs.getString('firstName') ?? '';

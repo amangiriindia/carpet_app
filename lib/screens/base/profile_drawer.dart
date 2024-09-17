@@ -24,6 +24,7 @@ class ProfileDrawer extends StatefulWidget {
 class _ProfileDrawerState extends State<ProfileDrawer> {
   late String _userId = '';
   late String _firstName = '';
+  late String _lastName = '';
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     setState(() {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
       _firstName = prefs.getString('firstName') ?? '';
+      _lastName = prefs.getString('lastName') ?? '';
     });
   }
 
@@ -167,7 +169,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Hello $_firstName',
+                      'Hello ${_firstName} ${_lastName}',
                       style: AppStyles.headingTextStyle.copyWith(color: Colors.white),
                     ),
                     IconButton(

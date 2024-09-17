@@ -283,7 +283,7 @@ class _AddressScreenState extends State<AddressScreen> {
                     final SharedPreferences prefs = await SharedPreferences.getInstance();
                     final SharedPreferences prefsadd = await SharedPreferences.getInstance();
                     await prefs.setString('CurrentSelectedAddress', _id);
-                    if (prefs.get('checkCarpetFlag') != false) {
+                    if (prefs.get('checkCarpetFlag') != null) {
                       CommonFunction.showToast(context, "Address has been Selected.");
                       print(prefs.get('checkCarpetFlag'));
                       await prefs.setBool('CurrentSelectedAddressFlag', true);

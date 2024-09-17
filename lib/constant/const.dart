@@ -4,8 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class APIConstants {
   static const String API_URL = 'https://oac.onrender.com/';
-  static const String AI_MODEL_URL = 'https://carpet-editor.onrender.com/';
-  static const String LOCALHOST= 'http://192.168.1.39:5000/';
+  static const String AI_MODEL_URL = 'https://carpet-editor1.onrender.com/';
+  static const String LOCALHOST= 'https://carpet-editor1.onrender.com/';
+  // static const String LOCALHOST= 'http://192.168.1.39:5000/';
 }
 
 

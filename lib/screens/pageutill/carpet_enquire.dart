@@ -63,7 +63,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   late String material = 'Material information not provided';
   late String disclaimer = 'Disclaimer not available';
   late String care = 'Care instructions not available';
-  late String dimensionId = "1";
+
 
 
   @override
@@ -155,23 +155,30 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
     final String apiUrl =
         '${APIConstants.API_URL}api/v1/enquiry/create-enquiry';
 
+      if(widget.dimensionId == ""){
+
+      }
+
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl))
         ..fields['user'] = _userId
         ..fields['address'] = widget.addressId
-        ..fields['customSize'] =  widget.customSize
+        ..fields['customSize'] = widget.customSize
         ..fields['product'] = widget.carpetId
         ..fields['quantity'] = _quantityController.text
-        ..fields['productSize'] = dimensionId
         ..fields['shape'] = widget.shapeId
-        ..fields['productColor'] =
-            jsonEncode(widget.hexCodes) // Encode as JSON array
+        ..fields['productColor'] = jsonEncode(widget.hexCodes)
         ..fields['query'] = _queryController.text
         ..fields['status'] = 'false'
-        ..fields['expectedDelivery'] =
-            _expectedDeliveryDate?.toIso8601String() ?? ''
+        ..fields['expectedDelivery'] = _expectedDeliveryDate?.toIso8601String() ?? ''
         ..fields['patternId'] = widget.patternId;
-      // Check if the image is available and add it to the request
+
+// Only add productSize if dimensionId is not empty
+      if (widget.dimensionId!.isNotEmpty) {
+        request.fields['productSize'] = widget.dimensionId!;
+      }
+
+// Check if the image is available and add it to the request
       if (widget.patternImage.isNotEmpty) {
         request.files.add(
           http.MultipartFile.fromBytes(
@@ -184,7 +191,6 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       } else {
         print('Pattern image is null or empty, skipping image upload.');
       }
-
       // Send the request
       final response = await request.send();
 

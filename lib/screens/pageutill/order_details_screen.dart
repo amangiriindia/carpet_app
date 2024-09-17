@@ -198,11 +198,11 @@ class OrderDetailsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Name: John Doe', style: AppStyles.secondaryBodyTextStyle), // Example name
+          Text('Name: ${order.firstName} ${order.lastName} ', style: AppStyles.secondaryBodyTextStyle), // Example name
           const SizedBox(height: 8),
-          Text('Phone: +91 9876543210', style: AppStyles.secondaryBodyTextStyle),
+          Text('Phone: ${order.mobileNumber}', style: AppStyles.secondaryBodyTextStyle),
           const SizedBox(height: 8),
-          Text('Email: john.doe@example.com', style: AppStyles.secondaryBodyTextStyle),
+          Text('Email: ${order.email}', style: AppStyles.secondaryBodyTextStyle),
         ],
       ),
     );
@@ -215,13 +215,15 @@ class OrderDetailsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Street: 123 Main St', style: AppStyles.secondaryBodyTextStyle), // Example address
+          Text('Street: ${order.street}', style: AppStyles.secondaryBodyTextStyle), // Example address
           const SizedBox(height: 8),
-          Text('City: Mumbai', style: AppStyles.secondaryBodyTextStyle),
+          Text('City: ${order.city}', style: AppStyles.secondaryBodyTextStyle),
           const SizedBox(height: 8),
-          Text('Postal Code: 400001', style: AppStyles.secondaryBodyTextStyle),
+          Text('State: ${order.state}', style: AppStyles.secondaryBodyTextStyle),
           const SizedBox(height: 8),
-          Text('Country: India', style: AppStyles.secondaryBodyTextStyle),
+          Text('Postal Code: ${order.postalCode}', style: AppStyles.secondaryBodyTextStyle),
+          const SizedBox(height: 8),
+          Text('Country: ${order.country}', style: AppStyles.secondaryBodyTextStyle),
         ],
       ),
     );
@@ -234,9 +236,11 @@ class OrderDetailsPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Product Price: ₹${order.price.toStringAsFixed(2)}', style: AppStyles.secondaryBodyTextStyle),
+          Text('Product Price: ₹${order.itemsPrice.toStringAsFixed(2)}', style: AppStyles.secondaryBodyTextStyle),
           const SizedBox(height: 8),
-          Text('Shipping: ₹50.00', style: AppStyles.secondaryBodyTextStyle), // Example shipping price
+          Text('Tax Price: ₹${order.taxPrice.toStringAsFixed(2)}', style: AppStyles.secondaryBodyTextStyle),
+          const SizedBox(height: 8),
+          Text('Shipping: ₹${order.shippingPrice.toStringAsFixed(2)}', style: AppStyles.secondaryBodyTextStyle), // Example shipping price
           const SizedBox(height: 8),
           Text(
             'Total: ₹${(order.price + 50).toStringAsFixed(2)}',
@@ -268,7 +272,7 @@ class OrderDetailsPage extends StatelessWidget {
             children: [
               Icon(Icons.email, color: AppStyles.secondaryTextColor),
               const SizedBox(width: 10),
-              Text(' support@example.com', style: AppStyles.secondaryBodyTextStyle),
+              Text(' support@oacrugs.com', style: AppStyles.secondaryBodyTextStyle),
             ],
           ),
         ],

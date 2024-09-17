@@ -39,7 +39,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _lastNameController = TextEditingController();
     _emailController = TextEditingController();
     _phoneNumberController = TextEditingController();
-    _addressController = TextEditingController();
     _loadUserData();
   }
 
@@ -52,7 +51,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _lastNameController.text = prefs.getString('lastName') ?? '';
       _emailController.text = prefs.getString('email') ?? '';
       _phoneNumberController.text = prefs.getString('mobileNumber') ?? '';
-      _addressController.text = prefs.getString('address') ?? '';
       _isLoading = false;
     });
   }
@@ -68,7 +66,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _lastNameFocus.dispose();
     _emailFocus.dispose();
     _phoneNumberFocus.dispose();
-    _addressFocus.dispose();
     super.dispose();
   }
 
@@ -90,12 +87,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'lastName': _lastNameController.text.trim(),
           'email': _emailController.text.trim(),
           'mobileNumber': _phoneNumberController.text.trim(),
-          'address': _addressController.text.trim(),
         }),
       );
 
       CommonFunction.hideLoadingDialog(context);
-
+      print(response.body);
+      print(response.statusCode);
       final responseBody = json.decode(response.body);
       final user = responseBody['updatedUser'];
       if (response.statusCode == 200 && responseBody['success']) {
@@ -106,7 +103,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         await prefs.setString('lastName', user['lastName']);
         await prefs.setString('email', user['email']);
         await prefs.setString('mobileNumber', user['mobileNumber']);
-        await prefs.setString('address', user['address']);
 
         // Optionally, you can refresh the user profile or navigate away
       } else {

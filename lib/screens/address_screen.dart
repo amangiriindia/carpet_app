@@ -284,10 +284,10 @@ class _AddressScreenState extends State<AddressScreen> {
                     final SharedPreferences prefsadd = await SharedPreferences.getInstance();
                     await prefs.setString('CurrentSelectedAddress', _id);
                     if (prefs.get('checkCarpetFlag') != false) {
+                      CommonFunction.showToast(context, "Address has been Selected.");
                       print(prefs.get('checkCarpetFlag'));
                       await prefs.setBool('CurrentSelectedAddressFlag', true);
                       Navigator.of(context).pop();  // Pops the current page
-
                       if (prefsadd.getBool('addressFlag') != false) {
                         print(prefsadd.getBool('addressFlag'));
                         await prefsadd.setBool('addressFlag', false);

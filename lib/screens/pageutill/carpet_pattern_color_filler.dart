@@ -237,6 +237,7 @@ class _CarpetPatternColorFillerPageState
       // Send the request and capture the response
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+
       print(response.statusCode);
       print(response.body);
 
@@ -264,20 +265,24 @@ class _CarpetPatternColorFillerPageState
   }
 
 
+
   void _onContinuePressed() {
     if (_selectedColors.values.any((color) => color == null)) {
       CommonFunction.showToast(context, "Please choose a color for all boxes");
       return;
     } else {
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => CarpetShapeSizePage(
-          carpetId: widget.carpetId,
-          patternId: widget.patternId,
-          carpetName: widget.carpetName,
-          patternImage: screenShowImage,
-          hexCodes: _selectionOrder.map((selection) => selection['colorId']!).toList(),
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CarpetShapeSizePage(
+            carpetId: widget.carpetId,
+            patternId: widget.patternId,
+            carpetName: widget.carpetName,
+            patternImage: screenShowImage,
+            hexCodes: _selectionOrder.map((selection) => selection['colorId']!).toList(),
+          ),
         ),
-      ));
+      );
     }
   }
 

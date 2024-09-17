@@ -26,7 +26,7 @@ class EnquiryScreen extends StatefulWidget {
   final Uint8List patternImage;
   final List<String> hexCodes;
   final String shapeId;
-  final String dimensionId;
+  final String? dimensionId;
   final String addressId;
   final String quantity;
   final DateTime? expectedDeliveryDate;
@@ -63,6 +63,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   late String material = 'Material information not provided';
   late String disclaimer = 'Disclaimer not available';
   late String care = 'Care instructions not available';
+  late String dimensionId = "1";
 
 
   @override
@@ -161,7 +162,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
         ..fields['customSize'] =  widget.customSize
         ..fields['product'] = widget.carpetId
         ..fields['quantity'] = _quantityController.text
-        ..fields['productSize'] = widget.dimensionId
+        ..fields['productSize'] = dimensionId
         ..fields['shape'] = widget.shapeId
         ..fields['productColor'] =
             jsonEncode(widget.hexCodes) // Encode as JSON array
@@ -220,6 +221,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       }
     } catch (error) {
       // Catch and print any errors during the process
+      // Catch and print any errors during the proces
       print('Error submitting enquiry: $error');
 
       // Show a generic error message to the user
@@ -418,50 +420,6 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
               ),
             ],
           );
-        },
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex:
-            2, // Set the appropriate index for the Enquiry form screen
-        onTap: (index) {
-          // Handle navigation based on index
-          if (index == 0) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => const HomeScreen(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          } else if (index == 1) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => const SearchHomePage(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          } else if (index == 2) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => const WishListScreen(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          } else if (index == 3) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => const ProfileDrawer(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          }
         },
       ),
     );

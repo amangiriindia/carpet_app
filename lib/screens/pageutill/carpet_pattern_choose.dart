@@ -86,7 +86,7 @@ class _CarpetPatternPageState extends State<CarpetPatternPage> {
           carpetName: widget.carpetName,
           patternImage: selectedPattern.image,
           patternLayoutImage: selectedPattern.layoutimage,
-          patternNumber: int.parse(selectedPattern.patternNumber)-1,
+          patternNumber: int.parse(selectedPattern.patternNumber),
         ),
       ),
     );

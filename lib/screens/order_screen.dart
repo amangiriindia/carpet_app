@@ -17,7 +17,7 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  late String _userId;
+  late String _userId ="";
   List<Order> _orders = []; // List to hold fetched orders
   bool _isLoading = true; // Loading state
 
@@ -25,7 +25,6 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     _loadUserData();
-    _fetchOrders();
   }
 
   Future<void> _loadUserData() async {
@@ -33,6 +32,7 @@ class _OrderScreenState extends State<OrderScreen> {
     setState(() {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
     });
+    await _fetchOrders();
   }
 
   Future<void> _fetchOrders() async {
@@ -43,7 +43,7 @@ class _OrderScreenState extends State<OrderScreen> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'userId': _userId}),
       );
-
+      print(response.body);
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {
@@ -77,7 +77,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 lastName: json['userId']['lastName'] ?? 'Unknown',
                 email: json['userId']['email'] ?? 'Unknown',
                 mobileNumber: json['userId']['mobileNumber'] ?? 'Unknown',
-                street: json['enquiryId']['address']['street'] ?? 'Unknown',
+                street: json['enquiryId']['address']['city'] ?? 'Unknown',
                 city: json['enquiryId']['address']['city'] ?? 'Unknown',
                 postalCode:
                     json['enquiryId']['address']['postalCode'] ?? 'Unknown',
@@ -165,11 +165,11 @@ class Order {
   final String lastName;
   final String email;
   final String mobileNumber;
-  final String street;
-  final String city;
-  final String postalCode;
-  final String state;
-  final String country;
+   String? street ;
+   String? city;
+   String? postalCode;
+   String? state;
+   String? country;
 
   Order({
     required this.imagePath,
@@ -186,11 +186,11 @@ class Order {
     required this.lastName,
     required this.email,
     required this.mobileNumber,
-    required this.street,
-    required this.city,
-    required this.postalCode,
-    required this.state,
-    required this.country,
+     this.street,
+     this.city,
+     this.postalCode,
+     this.state,
+     this.country,
   });
 }
 

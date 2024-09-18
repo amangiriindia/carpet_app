@@ -10,7 +10,6 @@ import '../custmer_support_screen.dart';
 import '../profile_screen.dart';
 import '../pending_query_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../splash_screen/custom_splash_screen.dart';
 
 

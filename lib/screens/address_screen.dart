@@ -7,6 +7,7 @@ import '../components/home_app_bar.dart';
 import '../constant/const.dart';
 import 'base/profile_drawer.dart';
 import 'base/notification_screen.dart';
+import 'pageutill/update_address.dart';
 
 class AddressScreen extends StatefulWidget {
   const AddressScreen({super.key});
@@ -275,10 +276,12 @@ class _AddressScreenState extends State<AddressScreen> {
                 ),
                 Radio<String>(
                   value: _id,
+
                   groupValue: _selectedAddressId,
                   onChanged: (value) async {
                     setState(() {
                       _selectedAddressId = value;
+                      print(_selectedAddressId);
                     });
                     final SharedPreferences prefs = await SharedPreferences.getInstance();
                     final SharedPreferences prefsadd = await SharedPreferences.getInstance();
@@ -303,14 +306,30 @@ class _AddressScreenState extends State<AddressScreen> {
               ],
             ),
           ),
+          // Positioned(
+          //   top: 0,
+          //   right: 0,
+          //   child: IconButton(
+          //     icon: const Icon(Icons.delete, color: AppStyles.primaryColorStart),
+          //     onPressed: () {
+          //       _confirmDelete(context, _id);
+          //     },
+          //   ),
+          // ),
           Positioned(
             top: 0,
             right: 0,
             child: IconButton(
-              icon: const Icon(Icons.delete, color: AppStyles.primaryColorStart),
+              icon: const Icon(Icons.edit, color: AppStyles.primaryColorStart),
               onPressed: () {
-                _confirmDelete(context, _id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UpdateAddressScreen(addressId: _id),
+                  ),
+                );
               },
+
             ),
           ),
         ],

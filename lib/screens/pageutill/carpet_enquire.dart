@@ -1,5 +1,4 @@
 import 'package:OACrugs/constant/const.dart';
-import 'package:OACrugs/screens/pageutill/search_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -9,15 +8,10 @@ import 'dart:typed_data'; // Import for Uint8List
 import '../../components/gradient_button.dart';
 import '../../components/home_app_bar.dart';
 import '../../components/color_picker.dart';
-import '../../components/custom_app_bar.dart';
-import '../base/custom_navigation_bar.dart';
 import '../base/profile_drawer.dart';
-import '../home_screen.dart';
 import '../base/notification_screen.dart';
-import '../search_screen.dart';
-import 'package:OACrugs/screens/wishlist_screen.dart';
-
 import 'thanks_screen.dart'; // Correct import statement
+
 
 class EnquiryScreen extends StatefulWidget {
   final String carpetId;
@@ -53,6 +47,7 @@ class EnquiryScreen extends StatefulWidget {
   _EnquiryScreenState createState() => _EnquiryScreenState();
 }
 
+
 class _EnquiryScreenState extends State<EnquiryScreen> {
   final _quantityController = TextEditingController();
   final _queryController = TextEditingController();
@@ -63,19 +58,27 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
   late String material = 'Material information not provided';
   late String disclaimer = 'Disclaimer not available';
   late String care = 'Care instructions not available';
-
-
+  late String number = '1234567890';
+  late String name = 'name';
+  late String street = 'street';
+  late String postalCode = '454545';
+  late String state = 'state';
+  late String country = 'country';
+  late String city = 'city';
+  late String optionalNumber = '0987654321';
 
   @override
   void initState() {
     super.initState();
-    _fetchPatterns();
+    _loadUserData();
     // Initialize controllers with passed data
     _quantityController.text = widget.quantity;
     _queryController.text = widget.query;
     _expectedDeliveryDate = widget.expectedDeliveryDate;
-    _loadUserData();
+    _fetchAddressDetails();
+    _fetchPatterns();
   }
+
 
   Future<void> _fetchPatterns() async {
     String _errorMessage = '';
@@ -104,6 +107,44 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       });
     }
   }
+
+  Future<void> _fetchAddressDetails() async {
+
+    final url = '${APIConstants.API_URL}api/v1/address/single-address/${widget.addressId}';
+
+    try {
+      final response = await http.get(Uri.parse(url), headers: {'Content-Type': 'application/json'});
+
+     print(response.body);
+     print(response.statusCode);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        print(response.body);
+
+        if (data['success']) {
+          final address = data['getSingleAddress']; // Extract the address object
+          setState(() {
+            number = address['number'] ?? "1234567890";
+            name = address['name'] ?? "Test";
+            street = address['street'] ?? "Street";
+            city = address['city'] ?? "city";
+            state = address['state'] ?? "state";
+            postalCode = address['postalCode'] ?? "postalCode";
+            country = address['country'] ?? "country";
+            optionalNumber = address['optionalNumber'] ?? "";
+          });
+        } else {
+          print(data['message']);
+        }
+      } else {
+        print("Failed to fetch address details.");
+      }
+    } catch (error) {
+      CommonFunction.hideLoadingDialog(context); // Ensure hiding the loading dialog
+      print("An error occurred: $error");
+    }
+  }
+
 
 
   Future<void> _selectExpectedDeliveryDate() async {
@@ -146,23 +187,15 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
 
   Future<void> _loadUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
       _userId = prefs.getString('userId') ?? '66c4aa81c3e37d9ff6c4be6c';
-    });
   }
 
   Future<void> _submitEnquiry() async {
-    final String apiUrl =
-        '${APIConstants.API_URL}api/v1/enquiry/create-enquiry';
-
-      if(widget.dimensionId == ""){
-
-      }
+    final String apiUrl = '${APIConstants.API_URL}api/v1/enquiry/create-enquiry';
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl))
         ..fields['user'] = _userId
-        ..fields['address'] = widget.addressId
         ..fields['customSize'] = widget.customSize
         ..fields['product'] = widget.carpetId
         ..fields['quantity'] = _quantityController.text
@@ -172,13 +205,21 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
         ..fields['status'] = 'false'
         ..fields['expectedDelivery'] = _expectedDeliveryDate?.toIso8601String() ?? ''
         ..fields['patternId'] = widget.patternId;
+      request.fields['name'] = name;
+      request.fields['number'] = number;
+      request.fields['optionalNumber'] = optionalNumber ?? ''; // Handle optional field
+      request.fields['street'] = street;
+      request.fields['city'] = city;
+      request.fields['state'] = state;
+      request.fields['country'] = country;
+      request.fields['postalCode'] = postalCode;
 
-// Only add productSize if dimensionId is not empty
-      if (widget.dimensionId!.isNotEmpty) {
+      // Only add productSize if dimensionId is not empty
+      if (widget.dimensionId?.isNotEmpty ?? false) {
         request.fields['productSize'] = widget.dimensionId!;
       }
 
-// Check if the image is available and add it to the request
+      // Check if the image is available and add it to the request
       if (widget.patternImage.isNotEmpty) {
         request.files.add(
           http.MultipartFile.fromBytes(
@@ -191,6 +232,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       } else {
         print('Pattern image is null or empty, skipping image upload.');
       }
+
       // Send the request
       final response = await request.send();
 
@@ -203,7 +245,6 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       print('Response status code: ${response.statusCode}');
       print('Response body: ${responseBody.body}');
 
-
       if (response.statusCode == 201) {
         // Success case
         print('Enquiry submitted successfully');
@@ -215,19 +256,17 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
           ),
         );
       } else {
-        // Handle error cases, including 400, 401, 500, and others
+        // Handle error cases
         String errorMessage = responseJson['message'] ?? 'Unknown error';
         print('Failed to submit enquiry: $errorMessage');
 
-        // You can show an error message to the user here
-        // For example, using a SnackBar:
+        // Show an error message to the user
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $errorMessage')),
         );
       }
     } catch (error) {
       // Catch and print any errors during the process
-      // Catch and print any errors during the proces
       print('Error submitting enquiry: $error');
 
       // Show a generic error message to the user
@@ -237,6 +276,7 @@ class _EnquiryScreenState extends State<EnquiryScreen> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -51,12 +51,16 @@ class _PendingOueryScreenState extends State<PendingOueryScreen> {
           orders = (data['enquiries'] as List).map((item) {
             // Ensure 'data' is a List<int>
             List<int> photoData = List<int>.from(item['photo']['data']['data']);
-
+            // Handle the product size logic
+            String size = item['customSize']?.isNotEmpty ?? false
+                ? item['customSize']
+                : item['productSize']['size'] ?? 'Unknown';
             return Order(
               imagePath: 'data:image/jpeg;base64,' + base64Encode(Uint8List.fromList(photoData)),
               name: item['product']['name'] ?? 'Unknown',
               price: item['product']['price']?.toDouble() ?? 0.0,
-              size: item['productSize']['size'] ?? 'Unknown',
+              // size: item['productSize']['size'] ?? 'Unknown',
+              size: size,
             );
           }).toList();
         });

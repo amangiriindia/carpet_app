@@ -83,6 +83,9 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
               for (String colorId in colorIds) {
                 totalColorPrice += await _fetchColorInfo(colorId);
               }
+              String size = item['customSize']?.isNotEmpty ?? false
+                  ? item['customSize']
+                  : item['productSize']['size'] ?? 'Unknown';
 
               fetchedOrders.add(Order(
                 enquiryId: item['_id'] ?? 'Unknown',
@@ -90,7 +93,7 @@ class _ApprovedQueryScreenState extends State<ApprovedQueryScreen> {
                 carpetName: item['product']?['name'] ?? 'Unknown',
                 patternName: item['patternId']?['name'] ?? 'Unknown',
                 patternPrice: (item['patternId']?['collectionPrice'] ?? 0.0).toDouble(),
-                size: item['productSize']?['size'] ?? 'Unknown',
+                size: size,
                 sizePrice: (item['productSize']?['sizePrice'] ?? 0.0).toDouble(),
                 price: (item['product']?['price'] ?? 0.0).toDouble(),
                 gstPrecent: (item['product']?['gst'] ?? 0.0).toDouble(),

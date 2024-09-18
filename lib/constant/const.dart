@@ -3,15 +3,14 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class APIConstants {
-  static const String API_URL = 'https://oac.onrender.com/';
+   static const String API_URL = 'https://oac.onrender.com/';
   static const String AI_MODEL_URL = 'https://carpet-editor1.onrender.com/';
-  static const String LOCALHOST= 'https://carpet-editor1.onrender.com/';
-  // static const String LOCALHOST= 'http://192.168.1.39:5000/';
+  //static const String LOCALHOST= 'https://carpet-editor1.onrender.com/';
+  static const String LOCALHOST= 'http://192.168.1.39:5000/';
 }
 
 
 class AppStyles {
-  // Colors
   static const Color primaryColorStart = Color(0xFF991F35); // #991F35
   static const Color primaryColorEnd = Color(0xFF330A12);   // #330A12
   static const Color primaryTextColor = Color(0xFF292929);  // #292929

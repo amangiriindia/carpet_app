@@ -68,7 +68,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         "userId": _userId,
         "name": nameController.text,
         "number": phoneController.text,
-        "altPhone": altPhoneController.text,
+        "optionalNumber": altPhoneController.text,
         "street": streetController.text,
         "city": cityController.text,
         "state": stateController.text,

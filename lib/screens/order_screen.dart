@@ -17,9 +17,10 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
-  late String _userId ="";
+  late String _userId = "";
   List<Order> _orders = []; // List to hold fetched orders
   bool _isLoading = true; // Loading state
+  bool _noOrdersFound = false; // State to check if no orders are found
 
   @override
   void initState() {
@@ -44,59 +45,74 @@ class _OrderScreenState extends State<OrderScreen> {
         body: json.encode({'userId': _userId}),
       );
       print(response.body);
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['success']) {
           final ordersJson = data['orders'] as List<dynamic>;
           setState(() {
-            _orders = ordersJson.map((json) {
-              final imageData = json['enquiryId']['photo']?['data']?['data']
-                      as List<dynamic>? ??
-                  [];
-              final Uint8List imageBytes =
-                  Uint8List.fromList(imageData.cast<int>());
+            if (ordersJson.isEmpty) {
+              _noOrdersFound = true; // No orders found
+            } else {
+              _orders = ordersJson.map((json) {
+                // Handling the image data
+                final imageData = json['enquiryId']['photo']?['data']?['data'] as List<dynamic>? ?? [];
+                final Uint8List imageBytes = Uint8List.fromList(imageData.cast<int>());
 
-              return Order(
-                imagePath: imageBytes, // Use the decoded image bytes
-                name: json['enquiryId']['product']['name'] ??
-                    'Unknown', // Handle null name
-                price:
-                    (json['totalPrice'] ?? 0).toDouble(), // Handle null price
-                size: json['enquiryId']['productSize']['size'] ??
-                    'Unknown', // Handle null size
-                deliveryDate: json['deliveredAt'] ??
-                    'Unknown', // Handle null delivery date
-                isDelivered:
-                    json['status'] ?? 'Unknown', // Handle null delivery status
-                quantity:
-                    json['enquiryId']['quantity'] ?? 1, // Handle null quantity
-                itemsPrice: (json['itemsPrice'] ?? 0).toDouble(),
-                taxPrice: (json['taxPrice'] ?? 0).toDouble(),
-                shippingPrice: (json['shippingPrice'] ?? 0).toDouble(),
-                firstName: json['userId']['firstName'] ?? 'Unknown',
-                lastName: json['userId']['lastName'] ?? 'Unknown',
-                email: json['userId']['email'] ?? 'Unknown',
-                mobileNumber: json['userId']['mobileNumber'] ?? 'Unknown',
-                street: json['enquiryId']['address']['city'] ?? 'Unknown',
-                city: json['enquiryId']['address']['city'] ?? 'Unknown',
-                postalCode:
-                    json['enquiryId']['address']['postalCode'] ?? 'Unknown',
-                state: json['enquiryId']['address']['state'] ?? 'Unknown',
-                country: json['enquiryId']['address']['country'] ?? 'Unknown',
-              );
-            }).toList();
+                // Handle the product size logic
+                String size = json['enquiryId']['customSize']?.isNotEmpty ?? false
+                    ? json['enquiryId']['customSize']
+                    : json['enquiryId']['productSize']?['size'] ?? 'Unknown';
+
+                return Order(
+                  imagePath: imageBytes, // Decoded image bytes
+                  name: json['enquiryId']['product']['name'] ?? 'Unknown',
+                  price: (json['totalPrice'] ?? 0).toDouble(),
+                  size: size, // Handle null or empty size
+                  deliveryDate: json['updatedAt'] ?? '45',
+                  isDelivered: json['status'] ?? 'Unknown',
+                  quantity: json['enquiryId']['quantity'] ?? 1,
+                  itemsPrice: (json['itemsPrice'] ?? 0).toDouble(),
+                  taxPrice: (json['taxPrice'] ?? 0).toDouble(),
+                  shippingPrice: (json['shippingPrice'] ?? 0).toDouble(),
+                  firstName: json['userId']['firstName'] ?? 'Unknown',
+                  lastName: json['userId']['lastName'] ?? 'Unknown',
+                  email: json['userId']['email'] ?? 'Unknown',
+                  mobileNumber: json['userId']['mobileNumber'] ?? 'Unknown',
+                  street: json['enquiryId']['address']['street'] ?? 'Unknown',
+                  city: json['enquiryId']['address']['city'] ?? 'Unknown',
+                  postalCode: json['enquiryId']['address']['postalCode'] ?? 'Unknown',
+                  state: json['enquiryId']['address']['state'] ?? 'Unknown',
+                  country: json['enquiryId']['address']['country'] ?? 'Unknown',
+                );
+              }).toList();
+              _noOrdersFound = false;
+            }
             _isLoading = false;
           });
         } else {
           print('Failed to fetch orders: ${data['message']}');
+          setState(() {
+            _noOrdersFound = true; // Fetching failed
+            _isLoading = false;
+          });
         }
       } else {
         print('Failed to fetch orders. Status code: ${response.statusCode}');
+        setState(() {
+          _noOrdersFound = true; // Status code not 200
+          _isLoading = false;
+        });
       }
     } catch (e) {
       print('Error fetching orders: $e');
+      setState(() {
+        _noOrdersFound = true; // Error occurred
+        _isLoading = false;
+      });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -106,51 +122,61 @@ class _OrderScreenState extends State<OrderScreen> {
       endDrawer: const NotificationScreen(),
       drawer: const ProfileDrawer(),
       body: SafeArea(
-        child: _isLoading
-            ? CommonFunction.showLoadingIndicator()
-            : Column(
-                children: [
-                  Row(
-                    children: [
-                      Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.rotationY(3.14),
-                        child: IconButton(
-                          icon: const Icon(Icons.login_outlined,
-                              color: AppStyles.secondaryTextColor),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ),
-                      const SizedBox(width: 80),
-                      const Icon(Icons.shopping_bag,
-                          color: AppStyles.primaryTextColor),
-                      const SizedBox(width: 4),
-                      const Text(
-                        'Order',
-                        style: AppStyles.headingTextStyle,
-                      ),
-                    ],
+        child: Column(
+          children: [
+            // Static Header Row with back button and title
+            Row(
+              children: [
+                Transform(
+                  alignment: Alignment.center,
+                  transform: Matrix4.rotationY(3.14),
+                  child: IconButton(
+                    icon: const Icon(Icons.login_outlined,
+                        color: AppStyles.secondaryTextColor),
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                  const SizedBox(height: 20),
-                  Expanded(
-                    // Use Expanded here to allow scrolling
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 30, horizontal: 10),
-                      itemCount: _orders.length,
-                      itemBuilder: (context, index) {
-                        return OrderWidget(order: _orders[index]);
-                      },
-                    ),
-                  ),
-                ],
+                ),
+                const SizedBox(width: 80),
+                const Icon(Icons.shopping_bag,
+                    color: AppStyles.primaryTextColor),
+                const SizedBox(width: 4),
+                const Text(
+                  'Order',
+                  style: AppStyles.headingTextStyle,
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Body: Orders or No Orders Text
+            Expanded(
+              child: _isLoading
+                  ? CommonFunction.showLoadingIndicator()
+                  : _noOrdersFound
+                  ? Center(
+                child: Text(
+                  'Nothing here yet. Time to shop!',
+                  style: AppStyles.primaryBodyTextStyle,
+                ),
+              )
+                  : ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 30, horizontal: 10),
+                itemCount: _orders.length,
+                itemBuilder: (context, index) {
+                  return OrderWidget(order: _orders[index]);
+                },
               ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class Order {
+
+  class Order {
   final dynamic imagePath;
   final String name;
   final double price;

@@ -96,7 +96,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final responseBody = json.decode(response.body);
       final user = responseBody['updatedUser'];
       if (response.statusCode == 200 && responseBody['success']) {
-        CommonFunction.showToast(context, '${user['firstName']} ${user['lastName']}, Profile changes saved successfully!');
+        CommonFunction.showToast(context,
+            '${user['firstName']} ${user['lastName']}, Profile changes saved successfully!');
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('firstName', user['firstName']);
@@ -111,17 +112,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } catch (e) {
       print('Error: $e');
       CommonFunction.hideLoadingDialog(context);
-
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
-        appBar: const CustomNormalAppBar(), // Add an AppBar if it's missing
+        backgroundColor: AppStyles.backgroundPrimary,
+        // Set the background color here
+        appBar: const CustomNormalAppBar(),
+        // Add an AppBar if it's missing
         endDrawer: const NotificationScreen(),
         drawer: const ProfileDrawer(),
         body: Center(child: CircularProgressIndicator()),
@@ -131,13 +132,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: AppStyles.backgroundPrimary, // Set the background color here
-        appBar: const CustomNormalAppBar(), // Add an AppBar if it's missing
+        backgroundColor: AppStyles.backgroundPrimary,
+        // Set the background color here
+        appBar: const CustomNormalAppBar(),
+        // Add an AppBar if it's missing
         endDrawer: const NotificationScreen(),
         drawer: const ProfileDrawer(),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal:5),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
             child: Form(
               key: _formKey,
               child: Column(
@@ -149,16 +152,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         alignment: Alignment.center,
                         transform: Matrix4.rotationY(3.14),
                         child: IconButton(
-                          icon: const Icon(Icons.login_outlined,color:AppStyles.secondaryTextColor),
+                          icon: const Icon(Icons.login_outlined,
+                              color: AppStyles.secondaryTextColor),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
                       const Spacer(),
-                      const Icon(Icons.mode_edit_outline_outlined,  color:AppStyles.primaryTextColor),
+                      const Icon(Icons.mode_edit_outline_outlined,
+                          color: AppStyles.primaryTextColor),
                       const SizedBox(width: 4),
                       const Text(
                         'Edit Profile',
-                         style: AppStyles.headingTextStyle,
+                        style: AppStyles.headingTextStyle,
                       ),
                       const Spacer(flex: 2),
                     ],
@@ -166,10 +171,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 40),
                   _buildProfileIcon(),
                   const SizedBox(height: 20),
-                  _buildField('First Name', _firstNameController, _firstNameFocus),
+                  _buildField(
+                      'First Name', _firstNameController, _firstNameFocus),
                   _buildField('Last Name', _lastNameController, _lastNameFocus),
                   _buildField('Email', _emailController, _emailFocus),
-                  _buildField('Phone No.', _phoneNumberController, _phoneNumberFocus),
+                  _buildField(
+                      'Phone No.', _phoneNumberController, _phoneNumberFocus),
                   const SizedBox(height: 40),
                   Center(
                     child:
@@ -219,14 +226,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, FocusNode focusNode) {
+  Widget _buildField(String label, TextEditingController controller,
+      FocusNode focusNode) {
+    bool isEmailField = label == 'Email';
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Container(
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: focusNode.hasFocus ? Theme.of(context).primaryColor : Colors.grey,
+              color: focusNode.hasFocus ? Theme
+                  .of(context)
+                  .primaryColor : Colors.grey,
               width: 1.0,
             ),
           ),
@@ -234,45 +246,65 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: TextFormField(
-                controller: controller,
-                focusNode: focusNode,
-                style: AppStyles.secondaryBodyTextStyle,
-                decoration: InputDecoration(
-                  labelText: label,
-                  labelStyle: AppStyles.headingTextStyle,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  if (isEmailField) {
+                    CommonFunction.showToast(
+                        context, 'You cannot change your email!');
+                    FocusScope.of(context).requestFocus(
+                        FocusNode()); // Unfocus email field
+                  } else {
+                    FocusScope.of(context).requestFocus(
+                        focusNode); // Allow focus on other fields
+                  }
+                },
+                child: AbsorbPointer(
+                  absorbing: isEmailField, // Make the email field non-editable
+                  child: TextFormField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    style: AppStyles.secondaryBodyTextStyle,
+                    decoration: InputDecoration(
+                      labelText: label,
+                      labelStyle: AppStyles.headingTextStyle,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
+                    ),
+                  ),
                 ),
               ),
             ),
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppStyles.primaryColorEnd,AppStyles.primaryColorStart], // Define your gradient colors here
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            if (!isEmailField) // Show the edit icon only for non-email fields
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppStyles.primaryColorEnd,
+                      AppStyles.primaryColorStart
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
                 ),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: IconButton(
-                  icon: const Icon(Icons.mode_edit_outlined, size: 10, color: Colors.white),
-                  onPressed: () => FocusScope.of(context).requestFocus(focusNode),
-                  padding: EdgeInsets.zero,
+                child: Center(
+                  child: IconButton(
+                    icon: const Icon(Icons.mode_edit_outlined, size: 10,
+                        color: Colors.white),
+                    onPressed: () =>
+                        FocusScope.of(context).requestFocus(focusNode),
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
-              ),
-            )
-
+              )
           ],
         ),
       ),
     );
   }
 }
-
 
 
 

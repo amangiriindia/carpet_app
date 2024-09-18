@@ -28,7 +28,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
   TextEditingController _postalCodeController = TextEditingController();
   TextEditingController _countryController = TextEditingController();
   TextEditingController _numberController = TextEditingController();
-
+  TextEditingController _optnumberController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -65,6 +65,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
             _postalCodeController.text = address['postalCode'] ?? "";
             _countryController.text = address['country'] ?? "";
             _numberController.text = address['number'] ?? "";
+            _optnumberController.text = address['optionalNumber'] ?? "";
           });
         } else {
           print(data['message']);
@@ -96,6 +97,7 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
             "state": _stateController.text,
             "country": _countryController.text,
             "number": _numberController.text,
+            "optionalNumber": _optnumberController.text,
           }),
         );
         CommonFunction.hideLoadingDialog(context);
@@ -151,6 +153,10 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
                     const SizedBox(height: 20),
                     _buildTextField('Name', _nameController),
                     const SizedBox(height: 10),
+                    _buildTextField('Phone Number', _numberController),
+                    const SizedBox(height: 10),
+                    _buildTextField('Alternative Phone Number', _optnumberController),
+                    const SizedBox(height: 10),
                     _buildTextField('Street', _streetController),
                     const SizedBox(height: 10),
                     _buildTextField('City', _cityController),
@@ -160,8 +166,6 @@ class _UpdateAddressScreenState extends State<UpdateAddressScreen> {
                     _buildTextField('Postal Code', _postalCodeController),
                     const SizedBox(height: 10),
                     _buildTextField('Country', _countryController),
-                    const SizedBox(height: 10),
-                    _buildTextField('Phone Number', _numberController),
                     const SizedBox(height: 40),
                     Center(
                       child: DecoratedBox(

@@ -245,6 +245,7 @@ class _AddressScreenState extends State<AddressScreen> {
     String postalCode = address['postalCode'] ?? '';
     String country = address['country'] ?? '';
     String phoneNumber = address['number'] ?? '';
+    String altNumber = address['optionalNumber'] ?? '';
 
     return Card(
       elevation: 5,
@@ -270,7 +271,7 @@ class _AddressScreenState extends State<AddressScreen> {
                       const SizedBox(height: 4),
                       Text('$country  - $postalCode', style: AppStyles.secondaryBodyTextStyle),
                       const SizedBox(height: 4),
-                      Text('Phone: $phoneNumber', style: AppStyles.secondaryBodyTextStyle),
+                      Text('Phone: $phoneNumber, $altNumber ', style: AppStyles.secondaryBodyTextStyle),
                     ],
                   ),
                 ),
@@ -306,19 +307,19 @@ class _AddressScreenState extends State<AddressScreen> {
               ],
             ),
           ),
-          // Positioned(
-          //   top: 0,
-          //   right: 0,
-          //   child: IconButton(
-          //     icon: const Icon(Icons.delete, color: AppStyles.primaryColorStart),
-          //     onPressed: () {
-          //       _confirmDelete(context, _id);
-          //     },
-          //   ),
-          // ),
           Positioned(
             top: 0,
             right: 0,
+            child: IconButton(
+              icon: const Icon(Icons.delete, color: AppStyles.primaryColorStart),
+              onPressed: () {
+                _confirmDelete(context, _id);
+              },
+            ),
+          ),
+          Positioned(
+            top: 0,
+            right: 30,
             child: IconButton(
               icon: const Icon(Icons.edit, color: AppStyles.primaryColorStart),
               onPressed: () {
